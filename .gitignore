@@ -32,6 +32,9 @@ eligibil-md/
 dist/
 build/
 
+# Cron logs
+logs/
+
 # Grants pipeline — never commit raw emails (PII)
 inbox/*.eml
 inbox/*.txt

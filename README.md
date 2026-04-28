@@ -178,16 +178,34 @@ Push notifications to matched users
 **Run the pipeline:**
 
 ```bash
+# === Manual / file-based ===
 # Drop .eml files into ./inbox/, then:
 npm run grants:process       # extract + stage + write Obsidian drafts
 
-# Two-way sync between Supabase and Obsidian vault
+# === Automated sources ===
+npm run grants:gmail         # poll Gmail IMAP (label: grants-new)
+npm run grants:scrape        # scrape EIC/Cordis/ODIMM/AIPA/Startup Moldova
+npm run grants:fetch         # ALL sources (cron-friendly orchestrator)
+
+# === Obsidian sync ===
 npm run grants:sync          # both directions
 npm run grants:pull          # Supabase → Obsidian
 npm run grants:push          # Obsidian → Supabase
 
-# Admin UI for reviewing the queue
+# === Admin UI ===
 open http://localhost:3000/admin-queue.html
+```
+
+**Schedule with Windows Task Scheduler (every 6h):**
+```cmd
+schtasks /create /tn "eligibil-grants-fetch" ^
+  /tr "node C:\Users\Zinaida\ELIGIBIL\scripts\cron-fetch.js" ^
+  /sc hourly /mo 6
+```
+
+**Schedule with cron (Linux/macOS):**
+```cron
+0 */6 * * * cd /path/to/eligibil && npm run grants:fetch >> logs/cron.log 2>&1
 ```
 
 **Obsidian vault structure** (`~/eligibil-grants/`):
