@@ -155,6 +155,50 @@ The platform includes **70+ funding programs** across:
 
 ---
 
+## Grants Intelligence Pipeline
+
+Automated workflow for keeping the grants database fresh:
+
+```
+Email / RSS / Web scraper / Manual paste
+        ↓
+Claude API extraction → structured JSON
+        ↓
+SHA-256 fingerprint deduplication
+        ↓
+grants_staging (Supabase) + Obsidian draft
+        ↓
+[Auto-approve if score ≥ 85] OR [Admin queue review]
+        ↓
+grants table (production) + embedding regenerated
+        ↓
+Push notifications to matched users
+```
+
+**Run the pipeline:**
+
+```bash
+# Drop .eml files into ./inbox/, then:
+npm run grants:process       # extract + stage + write Obsidian drafts
+
+# Two-way sync between Supabase and Obsidian vault
+npm run grants:sync          # both directions
+npm run grants:pull          # Supabase → Obsidian
+npm run grants:push          # Obsidian → Supabase
+
+# Admin UI for reviewing the queue
+open http://localhost:3000/admin-queue.html
+```
+
+**Obsidian vault structure** (`~/eligibil-grants/`):
+- `drafts/` — pending review (AI writes here)
+- `published/` — live in Supabase grants table
+- `applied/` — startups in pipeline
+- `ignored/` — rejected
+- `_index.md` — auto-generated dashboard
+
+---
+
 ## Roadmap
 
 - [ ] Email deadline alerts

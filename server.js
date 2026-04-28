@@ -28,6 +28,7 @@ app.use(express.static(__dirname));
 
 // API routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api', require('./routes/api'));
 
 // Catch-all: serve index.html for non-API routes

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eligibil.eu — Grants Queue</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #1a202c;
+      line-height: 1.5;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    header h1 { font-size: 24px; font-weight: 700; }
+    header .stats { display: flex; gap: 24px; font-size: 14px; }
+    header .stats span strong { font-size: 20px; display: block; }
+
+    .container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
+
+    .toolbar {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .toolbar button {
+      padding: 8px 16px;
+      border: none;
+      background: #667eea;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .toolbar button:hover { background: #5568d3; transform: translateY(-1px); }
+    .toolbar button.secondary { background: #e2e8f0; color: #4a5568; }
+    .toolbar input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 8px; }
+
+    .queue-grid { display: grid; gap: 12px; }
+    .grant-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 20px;
+      align-items: center;
+      transition: 0.2s;
+    }
+    .grant-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+    .score {
+      text-align: center;
+      padding: 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 24px;
+    }
+    .score-95 { background: #fed7d7; color: #c53030; }
+    .score-70 { background: #c6f6d5; color: #2f855a; }
+    .score-50 { background: #fefcbf; color: #b7791f; }
+    .score-low { background: #e2e8f0; color: #4a5568; }
+
+    .grant-info h3 { font-size: 18px; margin-bottom: 4px; }
+    .grant-info .meta { color: #718096; font-size: 13px; display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+    .grant-info .meta span { display: flex; align-items: center; gap: 4px; }
+    .grant-info .source { color: #a0aec0; font-size: 12px; margin-top: 6px; font-style: italic; }
+
+    .actions { display: flex; gap: 8px; }
+    .btn-approve { background: #48bb78; color: white; }
+    .btn-reject { background: #f56565; color: white; }
+    .btn-edit { background: #ed8936; color: white; }
+    .btn-view { background: #4299e1; color: white; }
+    .actions button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+    .actions button:hover { transform: translateY(-1px); opacity: 0.95; }
+
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #a0aec0;
+    }
+    .empty h2 { margin-bottom: 8px; color: #4a5568; }
+
+    .modal-bg {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-bg.show { display: flex; }
+    .modal {
+      background: white;
+      padding: 28px;
+      border-radius: 16px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h2 { margin-bottom: 16px; }
+    .modal textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 12px;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .modal .modal-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2d3748;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 200;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(400px); } to { transform: translateX(0); } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📋 eligibil.eu — Grants Queue</h1>
+    <div class="stats">
+      <span>Pending <strong id="stat-pending">—</strong></span>
+      <span>Active grants <strong id="stat-active">—</strong></span>
+      <span>Auto-approved <strong id="stat-auto">—</strong></span>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="toolbar">
+      <button onclick="loadQueue()">🔄 Refresh</button>
+      <button onclick="openPaste()">➕ Paste new grant</button>
+      <input type="text" id="search" placeholder="🔍 Filter by program name..." oninput="filterQueue()" />
+      <button class="secondary" onclick="window.location='/dashboard.html'">← Dashboard</button>
+    </div>
+
+    <div id="queue" class="queue-grid">
+      <div class="empty">
+        <h2>Loading...</h2>
+      </div>
+    </div>
+  </div>
+
+  <div id="paste-modal" class="modal-bg" onclick="if(event.target===this)closePaste()">
+    <div class="modal">
+      <h2>Paste grant text</h2>
+      <p style="color:#718096;font-size:13px;margin-bottom:12px">
+        Lipește textul unui email sau anunț de grant. AI-ul îl va extrage și adăuga în queue.
+      </p>
+      <input type="text" id="paste-subject" placeholder="Subject (optional)" style="width:100%;padding:10px;border:1px solid #cbd5e0;border-radius:8px;margin-bottom:8px" />
+      <textarea id="paste-text" placeholder="Lipește textul aici..."></textarea>
+      <div class="modal-actions">
+        <button class="secondary" onclick="closePaste()" style="padding:8px 16px;border:none;background:#e2e8f0;border-radius:8px;cursor:pointer">Anulează</button>
+        <button onclick="submitPaste()" style="padding:8px 16px;border:none;background:#48bb78;color:white;border-radius:8px;cursor:pointer">Procesează</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allQueue = [];
+
+    async function api(path, opts = {}) {
+      const res = await fetch('/api/admin' + path, {
+        ...opts,
+        headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || res.statusText);
+      }
+      return res.json();
+    }
+
+    function toast(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    function scoreClass(s) {
+      if (s >= 85) return 'score-95';
+      if (s >= 70) return 'score-70';
+      if (s >= 50) return 'score-50';
+      return 'score-low';
+    }
+
+    function fmtAmount(min, max) {
+      if (!min && !max) return '—';
+      if (min && max && min !== max) return `€${min.toLocaleString()}–€${max.toLocaleString()}`;
+      return '€' + (max || min).toLocaleString();
+    }
+
+    function renderQueue(items) {
+      const el = document.getElementById('queue');
+      if (!items.length) {
+        el.innerHTML = '<div class="empty"><h2>🎉 Inbox zero!</h2><p>Nu sunt granturi în queue. Procesează emails noi sau adaugă manual.</p></div>';
+        return;
+      }
+      el.innerHTML = items.map(g => `
+        <div class="grant-card" data-id="${g.id}">
+          <div class="score ${scoreClass(g.relevance_score)}">${g.relevance_score || '?'}</div>
+          <div class="grant-info">
+            <h3>${escape(g.nume_program || 'Untitled')}</h3>
+            <div class="meta">
+              <span>🏢 ${escape(g.organizatie || '?')}</span>
+              <span>🌍 ${escape(g.tara || '?')}</span>
+              <span>💰 ${fmtAmount(g.suma_min, g.suma_max)}</span>
+              <span>📅 ${escape(g.deadline || 'De verificat')}</span>
+              ${g.updates_grant_id ? `<span style="color:#ed8936">↻ Update: ${g.updates_grant_id}</span>` : ''}
+            </div>
+            <div class="source">${escape(g.source_type || 'unknown')}: ${escape(g.source_subject || '—')}</div>
+          </div>
+          <div class="actions">
+            <button class="btn-approve" onclick="approve('${g.id}')">✓ Approve</button>
+            <button class="btn-reject" onclick="reject('${g.id}')">✗ Reject</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escape(s) {
+      return String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    async function loadQueue() {
+      try {
+        const [q, s] = await Promise.all([
+          api('/queue?limit=100'),
+          api('/stats'),
+        ]);
+        allQueue = q.queue;
+        renderQueue(allQueue);
+        document.getElementById('stat-pending').textContent = (s.staging?.pending || 0) + (s.staging?.pending_update || 0);
+        document.getElementById('stat-active').textContent = s.grants_total || 0;
+        document.getElementById('stat-auto').textContent = s.staging?.published || 0;
+      } catch (err) {
+        toast('Error: ' + err.message);
+      }
+    }
+
+    function filterQueue() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const filtered = allQueue.filter(g =>
+        (g.nume_program || '').toLowerCase().includes(q) ||
+        (g.organizatie || '').toLowerCase().includes(q)
+      );
+      renderQueue(filtered);
+    }
+
+    async function approve(id) {
+      if (!confirm('Aprobi acest grant și îl publici?')) return;
+      try {
+        const r = await api('/queue/' + id + '/approve', { method: 'POST', body: '{}' });
+        toast('✓ Aprobat: ' + r.grant_id);
+        loadQueue();
+      } catch (err) { toast('Error: ' + err.message); }
+    }
+
+    async function reject(id) {
+      const reason = prompt('Motiv (opțional):') || 'Manually rejected';
+      try {
+        await api('/queue/' + id + '/reject', { method: 'POST', body: JSON.stringify({ reason }) });
+        toast('✗ Respins');
+        loadQueue();
+      } catch (err) { toast('Error: ' + err.message); }
+    }
+
+    function openPaste() { document.getElementById('paste-modal').classList.add('show'); }
+    function closePaste() {
+      document.getElementById('paste-modal').classList.remove('show');
+      document.getElementById('paste-text').value = '';
+      document.getElementById('paste-subject').value = '';
+    }
+    async function submitPaste() {
+      const text = document.getElementById('paste-text').value;
+      const subject = document.getElementById('paste-subject').value;
+      if (text.length < 30) return toast('Textul e prea scurt');
+      try {
+        await api('/inbox', { method: 'POST', body: JSON.stringify({ text, subject }) });
+        toast('✓ Procesat');
+        closePaste();
+        loadQueue();
+      } catch (err) { toast('Error: ' + err.message); }
+    }
+
+    loadQueue();
+    setInterval(loadQueue, 30000); // auto-refresh every 30s
+  </script>
+</body>
+</html>

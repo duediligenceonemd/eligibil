@@ -31,3 +31,14 @@ eligibil-md/
 # Build artifacts
 dist/
 build/
+
+# Grants pipeline — never commit raw emails (PII)
+inbox/*.eml
+inbox/*.txt
+inbox/processed/
+inbox/failed/
+!inbox/README.md
+!inbox/.gitkeep
+
+# Obsidian vault (typically outside repo, but if it lands here)
+eligibil-grants/

@@ -13,7 +13,12 @@
     "dev": "node --watch server.js",
     "seed": "node scripts/seed-grants.js",
     "seed:dry": "node scripts/seed-grants.js --dry-run",
-    "db:push": "node scripts/push-schema.js"
+    "db:push": "node scripts/push-schema.js",
+    "grants:process": "node scripts/process-grants-inbox.js",
+    "grants:process:dry": "node scripts/process-grants-inbox.js --dry-run",
+    "grants:sync": "node scripts/sync-obsidian.js",
+    "grants:pull": "node scripts/sync-obsidian.js --pull",
+    "grants:push": "node scripts/sync-obsidian.js --push"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
