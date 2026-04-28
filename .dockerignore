@@ -1,0 +1,35 @@
+# Don't copy node_modules from host (different platform)
+node_modules
+npm-debug.log
+
+# Don't copy secrets
+.env
+*.env.local
+
+# Don't copy git/IDE
+.git
+.gitignore
+.vscode
+.idea
+
+# Don't copy local data
+db/eligibil.json
+inbox/*.eml
+inbox/*.txt
+inbox/processed/
+inbox/failed/
+logs/
+eligibil-grants/
+
+# Don't copy Claude config
+.claude/
+eligibil-md/
+
+# Don't copy docs
+README.md
+*.md
+!inbox/README.md
+
+# Build artifacts
+dist/
+build/

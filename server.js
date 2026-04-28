@@ -42,6 +42,7 @@ app.get('*', (req, res, next) => {
 // Initialise DB and start server
 require('./db/database').init();
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+// Bind to 0.0.0.0 for Cloud Run / Docker (default localhost-only would not accept external requests)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
