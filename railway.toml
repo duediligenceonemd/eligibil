@@ -1,0 +1,32 @@
+# =============================================================================
+# Railway deployment config — eligibil.eu
+#
+# Deploy:
+#   1. Go to https://railway.app/new
+#   2. "Deploy from GitHub repo" → select duediligenceonemd/eligibil
+#   3. Add environment variables (see .env.example)
+#   4. Railway auto-detects Dockerfile and deploys
+#
+# CLI deploy:
+#   npm i -g @railway/cli
+#   railway login
+#   railway link
+#   railway up
+# =============================================================================
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "node server.js"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+[[services]]
+name = "eligibil"
+[services.eligibil]
+domains = ["eligibil.up.railway.app"]
+port = 8080

@@ -1,0 +1,48 @@
+# =============================================================================
+# Render Blueprint — eligibil.eu
+#
+# Deploy:
+#   1. Push this file to GitHub (already done)
+#   2. Go to https://dashboard.render.com/blueprints
+#   3. Click "New Blueprint" → connect duediligenceonemd/eligibil
+#   4. Render reads this file and provisions everything
+#   5. Fill in environment variables marked sync:false
+#
+# Free tier: 750 hours/month, sleeps after 15 min idle, ~30s cold start
+# Paid Starter: $7/month, no sleep
+# =============================================================================
+
+services:
+  - type: web
+    name: eligibil
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: frankfurt          # closest to MD/RO
+    plan: free                 # change to "starter" for $7/mo (no sleep)
+    branch: master
+    autoDeploy: true           # auto-redeploy on git push
+    healthCheckPath: /
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8080
+      - key: SESSION_SECRET
+        generateValue: true    # Render auto-generates secure value
+
+      # Set these manually in Render dashboard (or via API)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GMAIL_USER
+        sync: false
+      - key: GMAIL_APP_PASSWORD
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false

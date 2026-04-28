@@ -217,6 +217,72 @@ schtasks /create /tn "eligibil-grants-fetch" ^
 
 ---
 
+## Deploy
+
+Production-ready configs for 4 platforms. Pick one and deploy in <5 minutes.
+
+### One-click deploy buttons
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/new?template=https%3A%2F%2Fgithub.com%2Fduediligenceonemd%2Feligibil)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/duediligenceonemd/eligibil)
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/duediligenceonemd/eligibil)
+
+### Manual deploy (PowerShell)
+
+```powershell
+# Google Cloud Run (currently live: europe-west1)
+.\scripts\deploy.ps1 gcp
+
+# Railway (no EU free tier, us-east1)
+.\scripts\deploy.ps1 railway
+
+# Render (Frankfurt, free tier sleeps after 15min idle)
+.\scripts\deploy.ps1 render
+
+# Fly.io (Frankfurt, scale-to-zero)
+.\scripts\deploy.ps1 fly
+```
+
+### Platform comparison
+
+| Platform | Region near MD/RO | Free tier | Cold start | Custom domain |
+|----------|-------------------|-----------|------------|---------------|
+| **Google Cloud Run** ⭐ | europe-west1 (Belgium) | 2M req/mo, scale-to-zero | ~1s | Free, auto SSL |
+| **Fly.io** | fra (Frankfurt) | 3 VMs × 256MB | ~500ms | Free, auto SSL |
+| **Render** | Frankfurt | 750h/mo (sleeps 15min) | ~30s on free | Free, auto SSL |
+| **Railway** | us-east1 only | $5 credit/mo | ~1s | Free .up.railway.app |
+
+**Recommendation:** Cloud Run (already live) or Fly.io for lowest latency to Eastern Europe users. Render free tier OK for testing only (sleeps).
+
+### Config files
+
+- `Dockerfile` — used by all 4 platforms
+- `.dockerignore` — excludes secrets/local data from image
+- `railway.toml` — Railway service config
+- `render.yaml` — Render Blueprint
+- `fly.toml` — Fly.io app config
+- `scripts/deploy-cloudrun.ps1` — GCP deploy with env from `.env`
+- `scripts/deploy.ps1` — multi-platform dispatcher
+
+### Custom domain (eligibil.eu)
+
+After purchasing the domain, map it to your chosen platform:
+
+```bash
+# Google Cloud Run
+gcloud beta run domain-mappings create --service=eligibil --domain=eligibil.eu --region=europe-west1
+
+# Fly.io
+flyctl certs create eligibil.eu
+
+# Render: Settings → Custom Domains (web UI)
+# Railway: Settings → Networking → Custom Domain (web UI)
+```
+
+All four issue automatic Let's Encrypt SSL certificates within ~10-30 minutes after DNS propagates.
+
+---
+
 ## Roadmap
 
 - [ ] Email deadline alerts
