@@ -190,6 +190,66 @@ router.post('/inbox', async (req, res) => {
 });
 
 // =============================================================================
+// POST /api/admin/recompute-scores — refresh user pool + rescore all staging
+// =============================================================================
+router.post('/recompute-scores', async (req, res) => {
+  const supabase = tryGetSupabase();
+  if (!supabase) return res.status(503).json({ error: 'Supabase not configured' });
+
+  try {
+    // 1. Refresh pool stats from current user_profiles
+    const { data: stats, error: statsErr } = await supabase.rpc('compute_pool_stats');
+    if (statsErr) throw new Error('compute_pool_stats: ' + statsErr.message);
+
+    // 2. Rescore all pending staging grants
+    const { data: count, error: rescoreErr } = await supabase.rpc('rescore_all_staging');
+    if (rescoreErr) throw new Error('rescore_all_staging: ' + rescoreErr.message);
+
+    res.json({
+      ok: true,
+      pool_stats: {
+        total_users: stats?.total_users || 0,
+        top_countries: (stats?.top_countries || []).slice(0, 5),
+        top_sectors:   (stats?.top_sectors   || []).slice(0, 5),
+        top_stages:    (stats?.top_stages    || []).slice(0, 3),
+        has_centroid:  !!stats?.centroid_embedding,
+      },
+      grants_rescored: count,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// =============================================================================
+// GET /api/admin/pool-stats — current user pool composition
+// =============================================================================
+router.get('/pool-stats', async (req, res) => {
+  const supabase = tryGetSupabase();
+  if (!supabase) return res.status(503).json({ error: 'Supabase not configured' });
+
+  const { data, error } = await supabase
+    .from('user_pool_stats')
+    .select('*')
+    .eq('id', 1)
+    .maybeSingle();
+
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.json({ ok: true, total_users: 0, top_countries: [], top_sectors: [], top_stages: [] });
+
+  res.json({
+    ok: true,
+    total_users:   data.total_users,
+    top_countries: data.top_countries || [],
+    top_sectors:   data.top_sectors   || [],
+    top_stages:    data.top_stages    || [],
+    trl_distribution: data.trl_distribution || [],
+    has_centroid:  !!data.centroid_embedding,
+    computed_at:   data.computed_at,
+  });
+});
+
+// =============================================================================
 // GET /api/admin/stats — dashboard counts
 // =============================================================================
 router.get('/stats', async (req, res) => {

@@ -251,7 +251,7 @@ router.get('/profile', (req, res) => {
 // =============================================================================
 // PUT /api/profile
 // =============================================================================
-router.put('/profile', (req, res) => {
+router.put('/profile', async (req, res) => {
   const {
     startupName, website, pitch, sector, stage, trl, country,
     teamSize, github, goals, amountIdx, horizon, priority,
@@ -280,6 +280,16 @@ router.put('/profile', (req, res) => {
   } else {
     startup = db.insert('startups', { user_id: req.session.userId, ...data });
   }
+
+  // Sync to Supabase for Scoring v2 (best-effort, non-blocking)
+  try {
+    const user = db.findOne('users', { id: req.session.userId });
+    const { syncProfile } = require('../db/profile-sync');
+    syncProfile(req.session.userId, user?.email, {
+      startupName, website, pitch, sector, stage, trl, country,
+      teamSize, github, goals, amountIdx, horizon, priority,
+    }).catch(err => console.warn('profile sync failed:', err.message));
+  } catch (_) { /* non-fatal */ }
 
   res.json({ ok: true, startup });
 });

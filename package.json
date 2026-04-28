@@ -29,7 +29,9 @@
     "grants:push": "node scripts/sync-obsidian.js --push",
     "grants:gmail": "node scripts/gmail-poller.js",
     "grants:scrape": "node scripts/web-scrapers.js",
-    "grants:fetch": "node scripts/cron-fetch.js"
+    "grants:fetch": "node scripts/cron-fetch.js",
+    "stats:refresh": "node scripts/compute-user-stats.js",
+    "stats:rescore": "node scripts/compute-user-stats.js --sync-json --rescore"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",

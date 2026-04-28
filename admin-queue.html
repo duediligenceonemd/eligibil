@@ -164,8 +164,16 @@
     <div class="toolbar">
       <button onclick="loadQueue()">🔄 Refresh</button>
       <button onclick="openPaste()">➕ Paste new grant</button>
+      <button onclick="recomputeScores()" style="background:#9f7aea">🎯 Recompute scores</button>
       <input type="text" id="search" placeholder="🔍 Filter by program name..." oninput="filterQueue()" />
       <button class="secondary" onclick="window.location='/dashboard.html'">← Dashboard</button>
+    </div>
+
+    <div id="pool-stats" style="background:white;padding:14px 20px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.05);margin-bottom:20px;font-size:13px;color:#4a5568;display:none">
+      <strong style="color:#1a202c">User Pool</strong> · <span id="ps-users">0</span> users ·
+      <strong>Countries:</strong> <span id="ps-countries">—</span> ·
+      <strong>Sectors:</strong> <span id="ps-sectors">—</span> ·
+      <strong>Stages:</strong> <span id="ps-stages">—</span>
     </div>
 
     <div id="queue" class="queue-grid">
@@ -260,18 +268,37 @@
 
     async function loadQueue() {
       try {
-        const [q, s] = await Promise.all([
+        const [q, s, p] = await Promise.all([
           api('/queue?limit=100'),
           api('/stats'),
+          api('/pool-stats').catch(() => null),
         ]);
         allQueue = q.queue;
         renderQueue(allQueue);
         document.getElementById('stat-pending').textContent = (s.staging?.pending || 0) + (s.staging?.pending_update || 0);
         document.getElementById('stat-active').textContent = s.grants_total || 0;
         document.getElementById('stat-auto').textContent = s.staging?.published || 0;
+
+        if (p && p.total_users > 0) {
+          document.getElementById('pool-stats').style.display = 'block';
+          document.getElementById('ps-users').textContent = p.total_users;
+          document.getElementById('ps-countries').textContent = (p.top_countries || []).slice(0, 3).map(c => `${c.value} ${c.pct}%`).join(', ') || '—';
+          document.getElementById('ps-sectors').textContent = (p.top_sectors || []).slice(0, 3).map(s => `${s.value} ${s.pct}%`).join(', ') || '—';
+          document.getElementById('ps-stages').textContent = (p.top_stages || []).slice(0, 3).map(s => `${s.value} ${s.pct}%`).join(', ') || '—';
+        }
       } catch (err) {
         toast('Error: ' + err.message);
       }
+    }
+
+    async function recomputeScores() {
+      if (!confirm('Refresh user pool stats and rescore all pending grants?')) return;
+      toast('Recomputing... (may take 10-30s)');
+      try {
+        const r = await api('/recompute-scores', { method: 'POST', body: '{}' });
+        toast(`✓ ${r.grants_rescored} grants rescored using ${r.pool_stats.total_users} users`);
+        loadQueue();
+      } catch (err) { toast('Error: ' + err.message); }
     }
 
     function filterQueue() {
