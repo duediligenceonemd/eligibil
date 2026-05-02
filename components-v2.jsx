@@ -1,11 +1,36 @@
 // v2 components — hero upload, matching flow steps, sample report, TRL table, dual-mode, doc generation
-const { useState: uS2 } = React;
+const { useState: uS2, useEffect: uE2 } = React;
 
 /* Hero with upload panel -------------------------------------- */
 function HeroV2() {
   const [slots, setSlots] = uS2({ deck: false, video: false, wp: false });
+  const [stats, setStats] = uS2(null);
   const filled = Object.values(slots).filter(Boolean).length;
   const toggle = (k) => setSlots(s => ({ ...s, [k]: !s[k] }));
+
+  // Pas 7 — replace the static "735+" trust stat with the real catalog count
+  // from /api/grants/stats (public endpoint added in Pas 3). Falls back
+  // gracefully: if the fetch fails or returns zeros, the cell shows "…"
+  // until data arrives, never the false "735+".
+  uE2(() => {
+    let cancelled = false;
+    fetch('/api/grants/stats')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (!cancelled && d) setStats(d); })
+      .catch(() => { /* leave stats null → "…" */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Prefer verified count (the trust signal); fall back to total if no
+  // grant has evidence_status set yet (pre-enrichment), then to "…" while loading.
+  const verifiedCount = stats?.verified || 0;
+  const totalCount    = stats?.total    || 0;
+  const sourcesNum =
+    verifiedCount > 0 ? `${verifiedCount}+` :
+    totalCount    > 0 ? `${totalCount}+`    :
+    '…';
+  const sourcesLbl =
+    verifiedCount > 0 ? 'Surse verificate' : 'Surse indexate';
 
   return (
     <section className="section hero-v2" data-screen-label="01 Hero">
@@ -55,7 +80,7 @@ function HeroV2() {
         </div>
 
         <div className="trust" style={{ marginTop: 0 }}>
-          {[['735+','Surse indexate'],['90s','Timp până la scor'],['7','Agenți AI de evaluare'],['€0','Cost în faza beta'],['4','Limbi RO·EN·RU·UA']].map(([n,l]) => (
+          {[[sourcesNum, sourcesLbl],['90s','Timp până la scor'],['7','Agenți AI de evaluare'],['€0','Cost în faza beta'],['4','Limbi RO·EN·RU·UA']].map(([n,l]) => (
             <div className="trust__cell" key={l}>
               <span className="trust__num">{n}</span>
               <span className="trust__lbl">{l}</span>
