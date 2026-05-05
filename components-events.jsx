@@ -2,146 +2,11 @@
 const { useState, useMemo, useEffect } = React;
 
 // ========== DATA ==========
-const EVENTS = [
-  {
-    id: 'e01', featured: true,
-    title: 'EIC Accelerator Masterclass: Pregătire Stage 1 aplicație',
-    desc: 'Workshop intensiv de 4 ore cu ex-evaluator EIC. Vei înțelege cum se scoring-uie aplicația ta și vei primi un template validat. Include 1:1 de 30 min după workshop.',
-    type: 'workshop', format: 'online',
-    date: '28 Apr 2026', day: '28', month: 'Apr', year: '2026', monthFull: 'Aprilie 2026', time: '14:00–18:00 EET', timeSub: 'Online · via Zoom',
-    country: 'EU', city: 'Online (EN)', flag: '🇪🇺',
-    org: 'EIC Community', orgLogo: 'EC',
-    topics: ['EIC', 'Grant writing', 'Deep-tech'],
-    price: 'Gratuit pentru membri', priceKind: 'free',
-    attending: 247, capacity: 500, live: true,
-    speakers: ['JM', 'AC', 'KL'],
-  },
-  // Mai 2026
-  {
-    id: 'e02', title: 'Hackathon Moldova Tech 2026', desc: 'Hackathon național 48h, 3 tracks: FinTech, HealthTech, GovTech. Premii 500K MDL + mentoring + follow-on funding.',
-    type: 'hackathon', format: 'offline',
-    day: '03', month: 'Mai', year: '2026', monthFull: 'Mai 2026', date: '3–5 Mai 2026', time: '48h non-stop',
-    country: 'MD', city: 'Chișinău · Tekwill', flag: '🇲🇩',
-    org: 'Tekwill', orgLogo: 'TW',
-    topics: ['FinTech', 'HealthTech', 'Hackathon'],
-    price: 'Gratuit', priceKind: 'free',
-    attending: 184, capacity: 300,
-  },
-  {
-    id: 'e03', title: 'StartupBlink Summit · București 2026', desc: 'Cea mai mare conferință de startup din Balcani. 80+ speakers, 1,200 atendees, 40 VCs prezenți, demo area cu 60 startup-uri.',
-    type: 'conference', format: 'offline',
-    day: '08', month: 'Mai', year: '2026', monthFull: 'Mai 2026', date: '8–9 Mai 2026', time: '09:00–19:00',
-    country: 'RO', city: 'București · Radisson', flag: '🇷🇴',
-    org: 'StartupBlink RO', orgLogo: 'SB',
-    topics: ['Conference', 'VC', 'Networking'],
-    price: '€180 / €95 student', priceKind: 'paid',
-    attending: 890, capacity: 1200,
-  },
-  {
-    id: 'e04', title: 'Pitch Night #42 — AI & ML Startups', desc: '6 startup-uri AI/ML din CEE își prezintă produsele în fața unui panel de 5 VCs. Networking + beer după pitch-uri.',
-    type: 'pitch', format: 'hybrid',
-    day: '12', month: 'Mai', year: '2026', monthFull: 'Mai 2026', date: '12 Mai 2026', time: '18:00–21:00 EET',
-    country: 'RO', city: 'Cluj-Napoca · Impact Hub', flag: '🇷🇴',
-    org: 'ClujHub + GapMinder VC', orgLogo: 'CH',
-    topics: ['AI/ML', 'Pitch', 'VC'],
-    price: 'Gratuit', priceKind: 'free',
-    attending: 96, capacity: 120,
-  },
-  {
-    id: 'e05', title: 'Horizon Europe — Info Day pentru Cluster 4', desc: 'Sesiune oficială de informare a Comisiei Europene. Priorități 2026, buget, condiții participare consorții. Întrebări live la NCP.',
-    type: 'webinar', format: 'online',
-    day: '15', month: 'Mai', year: '2026', monthFull: 'Mai 2026', date: '15 Mai 2026', time: '10:00–13:00 CET',
-    country: 'EU', city: 'Online (EN)', flag: '🇪🇺',
-    org: 'European Commission', orgLogo: 'EC',
-    topics: ['Horizon Europe', 'R&D', 'Grants'],
-    price: 'Gratuit', priceKind: 'free',
-    attending: 1240,
-  },
-  {
-    id: 'e06', title: 'How To Raise Pre-Seed în 2026 — Workshop', desc: 'Cum să structurezi runda pre-seed: term sheet, valuation, SAFE vs. equity, cum să găsești angels în CEE.',
-    type: 'workshop', format: 'online',
-    day: '18', month: 'Mai', year: '2026', monthFull: 'Mai 2026', date: '18 Mai 2026', time: '15:00–17:30 EET',
-    country: 'EU', city: 'Online (RO)', flag: '🇪🇺',
-    org: 'eligibil.md + Early Game VC', orgLogo: 'EG',
-    topics: ['Fundraising', 'Pre-seed'],
-    price: 'Gratuit abonați · €29 public', priceKind: 'paid',
-    attending: 340, capacity: 500,
-  },
-  {
-    id: 'e07', title: 'Demo Day Tekwill Accelerator · Cohort 7', desc: '16 startup-uri de la Tekwill Accelerator își fac exit-ul din program. VCs, angels și press prezenți. Meet-and-greet după demos.',
-    type: 'demo-day', format: 'hybrid',
-    day: '22', month: 'Mai', year: '2026', monthFull: 'Mai 2026', date: '22 Mai 2026', time: '17:00–22:00 EET',
-    country: 'MD', city: 'Chișinău · Tekwill', flag: '🇲🇩',
-    org: 'Tekwill Accelerator', orgLogo: 'TA',
-    topics: ['Demo Day', 'Accelerator', 'VC'],
-    price: 'Invitați only', priceKind: 'free',
-    attending: 220, capacity: 250,
-  },
-  {
-    id: 'e08', title: 'Women in Tech Breakfast · Sofia', desc: 'Networking matinal pentru founder-ele din Balcani. Keynote de 20 min + discuții round-table. Croissants + espresso.',
-    type: 'networking', format: 'offline',
-    day: '25', month: 'Mai', year: '2026', monthFull: 'Mai 2026', date: '25 Mai 2026', time: '08:30–11:00 EET',
-    country: 'BG', city: 'Sofia · Betahaus', flag: '🇧🇬',
-    org: 'Women In Tech BG', orgLogo: 'WT',
-    topics: ['Women', 'Networking'],
-    price: '€12', priceKind: 'paid',
-    attending: 48, capacity: 60,
-  },
-  // Iunie
-  {
-    id: 'e09', title: 'Startup Moldova 2026 — Q&A oficial cu AGEPI', desc: 'Director AGEPI răspunde live la întrebări despre aplicarea la programul Startup Moldova 2026. Includ formular tips.',
-    type: 'webinar', format: 'online',
-    day: '04', month: 'Iun', year: '2026', monthFull: 'Iunie 2026', date: '4 Iun 2026', time: '16:00–17:30 EET',
-    country: 'MD', city: 'Online (RO)', flag: '🇲🇩',
-    org: 'AGEPI + ODA', orgLogo: 'AG',
-    topics: ['Startup Moldova', 'AGEPI', 'Grant'],
-    price: 'Gratuit', priceKind: 'free',
-    attending: 420, capacity: 1000,
-  },
-  {
-    id: 'e10', title: 'Web Summit Rio — Side Event CEE', desc: 'Delegație de 40 startup-uri din Europa Centrală și de Est la Web Summit Rio. Pre-schedule meetings cu 200+ VCs internaționali.',
-    type: 'conference', format: 'offline',
-    day: '10', month: 'Iun', year: '2026', monthFull: 'Iunie 2026', date: '10–12 Iun 2026', time: '3 zile',
-    country: 'BR', city: 'Rio de Janeiro', flag: '🇧🇷',
-    org: 'InvestEU + Web Summit', orgLogo: 'WS',
-    topics: ['Conference', 'Global', 'VC'],
-    price: '€890 / €450 early', priceKind: 'paid',
-    attending: 38, capacity: 40,
-  },
-  {
-    id: 'e11', title: 'AI Romania — Bootcamp pentru Founders', desc: 'Intensive 3-day bootcamp în Cluj. AI infra, modele open-source, fine-tuning, GTM pentru AI products. Max 30 participanți.',
-    type: 'workshop', format: 'offline',
-    day: '15', month: 'Iun', year: '2026', monthFull: 'Iunie 2026', date: '15–17 Iun 2026', time: '09:00–18:00 EET',
-    country: 'RO', city: 'Cluj-Napoca · ClujHub', flag: '🇷🇴',
-    org: 'AI Romania', orgLogo: 'AI',
-    topics: ['AI/ML', 'Bootcamp'],
-    price: '€450', priceKind: 'paid',
-    attending: 22, capacity: 30,
-  },
-  {
-    id: 'e12', title: 'Climate Tech Pitch Night · Warsaw', desc: '8 climate-tech startup-uri din regiunea DACH+CEE pitch în fața InnoEnergy + EIT Climate. Focus hard-tech, nu software.',
-    type: 'pitch', format: 'hybrid',
-    day: '20', month: 'Iun', year: '2026', monthFull: 'Iunie 2026', date: '20 Iun 2026', time: '17:00–21:00 CET',
-    country: 'PL', city: 'Warsaw · CambridgeInno', flag: '🇵🇱',
-    org: 'InnoEnergy + EIT', orgLogo: 'IE',
-    topics: ['Climate', 'Hard-tech', 'Pitch'],
-    price: 'Gratuit pentru founders', priceKind: 'free',
-    attending: 110, capacity: 150,
-  },
-  {
-    id: 'e13', title: 'Serie A Masterclass · cu Atomico Partner', desc: 'Partner senior de la Atomico prezintă: ce face diferența la Serie A în 2026, ce metrici contează, common mistakes.',
-    type: 'workshop', format: 'online',
-    day: '25', month: 'Iun', year: '2026', monthFull: 'Iunie 2026', date: '25 Iun 2026', time: '17:00–19:00 CET',
-    country: 'EU', city: 'Online (EN)', flag: '🇪🇺',
-    org: 'Atomico + eligibil.md', orgLogo: 'AT',
-    topics: ['Series A', 'VC', 'Fundraising'],
-    price: '€49 / gratuit Pro', priceKind: 'paid',
-    attending: 180, capacity: 400,
-  },
-];
+const EVENTS = [];  // initial empty — populated via /api/events fetch in EventsApp
 
 const TYPES = [
   { id: 'all', name: 'Toate' },
+  { id: 'grant_deadline', name: 'Deadline-uri granturi' },
   { id: 'hackathon', name: 'Hackathons' },
   { id: 'workshop', name: 'Workshops' },
   { id: 'conference', name: 'Conferințe' },
@@ -182,6 +47,107 @@ const PARTNERS = [
   { name: 'EIT Digital', sub: 'EU · Programme' },
   { name: 'Women in Tech', sub: 'CEE · Community' },
 ];
+
+// Brief 04 — country / flag map for normalizing API rows back to the UI's id-based country chips
+const COUNTRY_MAP = {
+  'Moldova':'MD','Republica Moldova':'MD',
+  'România':'RO','Romania':'RO',
+  'Bulgaria':'BG','Polonia':'PL','Poland':'PL',
+  'Portugalia':'EU','Finlanda':'EU','Franța':'EU','Germania':'EU','Danemarca':'EU','Malta':'EU',
+  'Ucraina':'UA','Ukraine':'UA',
+  'EU':'EU','UE':'EU',
+};
+const COUNTRY_FLAG = {
+  MD:'🇲🇩', RO:'🇷🇴', BG:'🇧🇬',
+  PL:'🇵🇱', UA:'🇺🇦', EU:'🇪🇺', BR:'🌍',
+};
+function flagFor(c) { return COUNTRY_FLAG[c] || '🌐'; }
+function _initials(name) {
+  return (name || '?').split(/s+/).map(s => s[0]).filter(Boolean).join('').slice(0, 3).toUpperCase();
+}
+
+const RO_MONTH_NAMES = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+const RO_MONTH_SHORT = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec'];
+
+function _datesFrom(startIso, endIso) {
+  const d = new Date(startIso);
+  if (isNaN(d)) return { day:'??', month:'??', monthFull:'TBA', year:'', date:'TBA', time:'' };
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = RO_MONTH_SHORT[d.getUTCMonth()];
+  const monthFull = RO_MONTH_NAMES[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  const year = String(d.getUTCFullYear());
+  let date = d.getUTCDate() + ' ' + month + ' ' + year;
+  if (endIso) {
+    const e = new Date(endIso);
+    if (!isNaN(e) && (e.getUTCDate() !== d.getUTCDate() || e.getUTCMonth() !== d.getUTCMonth())) {
+      date = d.getUTCDate() + '–' + e.getUTCDate() + ' ' + month + ' ' + year;
+    }
+  }
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mm = String(d.getUTCMinutes()).padStart(2, '0');
+  const time = (hh === '00' && mm === '00') ? '' : (hh + ':' + mm);
+  return { day, month, monthFull, year, date, time };
+}
+
+function _normalizeEvent(e) {
+  const cc = COUNTRY_MAP[e.country] || (e.country || 'EU').slice(0, 2).toUpperCase();
+  const dates = _datesFrom(e.start_date, e.end_date);
+  return Object.assign({
+    id: e.id,
+    source: 'event',
+    title: e.title || '(no title)',
+    desc: e.short_summary_ro || e.description_ro || '',
+    type: ({ pitch_event: 'pitch', accelerator_call: 'pitch' })[e.event_type] || e.event_type || 'conference',
+    format: e.is_online ? 'online' : 'offline',
+    country: cc,
+    city: [e.city, e.is_online ? 'Online' : null].filter(Boolean).join(' · '),
+    flag: flagFor(cc),
+    org: e.organizer_name || '',
+    orgLogo: _initials(e.organizer_name),
+    topics: Array.isArray(e.topics) ? e.topics : [],
+    price: e.is_free ? 'Gratuit' : (e.price_eur ? '€' + e.price_eur : 'Vezi pentru preț'),
+    priceKind: e.is_free ? 'free' : 'paid',
+    featured: !!e.is_featured,
+    registration_url: e.registration_url || e.online_url || '',
+    evidence_status: e.evidence_status,
+    _sortDate: e.start_date,
+  }, dates);
+}
+
+function _normalizeDeadline(d) {
+  const cc = COUNTRY_MAP[d.country] || (d.country || 'EU').slice(0, 2).toUpperCase();
+  const dates = _datesFrom(d.start_date, null);
+  return Object.assign({
+    id: d.id,
+    source: 'grant_deadline',
+    title: d.title || '(no title)',
+    desc: d.short_summary || '',
+    type: 'grant_deadline',
+    format: 'online',
+    country: cc,
+    city: d.country || 'Deadline',
+    flag: flagFor(cc),
+    org: d.organizer_name || '',
+    orgLogo: _initials(d.organizer_name),
+    topics: d.sector ? String(d.sector).split(/[,/]/).map(s => s.trim()).filter(Boolean).slice(0, 3) : [],
+    price: d.max_amount ? ('până la €' + Math.round(d.max_amount / 1000) + 'K') : 'Vezi pentru sumă',
+    priceKind: 'paid',
+    featured: false,
+    grant_url: d.url,
+    registration_url: d.external_url || '',
+    evidence_status: d.evidence_status,
+    _sortDate: d.start_date,
+  }, dates);
+}
+
+function normalizeApi(data) {
+  const out = [
+    ...((data.grant_deadlines || []).map(_normalizeDeadline)),
+    ...((data.events || []).map(_normalizeEvent)),
+  ];
+  return out.sort((a, b) => new Date(a._sortDate) - new Date(b._sortDate));
+}
+
 
 // ========== COMPONENTS ==========
 function Topbar() {
@@ -384,13 +350,24 @@ function MapView({ events }) {
 
 // ========== APP ==========
 function EventsApp() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [type, setType] = useState('all');
   const [country, setCountry] = useState('all');
   const [format, setFormat] = useState('all');
   const [view, setView] = useState('list');
   const [q, setQ] = useState('');
 
-  const filtered = useMemo(() => EVENTS.filter(e => {
+  useEffect(() => {
+    const lang = window.location.pathname.startsWith('/events') ? 'en' : 'ro';
+    fetch('/api/events?lang=' + lang)
+      .then(r => r.ok ? r.json() : { events: [], grant_deadlines: [] })
+      .then(data => setEvents(normalizeApi(data)))
+      .catch(() => setEvents([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = useMemo(() => events.filter(e => {
     if (e.featured) return false;
     if (type !== 'all' && e.type !== type) return false;
     if (country !== 'all' && e.country !== country) return false;
@@ -405,17 +382,17 @@ function EventsApp() {
     return m;
   }, [filtered]);
 
-  const featured = EVENTS.find(e => e.featured);
+  const featured = events.find(e => e.featured);
 
   // Count per type
   const typeCounts = useMemo(() => {
-    const c = { all: EVENTS.filter(e => !e.featured).length };
-    EVENTS.forEach(e => { if (!e.featured) c[e.type] = (c[e.type] || 0) + 1; });
+    const c = { all: events.filter(e => !e.featured).length };
+    events.forEach(e => { if (!e.featured) c[e.type] = (c[e.type] || 0) + 1; });
     return c;
   }, []);
   const countryCounts = useMemo(() => {
-    const c = { all: EVENTS.filter(e => !e.featured).length };
-    EVENTS.forEach(e => { if (!e.featured) c[e.country] = (c[e.country] || 0) + 1; });
+    const c = { all: events.filter(e => !e.featured).length };
+    events.forEach(e => { if (!e.featured) c[e.country] = (c[e.country] || 0) + 1; });
     return c;
   }, []);
 

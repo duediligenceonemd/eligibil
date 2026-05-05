@@ -296,6 +296,119 @@ router.get('/grants/:id', async (req, res) => {
 });
 
 // =============================================================================
+// GET /api/events — PUBLIC (Brief 04)
+// Combines two sources:
+//   1. events table — manually-curated external events (conferences, webinars,
+//      pitch nights, hackathons)
+//   2. grant deadlines — synthesized at request time from the grants table
+//      where deadline parses to a future ISO date
+// Query params:
+//   ?country=    ilike filter on country / funder_country
+//   ?type=       'conference' | 'pitch_event' | 'webinar' | 'workshop' |
+//                'networking' | 'hackathon' | 'accelerator_call' | 'grant_deadline'
+//   ?topic=      array contains
+//   ?lang=       'ro' (default) | 'en' — controls grant link path
+// =============================================================================
+const RO_MONTHS = { ian:0, feb:1, mar:2, apr:3, mai:4, iun:5, iul:6, aug:7, sep:8, oct:9, noi:10, dec:11 };
+function _parseEventsDeadline(s) {
+  if (!s) return null;
+  // ISO first
+  let d = new Date(s);
+  if (!isNaN(d) && d.getFullYear() > 2000) return d;
+  // Romanian "22 Mai 2026"
+  const m = String(s).match(/(\d{1,2})\s+(\w+)\s+(\d{4})/);
+  if (m) {
+    const month = RO_MONTHS[m[2].toLowerCase().slice(0, 3)];
+    if (month !== undefined) {
+      d = new Date(parseInt(m[3], 10), month, parseInt(m[1], 10));
+      return isNaN(d) ? null : d;
+    }
+  }
+  return null;
+}
+
+router.get('/events', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.json({ events: [], grant_deadlines: [] });
+
+  const { country, type, topic } = req.query;
+  const lang = (req.query.lang === 'en') ? 'en' : 'ro';
+
+  // ── 1. External events from the events table ──────────────────────────────
+  let events = [];
+  if (type !== 'grant_deadline') {  // skip the table query if user only wants grant deadlines
+    let q = sb.from('events')
+      .select('*')
+      .eq('status', 'upcoming')
+      .gte('start_date', new Date().toISOString())
+      .order('start_date', { ascending: true })
+      .limit(100);
+    if (country) q = q.ilike('country', `%${country}%`);
+    if (type)    q = q.eq('event_type', type);
+    if (topic)   q = q.contains('topics', [topic]);
+    const { data, error } = await q;
+    if (error) {
+      // Pre-Brief-04 schema (events table missing): degrade to empty list.
+      if (!/relation .* does not exist/i.test(error.message || '')) {
+        console.error('GET /api/events events query error:', error.message);
+      }
+      events = [];
+    } else {
+      events = data || [];
+    }
+  }
+
+  // ── 2. Grant deadlines synthesized as virtual events ──────────────────────
+  let grantDeadlines = [];
+  if (!type || type === 'grant_deadline') {  // skip when filtering to a non-deadline type
+    try {
+      let gq = sb.from('grants')
+        .select('id, slug_ro, slug_en, nume_program, nume_program_en, ' +
+                'short_summary_ro, short_summary_en, funder_name, funder_country, ' +
+                'tara, deadline, suma_max, sector, application_url, evidence_status')
+        .eq('status', 'Activ')
+        .not('deadline', 'is', null)
+        .limit(100);
+      if (country) gq = gq.or(`tara.ilike.%${country}%,funder_country.ilike.%${country}%`);
+      const { data: grants, error: gerr } = await gq;
+      if (gerr) {
+        if (!/column .* does not exist/i.test(gerr.message || '')) {
+          console.error('GET /api/events grants query error:', gerr.message);
+        }
+        // Pre-Pas-1 columns missing → no grant deadlines emitted.
+      } else {
+        grantDeadlines = (grants || [])
+          .map(g => ({ g, parsedDate: _parseEventsDeadline(g.deadline) }))
+          .filter(x => x.parsedDate && x.parsedDate > new Date())
+          .map(({ g, parsedDate }) => ({
+            id:           'grant_' + g.id,
+            slug_ro:      g.slug_ro,
+            slug_en:      g.slug_en,
+            title:        lang === 'en' ? (g.nume_program_en || g.nume_program) : g.nume_program,
+            short_summary: lang === 'en' ? g.short_summary_en : g.short_summary_ro,
+            event_type:   'grant_deadline',
+            start_date:   parsedDate.toISOString(),
+            country:      g.funder_country || g.tara || null,
+            organizer_name: g.funder_name || null,
+            max_amount:   g.suma_max,
+            sector:       g.sector,
+            url:          g.slug_ro
+              ? (lang === 'en' && g.slug_en ? `/en/grants/${g.slug_en}` : `/ro/granturi/${g.slug_ro}`)
+              : `/grant.html?id=${encodeURIComponent(g.id)}`,
+            external_url: g.application_url,
+            evidence_status: g.evidence_status,
+          }))
+          .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+      }
+    } catch (err) {
+      console.error('GET /api/events grant deadlines unexpected error:', err.message);
+    }
+  }
+
+  res.json({ events, grant_deadlines: grantDeadlines });
+});
+
+// =============================================================================
 // GET /api/profile
 // =============================================================================
 router.get('/profile', requireAuth, (req, res) => {
