@@ -22,6 +22,11 @@ const EVENT_TYPE_OPTIONS = [
   'networking', 'hackathon', 'accelerator_call',
 ];
 const EVENT_STATUS_OPTIONS = ['upcoming', 'live', 'past', 'cancelled'];
+const FUNDER_TYPE_OPTIONS = [
+  '', 'foundation', 'government', 'corporate', 'vc_fund',
+  'accelerator', 'eu_program', 'dao', 'other',
+];
+const FUNDER_STATUS_OPTIONS = ['active', 'inactive', 'archived'];
 
 const GRANTS_CONFIG = {
   title: 'Granturi',
@@ -147,6 +152,56 @@ const EVENTS_CONFIG = {
     { name: 'source_url',       label: 'Source URL',    type: 'text',     group: 'Sursă' },
     { name: 'source_name',      label: 'Source name',   type: 'text',     group: 'Sursă' },
     { name: 'evidence_status',  label: 'Evidence status', type: 'select', group: 'Sursă', options: EVIDENCE_OPTIONS },
+  ],
+};
+
+const FUNDERS_CONFIG = {
+  title: 'Donatori',
+  apiBase: '/api/admin/funders',
+  pk: 'id',
+  pkEditable: false,    // UUID, generated server-side
+  newDefaults: { funder_type: 'foundation', status: 'active' },
+  searchKeys: ['name', 'name_en', 'short_name', 'country', 'website'],
+  listColumns: [
+    { key: 'name',         label: 'Nume',         primary: true },
+    { key: 'funder_type',  label: 'Tip',          chip: true,  width: 130 },
+    { key: 'country',      label: 'Țară',                       width: 110 },
+    { key: 'website',      label: 'Website',      width: 220, render: (v) => v ? new URL(v, 'http://x').hostname.replace(/^www\./, '') : '—' },
+    { key: 'status',       label: 'Status',       chip: true,  width: 100 },
+    { key: 'evidence_status', label: 'Evidence',
+      chipMap: { verified_primary: 'ok', verified_secondary: 'ok', hypothesis: 'warn' }, width: 130 },
+  ],
+  defaultSort: { key: 'updated_at', dir: 'desc' },
+  fields: [
+    { name: 'slug',            label: 'Slug',                type: 'text',     group: 'Identitate', help: 'URL-friendly. Folosit pentru pagini publice viitoare /donatori/<slug>.' },
+    { name: 'name',            label: 'Nume (RO)',           type: 'text',     group: 'Identitate', required: true },
+    { name: 'name_en',         label: 'Nume (EN)',           type: 'text',     group: 'Identitate' },
+    { name: 'short_name',      label: 'Acronim / nume scurt', type: 'text',    group: 'Identitate', help: 'Ex: EIC, ODIMM, NSF' },
+
+    { name: 'funder_type',     label: 'Tip donator',         type: 'select',   group: 'Tip', options: FUNDER_TYPE_OPTIONS },
+    { name: 'status',          label: 'Status',              type: 'select',   group: 'Tip', options: FUNDER_STATUS_OPTIONS },
+
+    { name: 'country',         label: 'Țară (HQ)',           type: 'text',     group: 'Geografie' },
+    { name: 'hq_city',         label: 'Oraș HQ',             type: 'text',     group: 'Geografie' },
+    { name: 'countries_funded', label: 'Țări finanțate',     type: 'json',     group: 'Geografie', help: 'Array string: ["Moldova","România","UE"]' },
+
+    { name: 'logo_url',        label: 'Logo URL',            type: 'text',     group: 'Branding' },
+    { name: 'website',         label: 'Website',             type: 'text',     group: 'Branding' },
+    { name: 'contact_email',   label: 'Email contact',       type: 'text',     group: 'Branding' },
+
+    { name: 'short_summary_ro', label: 'Sumar scurt RO',     type: 'textarea', group: 'Conținut', help: '<160 chars pentru SEO meta' },
+    { name: 'short_summary_en', label: 'Sumar scurt EN',     type: 'textarea', group: 'Conținut' },
+    { name: 'description_ro',  label: 'Descriere RO',        type: 'textarea', group: 'Conținut' },
+    { name: 'description_en',  label: 'Descriere EN',        type: 'textarea', group: 'Conținut' },
+
+    { name: 'focus_areas',     label: 'Focus areas',         type: 'json',     group: 'Targeting', help: 'Array string: ["AI","climate","deep-tech"]' },
+    { name: 'stages_funded',   label: 'Stages',              type: 'json',     group: 'Targeting' },
+
+    { name: 'founded_year',    label: 'Înființat (an)',      type: 'number',   group: 'Track record' },
+    { name: 'total_funding_eur', label: 'Total finanțat (EUR)', type: 'number', group: 'Track record', help: 'Suma agregată dezvăluită' },
+    { name: 'notable_grantees', label: 'Beneficiari notabili', type: 'json',   group: 'Track record', help: 'Array de nume' },
+
+    { name: 'evidence_status', label: 'Evidence status',     type: 'select',   group: 'Sursă', options: EVIDENCE_OPTIONS },
   ],
 };
 
@@ -509,6 +564,7 @@ function AdminApp() {
   const [user, setUser] = useState(null);
   const [grantsCount, setGrantsCount] = useState(null);
   const [eventsCount, setEventsCount] = useState(null);
+  const [fundersCount, setFundersCount] = useState(null);
 
   // Wait for auth.js to populate window.__USER (it dispatches 'auth-ready')
   useEffect(() => {
@@ -524,12 +580,14 @@ function AdminApp() {
       if (r.ok) setStats(await r.json());
     } catch {}
     try {
-      const [g, e] = await Promise.all([
-        fetch('/api/admin/grants', { credentials: 'same-origin' }).then(r => r.json()),
-        fetch('/api/admin/events', { credentials: 'same-origin' }).then(r => r.json()),
+      const [g, e, f] = await Promise.all([
+        fetch('/api/admin/grants',  { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/events',  { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/funders', { credentials: 'same-origin' }).then(r => r.json()),
       ]);
       setGrantsCount(g.items?.length ?? 0);
       setEventsCount(e.items?.length ?? 0);
+      setFundersCount(f.items?.length ?? 0);
     } catch {}
   }, []);
 
@@ -539,6 +597,7 @@ function AdminApp() {
     { id: 'dashboard', label: 'Dashboard',  count: null },
     { id: 'grants',    label: 'Granturi',   count: grantsCount },
     { id: 'events',    label: 'Evenimente', count: eventsCount },
+    { id: 'funders',   label: 'Donatori',   count: fundersCount },
   ];
 
   return (
@@ -570,6 +629,7 @@ function AdminApp() {
           {tab === 'dashboard' && <Dashboard stats={stats} />}
           {tab === 'grants'    && <CrudPage config={GRANTS_CONFIG} />}
           {tab === 'events'    && <CrudPage config={EVENTS_CONFIG} />}
+          {tab === 'funders'   && <CrudPage config={FUNDERS_CONFIG} />}
         </main>
       </div>
     </div>

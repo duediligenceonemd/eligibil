@@ -389,6 +389,63 @@ router.delete('/events/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ── FUNDERS / Donatori (Admin iter 2) ─────────────────────────────────────────
+router.get('/funders', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const { data, error } = await sb.from('funders').select('*')
+    .order('updated_at', { ascending: false })
+    .limit(500);
+  if (error) {
+    if (/relation .* does not exist/i.test(error.message || '')) {
+      return res.json({ ok: true, items: [], schema_missing: true });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+  res.json({ ok: true, items: data || [] });
+});
+
+router.get('/funders/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const { data, error } = await sb.from('funders').select('*').eq('id', req.params.id).maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data)  return res.status(404).json({ error: 'Funder not found' });
+  res.json({ ok: true, item: data });
+});
+
+router.post('/funders', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const body = req.body || {};
+  if (!body.name) return res.status(400).json({ error: 'name is required' });
+  const insert = { ...body };
+  delete insert.id; delete insert.created_at; delete insert.updated_at;
+  const { data, error } = await sb.from('funders').insert(insert).select().maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true, item: data });
+});
+
+router.put('/funders/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const update = { ...(req.body || {}) };
+  delete update.id; delete update.created_at; delete update.updated_at;
+  const { data, error } = await sb.from('funders').update(update).eq('id', req.params.id).select().maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data)  return res.status(404).json({ error: 'Funder not found' });
+  res.json({ ok: true, item: data });
+});
+
+router.delete('/funders/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  // ON DELETE SET NULL on grants.funder_id — safe to remove a funder; grants stay.
+  const { error } = await sb.from('funders').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
 // =============================================================================
 // GET /api/admin/stats — dashboard counts
 // =============================================================================
