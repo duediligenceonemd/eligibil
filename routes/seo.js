@@ -38,6 +38,16 @@ const STATIC_PAGES = [
   { path: '/search', changefreq: 'daily'  },
 ];
 
+// ── Programmatic SEO listings — keep in sync with SEO_SECTORS / SEO_COUNTRIES
+//    in server.js. Each pair becomes one /ro/granturi-{s}-{c} URL plus an
+//    /en/grants-{s}-{c} URL with hreflang alternates linking the pair.
+//    9 sectors × 4 countries × 2 langs = 72 sitemap entries.
+const SEO_LISTING_SECTORS = [
+  'ai', 'biotech', 'climate', 'fintech', 'edtech',
+  'deep-tech', 'saas', 'healthtech', 'mobility',
+];
+const SEO_LISTING_COUNTRIES = ['moldova', 'romania', 'ucraina', 'ue'];
+
 // ── /sitemap.xml ─────────────────────────────────────────────────────────────
 router.get('/sitemap.xml', async (req, res) => {
   const urls = [];
@@ -99,6 +109,31 @@ router.get('/sitemap.xml', async (req, res) => {
     } catch (err) {
       console.error('GET /sitemap.xml unexpected error:', err.message);
       // Fall through with whatever we have.
+    }
+  }
+
+  // Programmatic SEO listings cartesian product (always emitted; the routes
+  // themselves serve a 503/404 if Supabase is missing or empty, but the
+  // sitemap entry is stable so crawlers don't drop them).
+  for (const s of SEO_LISTING_SECTORS) {
+    for (const c of SEO_LISTING_COUNTRIES) {
+      const ro = `${SITE_URL}/ro/granturi-${s}-${c}`;
+      const en = `${SITE_URL}/en/grants-${s}-${c}`;
+      urls.push(
+        '  <url>\n' +
+        `    <loc>${ro}</loc>\n` +
+        '    <changefreq>weekly</changefreq>\n' +
+        `    <xhtml:link rel="alternate" hreflang="ro" href="${ro}" />\n` +
+        `    <xhtml:link rel="alternate" hreflang="en" href="${en}" />\n` +
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${ro}" />\n` +
+        '  </url>'
+      );
+      urls.push(
+        '  <url>\n' +
+        `    <loc>${en}</loc>\n` +
+        '    <changefreq>weekly</changefreq>\n' +
+        '  </url>'
+      );
     }
   }
 
