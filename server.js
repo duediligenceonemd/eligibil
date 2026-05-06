@@ -160,6 +160,74 @@ app.get('/events',     (req, res) => res.sendFile(path.join(__dirname, 'events.h
 // every API call enforces requireAdmin server-side.
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
+// /stiri (RO) + /news (EN) listing + detail. /blog detail+listing same lang
+// in both URLs (brand convention). All public; auth.js whitelists below.
+const { renderListingPage, renderDetailPage } = require('./lib/render-content-page');
+
+async function serveContentListing(req, res, kind, lang) {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).sendFile(path.join(__dirname, '404.html'));
+  const table = kind === 'news' ? 'news' : 'blog_posts';
+  try {
+    const { data, error } = await sb.from(table)
+      .select('id, slug_ro, slug_en, title, title_en, excerpt_ro, excerpt_en, ' +
+              'hero_image, author, category, tags, published_at, ' +
+              (kind === 'blog' ? 'reading_time_min, is_featured, ' : '') +
+              'status, updated_at')
+      .eq('status', 'published')
+      .not('published_at', 'is', null)
+      .lte('published_at', new Date().toISOString())
+      .order('published_at', { ascending: false })
+      .limit(50);
+    if (error) {
+      // Pre-Iter-3 schema (table missing) → empty list (still renders the page)
+      if (/relation .* does not exist/i.test(error.message || '')) {
+        return res.type('html').send(renderListingPage({ kind, lang, items: [] }));
+      }
+      throw error;
+    }
+    res.type('html').send(renderListingPage({ kind, lang, items: data || [] }));
+  } catch (err) {
+    console.error('content listing error', err);
+    res.status(500).sendFile(path.join(__dirname, '404.html'));
+  }
+}
+
+async function serveContentDetail(req, res, kind, lang, slugColumn) {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).sendFile(path.join(__dirname, '404.html'));
+  const table = kind === 'news' ? 'news' : 'blog_posts';
+  try {
+    const { data, error } = await sb.from(table).select('*')
+      .eq(slugColumn, req.params.slug)
+      .eq('status', 'published')
+      .maybeSingle();
+    if (error) {
+      if (/relation .* does not exist/i.test(error.message || '')) {
+        return res.status(404).sendFile(path.join(__dirname, '404.html'));
+      }
+      throw error;
+    }
+    if (!data) return res.status(404).sendFile(path.join(__dirname, '404.html'));
+    res.type('html').send(renderDetailPage({ kind, lang, item: data }));
+  } catch (err) {
+    console.error('content detail error', err);
+    res.status(500).sendFile(path.join(__dirname, '404.html'));
+  }
+}
+
+// Listings
+app.get('/stiri', (req, res) => serveContentListing(req, res, 'news', 'ro'));
+app.get('/news',  (req, res) => serveContentListing(req, res, 'news', 'en'));
+app.get('/blog',  (req, res) => serveContentListing(req, res, 'blog', 'ro'));
+
+// Detail. /stiri/:slug → news (RO slug). /news/:slug → news (EN slug).
+// /blog/:slug → blog (RO slug; EN visitors land via /blog?lang=en in iter 4
+// or a future /en/blog/:slug route).
+app.get('/stiri/:slug', (req, res) => serveContentDetail(req, res, 'news', 'ro', 'slug_ro'));
+app.get('/news/:slug',  (req, res) => serveContentDetail(req, res, 'news', 'en', 'slug_en'));
+app.get('/blog/:slug',  (req, res) => serveContentDetail(req, res, 'blog', 'ro', 'slug_ro'));
+
 // SEO routes — /sitemap.xml + /robots.txt. Mounted before express.static
 // so they're guaranteed to win over any static file with the same name.
 app.use('/', require('./routes/seo'));

@@ -446,6 +446,78 @@ router.delete('/funders/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ── NEWS / BLOG (Admin iter 3) ─────────────────────────────────────────────
+// Generic CRUD factory — same shape, two tables.
+function makeContentCrud(table, requiredFields) {
+  return {
+    list: async (req, res) => {
+      const sb = tryGetSupabase();
+      if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+      const { data, error } = await sb.from(table).select('*')
+        .order('updated_at', { ascending: false }).limit(500);
+      if (error) {
+        if (/relation .* does not exist/i.test(error.message || '')) {
+          return res.json({ ok: true, items: [], schema_missing: true });
+        }
+        return res.status(500).json({ error: error.message });
+      }
+      res.json({ ok: true, items: data || [] });
+    },
+    get: async (req, res) => {
+      const sb = tryGetSupabase();
+      if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+      const { data, error } = await sb.from(table).select('*').eq('id', req.params.id).maybeSingle();
+      if (error) return res.status(500).json({ error: error.message });
+      if (!data)  return res.status(404).json({ error: 'Not found' });
+      res.json({ ok: true, item: data });
+    },
+    create: async (req, res) => {
+      const sb = tryGetSupabase();
+      if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+      const body = req.body || {};
+      for (const f of requiredFields) {
+        if (!body[f]) return res.status(400).json({ error: f + ' is required' });
+      }
+      const insert = { ...body };
+      delete insert.id; delete insert.created_at; delete insert.updated_at;
+      const { data, error } = await sb.from(table).insert(insert).select().maybeSingle();
+      if (error) return res.status(500).json({ error: error.message });
+      res.json({ ok: true, item: data });
+    },
+    update: async (req, res) => {
+      const sb = tryGetSupabase();
+      if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+      const update = { ...(req.body || {}) };
+      delete update.id; delete update.created_at; delete update.updated_at;
+      const { data, error } = await sb.from(table).update(update).eq('id', req.params.id).select().maybeSingle();
+      if (error) return res.status(500).json({ error: error.message });
+      if (!data)  return res.status(404).json({ error: 'Not found' });
+      res.json({ ok: true, item: data });
+    },
+    del: async (req, res) => {
+      const sb = tryGetSupabase();
+      if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+      const { error } = await sb.from(table).delete().eq('id', req.params.id);
+      if (error) return res.status(500).json({ error: error.message });
+      res.json({ ok: true });
+    },
+  };
+}
+
+const newsCrud = makeContentCrud('news', ['slug_ro', 'title']);
+router.get   ('/news',     newsCrud.list);
+router.get   ('/news/:id', newsCrud.get);
+router.post  ('/news',     newsCrud.create);
+router.put   ('/news/:id', newsCrud.update);
+router.delete('/news/:id', newsCrud.del);
+
+const blogCrud = makeContentCrud('blog_posts', ['slug_ro', 'title']);
+router.get   ('/blog',     blogCrud.list);
+router.get   ('/blog/:id', blogCrud.get);
+router.post  ('/blog',     blogCrud.create);
+router.put   ('/blog/:id', blogCrud.update);
+router.delete('/blog/:id', blogCrud.del);
+
 // =============================================================================
 // GET /api/admin/stats — dashboard counts
 // =============================================================================
