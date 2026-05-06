@@ -518,6 +518,51 @@ router.post  ('/blog',     blogCrud.create);
 router.put   ('/blog/:id', blogCrud.update);
 router.delete('/blog/:id', blogCrud.del);
 
+// ── COMMENTS MODERATION ──────────────────────────────────────────────────────
+router.get('/comments', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const { data, error } = await sb.from('comments').select('*')
+    .order('created_at', { ascending: false }).limit(500);
+  if (error) {
+    if (/relation .* does not exist/i.test(error.message || '')) {
+      return res.json({ ok: true, items: [], schema_missing: true });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+  res.json({ ok: true, items: data || [] });
+});
+
+router.get('/comments/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const { data, error } = await sb.from('comments').select('*').eq('id', req.params.id).maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data)  return res.status(404).json({ error: 'Not found' });
+  res.json({ ok: true, item: data });
+});
+
+router.put('/comments/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  // Whitelist mutable fields — admin can flip status only
+  const update = {};
+  if (req.body?.status) update.status = req.body.status;
+  if (req.body?.body)   update.body   = req.body.body;
+  const { data, error } = await sb.from('comments').update(update).eq('id', req.params.id).select().maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data)  return res.status(404).json({ error: 'Not found' });
+  res.json({ ok: true, item: data });
+});
+
+router.delete('/comments/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const { error } = await sb.from('comments').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
 // =============================================================================
 // GET /api/admin/stats — dashboard counts
 // =============================================================================

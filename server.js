@@ -216,17 +216,22 @@ async function serveContentDetail(req, res, kind, lang, slugColumn) {
   }
 }
 
-// Listings
-app.get('/stiri', (req, res) => serveContentListing(req, res, 'news', 'ro'));
-app.get('/news',  (req, res) => serveContentListing(req, res, 'news', 'en'));
-app.get('/blog',  (req, res) => serveContentListing(req, res, 'blog', 'ro'));
+// RSS feeds at /stiri/feed.xml, /news/feed.xml, /blog/feed.xml — mounted
+// BEFORE the /:slug routes so "feed.xml" isn't captured as a slug.
+app.use('/', require('./routes/feeds'));
 
-// Detail. /stiri/:slug → news (RO slug). /news/:slug → news (EN slug).
-// /blog/:slug → blog (RO slug; EN visitors land via /blog?lang=en in iter 4
-// or a future /en/blog/:slug route).
-app.get('/stiri/:slug', (req, res) => serveContentDetail(req, res, 'news', 'ro', 'slug_ro'));
-app.get('/news/:slug',  (req, res) => serveContentDetail(req, res, 'news', 'en', 'slug_en'));
-app.get('/blog/:slug',  (req, res) => serveContentDetail(req, res, 'blog', 'ro', 'slug_ro'));
+// Listings
+app.get('/stiri',    (req, res) => serveContentListing(req, res, 'news', 'ro'));
+app.get('/news',     (req, res) => serveContentListing(req, res, 'news', 'en'));
+app.get('/blog',     (req, res) => serveContentListing(req, res, 'blog', 'ro'));
+app.get('/en/blog',  (req, res) => serveContentListing(req, res, 'blog', 'en'));
+
+// Detail. /stiri/:slug → news (RO). /news/:slug → news (EN).
+// /blog/:slug → blog (RO). /en/blog/:slug → blog (EN).
+app.get('/stiri/:slug',    (req, res) => serveContentDetail(req, res, 'news', 'ro', 'slug_ro'));
+app.get('/news/:slug',     (req, res) => serveContentDetail(req, res, 'news', 'en', 'slug_en'));
+app.get('/blog/:slug',     (req, res) => serveContentDetail(req, res, 'blog', 'ro', 'slug_ro'));
+app.get('/en/blog/:slug',  (req, res) => serveContentDetail(req, res, 'blog', 'en', 'slug_en'));
 
 // SEO routes — /sitemap.xml + /robots.txt. Mounted before express.static
 // so they're guaranteed to win over any static file with the same name.

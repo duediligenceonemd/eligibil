@@ -30,6 +30,8 @@ const FUNDER_STATUS_OPTIONS = ['active', 'inactive', 'archived'];
 const CONTENT_STATUS_OPTIONS = ['draft', 'published', 'archived'];
 const NEWS_CATEGORY_OPTIONS = ['', 'Anunț', 'Update', 'Politici', 'Eveniment', 'Press'];
 const BLOG_CATEGORY_OPTIONS = ['', 'Tutorial', 'Opinie', 'Studiu de caz', 'Interviu', 'Ghid'];
+const COMMENT_STATUS_OPTIONS = ['approved', 'hidden', 'deleted'];
+const COMMENT_CONTENT_TYPE_OPTIONS = ['grant', 'blog_post', 'news_article'];
 
 const GRANTS_CONFIG = {
   title: 'Granturi',
@@ -276,6 +278,33 @@ const BLOG_CONFIG = {
   ],
   defaultSort: { key: 'published_at', dir: 'desc' },
   fields: _contentFields(BLOG_CATEGORY_OPTIONS, true),
+};
+
+const COMMENTS_CONFIG = {
+  title: 'Comentarii',
+  apiBase: '/api/admin/comments',
+  pk: 'id',
+  pkEditable: false,
+  newDefaults: {},
+  searchKeys: ['user_email', 'user_name', 'body', 'content_id'],
+  listColumns: [
+    { key: 'created_at',   label: 'Creat',    mono: true,   width: 130, render: (v) => v ? new Date(v).toISOString().slice(0,16).replace('T',' ') : '—' },
+    { key: 'user_name',    label: 'Autor',                  width: 140 },
+    { key: 'content_type', label: 'Tip',      chip: true,   width: 120 },
+    { key: 'content_id',   label: 'Țintă',    mono: true,   width: 130 },
+    { key: 'body',         label: 'Conținut', primary: true, render: (v) => (v || '').slice(0, 100) + ((v || '').length > 100 ? '…' : '') },
+    { key: 'status',       label: 'Status',   chip: true,   width: 110,
+      chipMap: { approved: 'ok', hidden: 'warn', deleted: 'crit' } },
+  ],
+  defaultSort: { key: 'created_at', dir: 'desc' },
+  fields: [
+    { name: 'content_type', label: 'Tip conținut', type: 'select', group: 'Țintă', options: COMMENT_CONTENT_TYPE_OPTIONS },
+    { name: 'content_id',   label: 'ID țintă',     type: 'text',   group: 'Țintă' },
+    { name: 'user_email',   label: 'Email autor',  type: 'text',   group: 'Autor' },
+    { name: 'user_name',    label: 'Nume autor',   type: 'text',   group: 'Autor' },
+    { name: 'body',         label: 'Conținut',     type: 'textarea', group: 'Conținut' },
+    { name: 'status',       label: 'Status',       type: 'select', group: 'Moderare', options: COMMENT_STATUS_OPTIONS, help: '"hidden" = invizibil pe pagină ; "deleted" = șters logic' },
+  ],
 };
 
 // ─── Field component ──────────────────────────────────────────────────────────
@@ -640,6 +669,7 @@ function AdminApp() {
   const [fundersCount, setFundersCount] = useState(null);
   const [newsCount, setNewsCount]       = useState(null);
   const [blogCount, setBlogCount]       = useState(null);
+  const [commentsCount, setCommentsCount] = useState(null);
 
   // Wait for auth.js to populate window.__USER (it dispatches 'auth-ready')
   useEffect(() => {
@@ -655,30 +685,33 @@ function AdminApp() {
       if (r.ok) setStats(await r.json());
     } catch {}
     try {
-      const [g, e, f, n, b] = await Promise.all([
-        fetch('/api/admin/grants',  { credentials: 'same-origin' }).then(r => r.json()),
-        fetch('/api/admin/events',  { credentials: 'same-origin' }).then(r => r.json()),
-        fetch('/api/admin/funders', { credentials: 'same-origin' }).then(r => r.json()),
-        fetch('/api/admin/news',    { credentials: 'same-origin' }).then(r => r.json()),
-        fetch('/api/admin/blog',    { credentials: 'same-origin' }).then(r => r.json()),
+      const [g, e, f, n, b, c] = await Promise.all([
+        fetch('/api/admin/grants',   { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/events',   { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/funders',  { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/news',     { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/blog',     { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/comments', { credentials: 'same-origin' }).then(r => r.json()),
       ]);
       setGrantsCount(g.items?.length ?? 0);
       setEventsCount(e.items?.length ?? 0);
       setFundersCount(f.items?.length ?? 0);
       setNewsCount(n.items?.length ?? 0);
       setBlogCount(b.items?.length ?? 0);
+      setCommentsCount(c.items?.length ?? 0);
     } catch {}
   }, []);
 
   useEffect(() => { loadCounts(); }, [loadCounts, tab]);
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard',  count: null },
-    { id: 'grants',    label: 'Granturi',   count: grantsCount },
-    { id: 'events',    label: 'Evenimente', count: eventsCount },
-    { id: 'funders',   label: 'Donatori',   count: fundersCount },
-    { id: 'news',      label: 'Știri',      count: newsCount },
-    { id: 'blog',      label: 'Blog',       count: blogCount },
+    { id: 'dashboard', label: 'Dashboard',   count: null },
+    { id: 'grants',    label: 'Granturi',    count: grantsCount },
+    { id: 'events',    label: 'Evenimente',  count: eventsCount },
+    { id: 'funders',   label: 'Donatori',    count: fundersCount },
+    { id: 'news',      label: 'Știri',       count: newsCount },
+    { id: 'blog',      label: 'Blog',        count: blogCount },
+    { id: 'comments',  label: 'Comentarii',  count: commentsCount },
   ];
 
   return (
@@ -713,6 +746,7 @@ function AdminApp() {
           {tab === 'funders'   && <CrudPage config={FUNDERS_CONFIG} />}
           {tab === 'news'      && <CrudPage config={NEWS_CONFIG} />}
           {tab === 'blog'      && <CrudPage config={BLOG_CONFIG} />}
+          {tab === 'comments'  && <CrudPage config={COMMENTS_CONFIG} />}
         </main>
       </div>
     </div>

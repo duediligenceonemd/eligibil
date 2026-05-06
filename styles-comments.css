@@ -1,0 +1,147 @@
+/* Comments + reactions UI for content detail pages.
+   Reuses the var palette from styles-search.css. */
+
+.cm {
+  max-width: 760px;
+  margin: 48px auto 0;
+  padding: 32px 32px 80px;
+  border-top: 1px solid var(--sb-rule-soft);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.cm__bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+.cm__like {
+  background: transparent;
+  border: 1px solid var(--sb-rule);
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--sb-ink);
+  transition: all 120ms;
+  font-family: 'JetBrains Mono', monospace;
+}
+.cm__like:hover { border-color: var(--sb-accent); color: var(--sb-accent); }
+.cm__like.is-active {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-bg);
+}
+
+.cm__count { color: var(--sb-muted); }
+
+.cm__signin {
+  padding: 16px;
+  background: var(--sb-bg);
+  border: 1px dashed var(--sb-rule);
+  text-align: center;
+  font-size: 14px;
+  color: var(--sb-muted);
+}
+.cm__signin a { color: var(--sb-accent); text-decoration: underline; }
+
+.cm__form {
+  margin-bottom: 24px;
+}
+.cm__input {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 14px;
+  background: var(--sb-surface);
+  border: 1px solid var(--sb-rule);
+  color: var(--sb-ink);
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 120ms;
+}
+.cm__input:focus { border-color: var(--sb-accent); }
+
+.cm__form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+.cm__charcount {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--sb-muted);
+}
+.cm__submit {
+  padding: 8px 16px;
+  background: var(--sb-accent);
+  border: 1px solid var(--sb-accent);
+  color: var(--sb-bg);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.cm__submit:hover:not(:disabled) { background: var(--sb-ink); border-color: var(--sb-ink); }
+.cm__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.cm__error {
+  padding: 10px 14px;
+  border: 1px solid var(--sb-crit);
+  background: #fbece9;
+  color: var(--sb-crit);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.cm__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cm__item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--sb-rule-soft);
+}
+.cm__item-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.cm__item-head strong { color: var(--sb-ink); font-weight: 600; }
+.cm__item-time { color: var(--sb-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.cm__del {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 16px;
+  color: var(--sb-muted);
+  cursor: pointer;
+  padding: 0 4px;
+}
+.cm__del:hover { color: var(--sb-crit); }
+
+.cm__item-body {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--sb-ink);
+  white-space: pre-wrap;
+}
+
+.cm__empty, .cm__loading {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--sb-muted);
+  font-size: 13px;
+}
