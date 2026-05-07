@@ -1,5 +1,5 @@
 -- =============================================================================
--- eligibil.eu — Comments + Reactions
+-- eligibil.org — Comments + Reactions
 -- Polymorphic association: a comment / reaction targets one of three content
 -- types (grant / blog_post / news_article). Identified by (content_type,
 -- content_id). content_id is TEXT to accommodate both grants.id (TEXT) and

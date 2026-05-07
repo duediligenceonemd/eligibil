@@ -1,5 +1,5 @@
 -- =============================================================================
--- eligibil.eu — Grants Vector Database Schema
+-- eligibil.org — Grants Vector Database Schema
 -- Run this once in Supabase SQL Editor (Dashboard → SQL Editor → New query → Run)
 -- =============================================================================
 

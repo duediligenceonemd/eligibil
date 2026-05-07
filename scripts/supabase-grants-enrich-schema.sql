@@ -1,5 +1,5 @@
 -- ============================================================================
--- eligibil.eu — Grants schema enrichment v2
+-- eligibil.org — Grants schema enrichment v2
 -- Adds: bilingual slugs, structured eligibility, SEO meta, evidence tracking
 --
 -- Run AFTER supabase-schema.sql.

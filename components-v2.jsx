@@ -44,7 +44,7 @@ function HeroV2() {
             Încarcă. Analizează. Află exact unde ești <em>eligibil</em>.
           </h1>
           <p className="hero-v2__sub">
-            eligibil.eu analizează artefactele startupului tău — pitch deck, video și whitepaper — identifică automat TRL-ul, calculează scorul de potrivire pentru peste 735 de granturi și îți livrează un plan concret să devii maxim eligibil.
+            eligibil.org analizează artefactele startupului tău — pitch deck, video și whitepaper — identifică automat TRL-ul, calculează scorul de potrivire pentru peste 735 de granturi și îți livrează un plan concret să devii maxim eligibil.
           </p>
 
           <div className="upload-panel">
@@ -445,7 +445,7 @@ function DualMode() {
         <div className="section__label">04 — Două moduri de utilizare</div>
         <div className="section__head">
           <h2 className="section__title">Agregator de 735+ surse + motor de matching AI.</h2>
-          <p className="section__sub">eligibil.eu combină cel mai complet catalog de finanțare pentru Europa de Est cu un motor de analiză AI care transformă o listă de oportunități într-un plan personalizat. Folosește oricare dintre cele două moduri — sau ambele.</p>
+          <p className="section__sub">eligibil.org combină cel mai complet catalog de finanțare pentru Europa de Est cu un motor de analiză AI care transformă o listă de oportunități într-un plan personalizat. Folosește oricare dintre cele două moduri — sau ambele.</p>
         </div>
         <div className="dual-mode">
           <div className="dmode">

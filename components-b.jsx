@@ -22,7 +22,7 @@ function About() {
           <div>
             <h2 className="section__title">Agregatorul #1 de finanțare pentru startup-uri din Europa de Est.</h2>
             <p className="section__sub">
-              eligibil.eu unește peste 735 de surse de finanțare într-un singur loc și oferă fondatorilor claritate asupra oportunităților potrivite contextului lor. Pentru fiecare program, nu doar un link — ci o analiză completă de potrivire, pregătire și pași următori.
+              eligibil.org unește peste 735 de surse de finanțare într-un singur loc și oferă fondatorilor claritate asupra oportunităților potrivite contextului lor. Pentru fiecare program, nu doar un link — ci o analiză completă de potrivire, pregătire și pași următori.
             </p>
             <div style={{ marginTop: 32 }}>
               <div className="section__label" style={{ margin: 0 }}>Verticale acoperite</div>
@@ -60,11 +60,11 @@ function Advantages() {
   return (
     <section className="section" data-screen-label="06 Advantages">
       <div className="container">
-        <div className="section__label">05 — De ce eligibil.eu</div>
+        <div className="section__label">05 — De ce eligibil.org</div>
         <div className="section__head">
           <h2 className="section__title">Nu doar o listă. O infrastructură de decizie.</h2>
           <p className="section__sub">
-            Alte directoare îți dau o listă. eligibil.eu îți dă context, scor și pași concreți. Pentru fiecare program găsești informații structurate care te ajută să decizi dacă merită să aplici.
+            Alte directoare îți dau o listă. eligibil.org îți dă context, scor și pași concreți. Pentru fiecare program găsești informații structurate care te ajută să decizi dacă merită să aplici.
           </p>
         </div>
         <div className="advantages">
@@ -92,7 +92,7 @@ function AISection({ showAI }) {
         <div className="section__label">06 — Strat produs peste agregator</div>
         <div className="section__head">
           <h2 className="section__title">Peste catalog, un strat AI care îți calculează șansele.</h2>
-          <p className="section__sub">Răsfoirea liberă e gratuită pentru toți. Pentru fondatorii care vor mai mult decât o listă, eligibil.eu oferă un strat de analiză AI: încarci artefactele startup-ului (deck, video, whitepaper, site) și primești pentru fiecare program trei scoruri individuale și un plan de acțiune.</p>
+          <p className="section__sub">Răsfoirea liberă e gratuită pentru toți. Pentru fondatorii care vor mai mult decât o listă, eligibil.org oferă un strat de analiză AI: încarci artefactele startup-ului (deck, video, whitepaper, site) și primești pentru fiecare program trei scoruri individuale și un plan de acțiune.</p>
         </div>
         <div className="ai-hero">
           <div className="ai-hero__inner">
@@ -137,7 +137,7 @@ function Reports() {
         <div className="section__label">07 — Knowledge Hub</div>
         <div className="section__head">
           <h2 className="section__title">Rapoarte, whitepapers și insights despre piața finanțării.</h2>
-          <p className="section__sub">Analize aprofundate realizate de echipa eligibil.eu și parteneri academici. Descărcare gratuită pentru utilizatori înregistrați.</p>
+          <p className="section__sub">Analize aprofundate realizate de echipa eligibil.org și parteneri academici. Descărcare gratuită pentru utilizatori înregistrați.</p>
         </div>
         <div className="reports">
           {REPORTS.map((r, i) => (
@@ -230,7 +230,7 @@ function Blog() {
                 </div>
                 <h3 className="post__title">{p.title}</h3>
                 <p className="post__desc">{p.desc}</p>
-                <div className="post__foot">{p.date} · Echipa eligibil.eu</div>
+                <div className="post__foot">{p.date} · Echipa eligibil.org</div>
               </div>
             </a>
           ))}
@@ -261,7 +261,7 @@ function GetListed() {
           <div className="listed-left">
             <h2 className="section__title">Listează-te în catalog. Ajungi la fondatorii potriviți.</h2>
             <p className="section__sub">
-              Fondatorii, cercetătorii și startup-urile vin pe eligibil.eu pentru a găsi cele mai bune oportunități de finanțare. Apari în catalog și fii descoperit — gratuit. Crește vizibilitatea programului tău în Moldova, România, Europa de Est și mai departe.
+              Fondatorii, cercetătorii și startup-urile vin pe eligibil.org pentru a găsi cele mai bune oportunități de finanțare. Apari în catalog și fii descoperit — gratuit. Crește vizibilitatea programului tău în Moldova, România, Europa de Est și mai departe.
             </p>
             <div style={{ display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap' }}>
               <button className="btn btn--accent">Listează-te gratuit →</button>
@@ -326,7 +326,7 @@ function FAQ() {
         <div className="section__label">12 — Întrebări frecvente</div>
         <div className="faq-grid">
           <div>
-            <h2 className="section__title">Ce este eligibil.eu?</h2>
+            <h2 className="section__title">Ce este eligibil.org?</h2>
             <p className="section__sub">Răspundem întrebărilor pe care ni le pun cel mai des fondatorii, cercetătorii și partenerii.</p>
           </div>
           <div className="faq">
@@ -406,7 +406,7 @@ function Footer({ lang, setLang }) {
             <a href="#">Investește în Moldova</a>
           </div>
           <div className="footer__col">
-            <h5>eligibil.eu</h5>
+            <h5>eligibil.org</h5>
             <a href="#">Despre noi</a>
             <a href="#">Contact</a>
             <a href="#">Ecosistem duediligence.one</a>
@@ -415,7 +415,7 @@ function Footer({ lang, setLang }) {
           </div>
           <div className="footer__col">
             <h5>Contact</h5>
-            <a href="mailto:hello@eligibil.eu">hello@eligibil.eu</a>
+            <a href="mailto:hello@eligibil.org">hello@eligibil.org</a>
             <a href="#">Chat live (09:00–18:00 EET)</a>
             <div style={{ marginTop: 14, display: 'flex', gap: 12 }}>
               {['LinkedIn', 'YouTube', 'X', 'Telegram'].map(s => (
@@ -425,7 +425,7 @@ function Footer({ lang, setLang }) {
           </div>
         </div>
         <div className="footer__bottom">
-          <div>© 2026 eligibil.eu · duediligence.one SRL + eligibil Foundation · IT Park Moldova</div>
+          <div>© 2026 eligibil.org · duediligence.one SRL + eligibil Foundation · IT Park Moldova</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <div className="lang-sw">
               {[['RO', '🇷🇴 RO'], ['EN', '🇬🇧 EN'], ['RU', '🇷🇺 RU'], ['UA', '🇺🇦 UA']].map(([k, l]) => (

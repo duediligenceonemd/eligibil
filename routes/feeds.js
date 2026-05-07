@@ -8,7 +8,7 @@ const express = require('express');
 const { getSupabase } = require('../db/supabase');
 
 const router = express.Router();
-const SITE_URL = process.env.SITE_URL || 'https://eligibil.eu';
+const SITE_URL = process.env.SITE_URL || 'https://eligibil.org';
 
 function tryGetSupabase() {
   try { return getSupabase(); } catch { return null; }
@@ -34,17 +34,17 @@ function rfc822(d) {
 const FEEDS = {
   stiri: {
     table: 'news', lang: 'ro', path: '/stiri',
-    title: 'eligibil.eu — Știri',
+    title: 'eligibil.org — Știri',
     desc:  'Anunțuri și update-uri despre granturi, programe și ecosistemul de finanțare pentru startup-uri din Moldova, România și UE.',
   },
   news: {
     table: 'news', lang: 'en', path: '/news',
-    title: 'eligibil.eu — News',
+    title: 'eligibil.org — News',
     desc:  'Announcements and updates about grants, programs, and the startup funding ecosystem in Moldova, Romania, and the EU.',
   },
   blog: {
     table: 'blog_posts', lang: 'ro', path: '/blog',
-    title: 'eligibil.eu — Blog',
+    title: 'eligibil.org — Blog',
     desc:  'Tutoriale, opinii și studii de caz despre eligibilitate, pregătire pentru aplicații și matching AI.',
   },
 };
@@ -89,7 +89,7 @@ async function buildFeed(req, res, key) {
       '      <link>' + escapeXml(link) + '</link>',
       '      <guid isPermaLink="true">' + escapeXml(link) + '</guid>',
       pub ? '      <pubDate>' + pub + '</pubDate>' : '',
-      it.author ? '      <author>noreply@eligibil.eu (' + escapeXml(it.author) + ')</author>' : '',
+      it.author ? '      <author>noreply@eligibil.org (' + escapeXml(it.author) + ')</author>' : '',
       desc ? '      <description>' + escapeXml(desc) + '</description>' : '',
       it.hero_image ? '      <enclosure url="' + escapeXml(it.hero_image) + '" type="image/jpeg" />' : '',
       '    </item>',

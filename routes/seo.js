@@ -13,7 +13,7 @@ const { getSupabase } = require('../db/supabase');
 
 const router = express.Router();
 
-const SITE_URL = process.env.SITE_URL || 'https://eligibil.eu';
+const SITE_URL = process.env.SITE_URL || 'https://eligibil.org';
 
 function tryGetSupabase() {
   try { return getSupabase(); } catch { return null; }

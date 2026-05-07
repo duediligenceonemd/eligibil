@@ -81,7 +81,7 @@ async function main() {
   const doRescore = args.includes('--rescore');
 
   console.log('╔══════════════════════════════════════════╗');
-  console.log('║   eligibil.eu — User Stats Refresh       ║');
+  console.log('║   eligibil.org — User Stats Refresh       ║');
   console.log('╚══════════════════════════════════════════╝');
 
   const supabase = getSupabase();
