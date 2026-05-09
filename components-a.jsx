@@ -1,4 +1,4 @@
-// Main components for the eligibil.eu prototype
+// Main components for the eligibil.org prototype
 const { useState, useEffect, useRef, useMemo } = React;
 
 /* ---------- Nav + Mega-menu ---------- */

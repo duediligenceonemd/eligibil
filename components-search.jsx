@@ -1,4 +1,4 @@
-// Search page — eligibil.eu
+// Search page — eligibil.org
 // Public catalog browser. Reads /api/grants (now public) with filters,
 // debounces input, syncs URL params for shareable searches, renders
 // result cards linking to /ro/granturi/<slug> from Pas 2.

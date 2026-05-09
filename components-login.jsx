@@ -1,4 +1,4 @@
-// Login page — eligibil.eu
+// Login page — eligibil.org
 const { useState, useEffect } = React;
 
 function LoginApp() {
