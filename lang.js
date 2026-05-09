@@ -68,6 +68,7 @@
 
     // ── Stats
     'Surse indexate': 'Indexed sources',
+    'Surse verificate': 'Verified sources',
     'Timp până la scor': 'Time to score',
     'Agenți AI de evaluare': 'AI evaluation agents',
     'Cost în faza beta': 'Cost during beta',

@@ -7,11 +7,13 @@ const { getSupabase } = require('../db/supabase');
 const router = express.Router();
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
+// Applied per-route below. Public routes: GET /grants (catalog browsing for
+// /search), GET /grants/:id (grant detail). Everything else still requires
+// auth — including /grants/match which is profile-personalized.
 function requireAuth(req, res, next) {
   if (!req.session?.userId) return res.status(401).json({ error: 'Neautentificat' });
   next();
 }
-router.use(requireAuth);
 
 // ── Supabase — graceful degradation ──────────────────────────────────────────
 // Returns null if env vars not set (allows server to start without Supabase).
@@ -73,41 +75,93 @@ function toMatchPct(similarity, threshold = 0.25) {
 }
 
 // ── Shared select columns (no embedding — large field) ────────────────────────
-const GRANT_SELECT = [
+// Pas 1 columns (slug_*, short_summary_*, funder_*, evidence_status,
+// application_languages) are added via a second list and concatenated; if the
+// Pas 1 migration hasn't been applied yet, Supabase returns an error and the
+// /grants endpoint serves an empty list — degrades cleanly rather than crashing.
+const GRANT_SELECT_BASE = [
   'id', 'nume_program', 'organizatie', 'tara', 'tip',
   'dilutiv', 'suma_min', 'suma_max', 'stadiu', 'sector',
   'deadline', 'luna', 'dificultate', 'zile_min', 'zile_max',
   'cerinte', 'descriere', 'website', 'status',
-].join(', ');
+];
+const GRANT_SELECT_PAS1 = [
+  'slug_ro', 'slug_en', 'nume_program_en',
+  'short_summary_ro', 'short_summary_en',
+  'funder_name', 'funder_country',
+  'evidence_status', 'application_languages',
+];
+const GRANT_SELECT      = GRANT_SELECT_BASE.join(', ');
+const GRANT_SELECT_FULL = GRANT_SELECT_BASE.concat(GRANT_SELECT_PAS1).join(', ');
 
 // =============================================================================
-// GET /api/grants
-// Query params: ?sector= &tara= &stadiu= &min= &max= &dilutiv= &tip= &limit=
+// GET /api/grants — PUBLIC (catalog browsing for /search)
+// Query params:
+//   ?sector= &tara= &stadiu= &tip= &min= &max= &dilutiv=  (existing)
+//   &q=                  free-text search across nume_program / descriere / funder_name
+//   &language=           filter on application_languages (e.g. 'en')
+//   &sort=               'difficulty' (default) | 'amount' (suma_max desc) | 'name'
+//   &limit=              cap rows (default 100, max 200)
 // =============================================================================
 router.get('/grants', async (req, res) => {
   const supabase = tryGetSupabase();
   if (!supabase) return res.status(503).json({ error: 'Supabase neconfigurat. Adaugă credențialele în .env' });
 
   try {
-    const { sector, tara, stadiu, min, max, dilutiv, tip, limit = 100 } = req.query;
+    const {
+      sector, tara, stadiu, min, max, dilutiv, tip,
+      q, language, sort,
+    } = req.query;
+    const limit = Math.min(Number(req.query.limit) || 100, 200);
 
-    let query = supabase
-      .from('grants')
-      .select(GRANT_SELECT)
-      .eq('status', 'Activ')
-      .order('dificultate', { ascending: true })
-      .limit(Number(limit));
+    // Try the enriched select first; fall back to the base select if Pas 1
+    // columns aren't applied yet (column-not-found errors from Postgres).
+    async function runQuery(selectCols) {
+      let query = supabase
+        .from('grants')
+        .select(selectCols)
+        .eq('status', 'Activ')
+        .limit(limit);
 
-    if (tara)    query = query.ilike('tara', `%${tara}%`);
-    if (sector)  query = query.ilike('sector', `%${sector}%`);
-    if (stadiu)  query = query.ilike('stadiu', `%${stadiu}%`);
-    if (tip)     query = query.ilike('tip', `%${tip}%`);
-    if (min)     query = query.gte('suma_max', Number(min));
-    if (max)     query = query.lte('suma_min', Number(max));
-    if (dilutiv !== undefined && dilutiv !== '')
-      query = query.eq('dilutiv', dilutiv === 'true');
+      if (tara)    query = query.ilike('tara',   `%${tara}%`);
+      if (sector)  query = query.ilike('sector', `%${sector}%`);
+      if (stadiu)  query = query.ilike('stadiu', `%${stadiu}%`);
+      if (tip)     query = query.ilike('tip',    `%${tip}%`);
+      if (min)     query = query.gte('suma_max', Number(min));
+      if (max)     query = query.lte('suma_min', Number(max));
+      if (dilutiv !== undefined && dilutiv !== '')
+        query = query.eq('dilutiv', dilutiv === 'true');
+      if (language && selectCols.includes('application_languages'))
+        query = query.contains('application_languages', [String(language).toLowerCase()]);
+      if (q) {
+        const term = `%${q}%`;
+        // funder_name only exists in the enriched select; or-clause still works
+        // because PostgREST .or accepts unknown columns at parse-time but the
+        // outer fallback handles the column-missing case.
+        if (selectCols.includes('funder_name')) {
+          query = query.or(`nume_program.ilike.${term},descriere.ilike.${term},funder_name.ilike.${term}`);
+        } else {
+          query = query.or(`nume_program.ilike.${term},descriere.ilike.${term}`);
+        }
+      }
 
-    const { data, error } = await query;
+      // Sort
+      if (sort === 'amount') {
+        query = query.order('suma_max', { ascending: false, nullsFirst: false });
+      } else if (sort === 'name') {
+        query = query.order('nume_program', { ascending: true });
+      } else {
+        query = query.order('dificultate', { ascending: true });
+      }
+
+      return query;
+    }
+
+    let { data, error } = await runQuery(GRANT_SELECT_FULL);
+    if (error && /column .* does not exist/i.test(error.message || '')) {
+      // Pas 1 not applied yet — degrade to base columns.
+      ({ data, error } = await runQuery(GRANT_SELECT));
+    }
     if (error) throw error;
 
     res.json(data || []);
@@ -118,12 +172,38 @@ router.get('/grants', async (req, res) => {
 });
 
 // =============================================================================
+// GET /api/grants/stats — PUBLIC (homepage real numbers, prep for Pas 7)
+// Returns total active grants + how many are evidence-verified.
+// =============================================================================
+router.get('/grants/stats', async (req, res) => {
+  const supabase = tryGetSupabase();
+  if (!supabase) return res.json({ total: 0, verified: 0 });
+  try {
+    const { count: total } = await supabase
+      .from('grants').select('*', { count: 'exact', head: true })
+      .eq('status', 'Activ');
+    let verified = 0;
+    try {
+      const { count } = await supabase
+        .from('grants').select('*', { count: 'exact', head: true })
+        .eq('status', 'Activ')
+        .in('evidence_status', ['verified_primary', 'verified_secondary']);
+      verified = count || 0;
+    } catch { /* evidence_status column may not exist pre-Pas 1 */ }
+    res.json({ total: total || 0, verified });
+  } catch (err) {
+    console.error('GET /api/grants/stats error:', err.message);
+    res.json({ total: 0, verified: 0 });
+  }
+});
+
+// =============================================================================
 // GET /api/grants/match
 // Returns top matching grants for the authenticated user's startup profile.
 // Uses vector search (if OpenAI key set) or FTS fallback.
 // MUST be registered BEFORE /grants/:id so Express doesn't capture "match" as :id
 // =============================================================================
-router.get('/grants/match', async (req, res) => {
+router.get('/grants/match', requireAuth, async (req, res) => {
   const supabase = tryGetSupabase();
   if (!supabase) return res.status(503).json({ error: 'Supabase neconfigurat' });
 
@@ -218,7 +298,7 @@ router.get('/grants/:id', async (req, res) => {
 // =============================================================================
 // GET /api/profile
 // =============================================================================
-router.get('/profile', (req, res) => {
+router.get('/profile', requireAuth, (req, res) => {
   const user    = db.findOne('users',    { id: req.session.userId });
   const startup = db.findOne('startups', { user_id: req.session.userId });
   if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
@@ -251,7 +331,7 @@ router.get('/profile', (req, res) => {
 // =============================================================================
 // PUT /api/profile
 // =============================================================================
-router.put('/profile', async (req, res) => {
+router.put('/profile', requireAuth, async (req, res) => {
   const {
     startupName, website, pitch, sector, stage, trl, country,
     teamSize, github, goals, amountIdx, horizon, priority,
@@ -298,7 +378,7 @@ router.put('/profile', async (req, res) => {
 // GET /api/dashboard
 // Returns readiness + completeness + top 3 matched grants + alerts
 // =============================================================================
-router.get('/dashboard', async (req, res) => {
+router.get('/dashboard', requireAuth, async (req, res) => {
   const startup  = db.findOne('startups', { user_id: req.session.userId });
   const supabase = tryGetSupabase();
 
@@ -373,7 +453,7 @@ router.get('/dashboard', async (req, res) => {
 // =============================================================================
 // GET /api/pipeline
 // =============================================================================
-router.get('/pipeline', (req, res) => {
+router.get('/pipeline', requireAuth, (req, res) => {
   const items = db.findAll('pipeline_items', { user_id: req.session.userId });
   res.json({ ok: true, items });
 });
@@ -381,7 +461,7 @@ router.get('/pipeline', (req, res) => {
 // =============================================================================
 // POST /api/pipeline
 // =============================================================================
-router.post('/pipeline', (req, res) => {
+router.post('/pipeline', requireAuth, (req, res) => {
   const { grantId, grantName, stage, notes, deadline } = req.body;
   const item = db.insert('pipeline_items', {
     user_id:    req.session.userId,
