@@ -1,0 +1,346 @@
+/* Admin panel — eligibil.eu (Iteration 1: grants + events CRUD)
+   Utilitarian / brutalist; reuses palette from styles-search.css.   No fancy modals — edit panel is a side drawer flexed next to the list. */
+
+:root {
+  --ap-bg:      #f7f5f0;
+  --ap-surface: #ffffff;
+  --ap-ink:     #0e1620;
+  --ap-muted:   #6b6e72;
+  --ap-rule:    #d4cfc4;
+  --ap-rule-soft: #e7e3d9;
+  --ap-accent:  #1f3a5f;
+  --ap-live:    #0a5c3e;
+  --ap-warn:    #b8730a;
+  --ap-crit:    #a8341e;
+}
+
+.ap, .ap * { box-sizing: border-box; }
+.ap {
+  min-height: 100vh;
+  background: var(--ap-bg);
+  color: var(--ap-ink);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ap__loading {
+  padding: 80px 24px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--ap-muted);
+}
+
+/* ── Layout ────────────────────────────────────────────────────────────────── */
+.ap__shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+.ap__side {
+  background: var(--ap-surface);
+  border-right: 1px solid var(--ap-rule);
+  padding: 24px 0;
+  position: sticky; top: 0; align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+}
+.ap__main {
+  padding: 24px 32px;
+  overflow-x: hidden;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+.ap__brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  padding: 0 24px 24px;
+  border-bottom: 1px solid var(--ap-rule-soft);
+}
+.ap__brand span { color: var(--ap-accent); }
+.ap__nav { padding: 16px 0; display: flex; flex-direction: column; }
+.ap__nav button {
+  text-align: left; padding: 10px 24px;
+  border: 0; background: transparent;
+  font: inherit; color: var(--ap-ink); cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 80ms;
+}
+.ap__nav button:hover { background: var(--ap-bg); }
+.ap__nav button.is-active {
+  background: var(--ap-bg);
+  border-left-color: var(--ap-accent);
+  font-weight: 600;
+  color: var(--ap-accent);
+}
+.ap__nav .ap__count {
+  float: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ap-muted);
+  font-weight: 400;
+}
+.ap__user {
+  position: sticky; bottom: 0;
+  padding: 16px 24px;
+  border-top: 1px solid var(--ap-rule-soft);
+  font-size: 12px;
+  color: var(--ap-muted);
+}
+.ap__user a { color: var(--ap-accent); text-decoration: none; }
+
+/* ── Main toolbar ─────────────────────────────────────────────────────────── */
+.ap__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px; flex-wrap: wrap;
+}
+.ap__toolbar h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600; font-size: 24px;
+  margin: 0;
+}
+.ap__toolbar-r { display: flex; gap: 8px; align-items: center; }
+.ap__search {
+  padding: 8px 12px;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-rule);
+  font: inherit;
+  outline: none;
+  width: 240px;
+}
+.ap__search:focus { border-color: var(--ap-accent); }
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.ap-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--ap-rule);
+  background: var(--ap-surface);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 80ms;
+}
+.ap-btn:hover { border-color: var(--ap-ink); }
+.ap-btn--primary {
+  background: var(--ap-accent);
+  border-color: var(--ap-accent);
+  color: var(--ap-bg);
+}
+.ap-btn--primary:hover { background: var(--ap-ink); border-color: var(--ap-ink); }
+.ap-btn--danger {
+  border-color: var(--ap-crit); color: var(--ap-crit);
+}
+.ap-btn--danger:hover { background: var(--ap-crit); color: var(--ap-bg); }
+
+/* ── Layout: list ↔ editor ────────────────────────────────────────────────── */
+.ap__split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.ap__split.has-edit {
+  grid-template-columns: 1fr 520px;
+  gap: 16px;
+}
+
+/* ── Table ────────────────────────────────────────────────────────────────── */
+.ap__table-wrap {
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-rule);
+  overflow-x: auto;
+}
+.ap__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ap__table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--ap-rule);
+  background: var(--ap-bg);
+  cursor: pointer;
+  user-select: none;
+}
+.ap__table th:hover { color: var(--ap-ink); }
+.ap__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ap-rule-soft);
+  vertical-align: top;
+}
+.ap__table tr { cursor: pointer; transition: background 80ms; }
+.ap__table tbody tr:hover { background: var(--ap-bg); }
+.ap__table tbody tr.is-selected { background: var(--ap-bg); border-left: 3px solid var(--ap-accent); }
+.ap__cell-mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ap-muted); }
+.ap__cell-name { font-weight: 500; }
+
+.ap__chip {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 2px 6px; border: 1px solid var(--ap-rule);
+  color: var(--ap-muted);
+}
+.ap__chip--ok    { color: var(--ap-live); border-color: var(--ap-live); }
+.ap__chip--warn  { color: var(--ap-warn); border-color: var(--ap-warn); }
+.ap__chip--crit  { color: var(--ap-crit); border-color: var(--ap-crit); }
+
+/* ── Editor panel ─────────────────────────────────────────────────────────── */
+.ap__editor {
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-rule);
+  padding: 20px 24px;
+  position: sticky; top: 24px; align-self: flex-start;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+}
+.ap__editor-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ap-rule-soft);
+}
+.ap__editor-head h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600; font-size: 18px;
+  margin: 0;
+}
+.ap__editor-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ap-muted);
+}
+.ap__editor-actions {
+  position: sticky; bottom: 0;
+  background: var(--ap-surface);
+  padding: 12px 0 0;
+  border-top: 1px solid var(--ap-rule-soft);
+  margin-top: 16px;
+  display: flex; gap: 8px; justify-content: space-between;
+  align-items: center;
+}
+.ap__editor-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ap-muted);
+}
+.ap__editor-status.is-error { color: var(--ap-crit); }
+.ap__editor-status.is-saved { color: var(--ap-live); }
+
+/* ── Form fields ──────────────────────────────────────────────────────────── */
+.ap-field {
+  margin-bottom: 14px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.ap-field > label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-muted);
+}
+.ap-field > label small { font-weight: 400; text-transform: none; letter-spacing: 0; opacity: 0.7; margin-left: 6px; }
+.ap-field input[type="text"],
+.ap-field input[type="number"],
+.ap-field input[type="datetime-local"],
+.ap-field input[type="url"],
+.ap-field select,
+.ap-field textarea {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--ap-bg);
+  border: 1px solid var(--ap-rule);
+  font: inherit;
+  color: var(--ap-ink);
+  outline: none;
+}
+.ap-field textarea { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.45; resize: vertical; }
+.ap-field input:focus, .ap-field select:focus, .ap-field textarea:focus { border-color: var(--ap-accent); background: var(--ap-surface); }
+.ap-field--inline { flex-direction: row; align-items: center; gap: 8px; }
+.ap-field--inline > label { text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ap-ink); }
+
+.ap-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.ap-json-error {
+  margin-top: 4px;
+  color: var(--ap-crit);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+/* ── Section grouping in editor ──────────────────────────────────────────── */
+.ap-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ap-rule-soft);
+}
+.ap-section:last-of-type { border-bottom: 0; }
+.ap-section h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ap-muted);
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+.ap__empty {
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--ap-muted);
+  border: 1px dashed var(--ap-rule);
+  background: var(--ap-surface);
+}
+.ap__empty h3 { font-family: 'Space Grotesk', sans-serif; color: var(--ap-ink); font-weight: 600; font-size: 18px; margin: 0 0 8px; }
+
+/* ── Dashboard cards ──────────────────────────────────────────────────────── */
+.ap__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.ap__card {
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-rule);
+  padding: 16px 20px;
+}
+.ap__card-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--ap-accent);
+}
+.ap__card-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ap-muted);
+  margin-top: 8px;
+}
+
+/* ── Banners ──────────────────────────────────────────────────────────────── */
+.ap__banner {
+  padding: 12px 16px;
+  border: 1px solid var(--ap-warn);
+  background: #fff8eb;
+  color: var(--ap-warn);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.ap__banner.is-error { border-color: var(--ap-crit); background: #fbece9; color: var(--ap-crit); }
+
+@media (max-width: 900px) {
+  .ap__shell { grid-template-columns: 1fr; }
+  .ap__side { position: static; height: auto; }
+  .ap__split.has-edit { grid-template-columns: 1fr; }
+}
