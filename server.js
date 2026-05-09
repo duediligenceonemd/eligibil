@@ -57,6 +57,14 @@ async function serveGrantPage(req, res, lang, slugColumn) {
 app.get('/ro/granturi/:slug', (req, res) => serveGrantPage(req, res, 'ro', 'slug_ro'));
 app.get('/en/grants/:slug',  (req, res) => serveGrantPage(req, res, 'en', 'slug_en'));
 
+// /search — public catalog page. Static file served via the catch-all that
+// follows; we just need an explicit route ahead of the index.html fallback.
+app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'search.html')));
+
+// SEO routes — /sitemap.xml + /robots.txt. Mounted before express.static
+// so they're guaranteed to win over any static file with the same name.
+app.use('/', require('./routes/seo'));
+
 // Legacy redirect: /grant.html?id=EU012 → /ro/granturi/<slug>
 app.get('/grant.html', async (req, res, next) => {
   if (!req.query.id) return res.redirect(301, '/');

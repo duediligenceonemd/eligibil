@@ -6,11 +6,15 @@
 (function () {
   'use strict';
 
-  // Pages that don't require auth (marketing + auth pages themselves)
-  const PUBLIC_PAGES = ['/', '/index.html', '/login.html', '/register.html'];
-  const isPublic = PUBLIC_PAGES.some(p =>
-    window.location.pathname === p || window.location.pathname.endsWith(p)
-  );
+  // Pages that don't require auth (marketing + auth pages + public catalog).
+  // /search and the bilingual grant detail pages (/ro/granturi/*, /en/grants/*)
+  // are meant for SEO traffic — anonymous visitors must be able to browse.
+  const PUBLIC_PAGES = ['/', '/index.html', '/login.html', '/register.html', '/search', '/search.html'];
+  const PUBLIC_PREFIXES = ['/ro/granturi/', '/en/grants/'];
+  const path = window.location.pathname;
+  const isPublic =
+    PUBLIC_PAGES.some(p => path === p || path.endsWith(p)) ||
+    PUBLIC_PREFIXES.some(p => path.startsWith(p));
 
   if (isPublic) return;
 
