@@ -149,6 +149,17 @@ app.get(/^\/(ro|en)\/(granturi|grants)-(.+)$/, async (req, res, next) => {
 // follows; we just need an explicit route ahead of the index.html fallback.
 app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'search.html')));
 
+// /evenimente (RO) + /events (EN) — public events listing page (Brief 04).
+// Both routes serve the same events.html shell; components-events.jsx
+// detects the URL path to flip language.
+app.get('/evenimente', (req, res) => res.sendFile(path.join(__dirname, 'events.html')));
+app.get('/events',     (req, res) => res.sendFile(path.join(__dirname, 'events.html')));
+
+// /admin — protected admin panel (CRUD over grants + events). The page
+// loads auth.js which redirects anonymous visitors to /login.html, and
+// every API call enforces requireAdmin server-side.
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
+
 // SEO routes — /sitemap.xml + /robots.txt. Mounted before express.static
 // so they're guaranteed to win over any static file with the same name.
 app.use('/', require('./routes/seo'));

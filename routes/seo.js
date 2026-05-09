@@ -30,12 +30,13 @@ function escapeXml(s) {
 }
 
 // ── Static pages — only routes that actually exist today.
-// /evenimente + /events land in Brief 04; uncomment when those routes ship.
 // /pricing /about /parteneri are placeholders in the brief but no routes
 // exist yet — including them now would feed Google 404s.
 const STATIC_PAGES = [
-  { path: '/',       changefreq: 'daily'  },
-  { path: '/search', changefreq: 'daily'  },
+  { path: '/',           changefreq: 'daily'  },
+  { path: '/search',     changefreq: 'daily'  },
+  { path: '/evenimente', changefreq: 'daily'  },
+  { path: '/events',     changefreq: 'daily'  },
 ];
 
 // ── Programmatic SEO listings — keep in sync with SEO_SECTORS / SEO_COUNTRIES

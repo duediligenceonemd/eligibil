@@ -12,7 +12,9 @@
   // meant for SEO traffic — anonymous visitors must be able to browse.
   // Note: the listing prefixes use a dash separator (matching the route
   // pattern in server.js) which is distinct from the slash-based slug routes.
-  const PUBLIC_PAGES = ['/', '/index.html', '/login.html', '/register.html', '/search', '/search.html'];
+  const PUBLIC_PAGES = ['/', '/index.html', '/login.html', '/register.html',
+                        '/search', '/search.html',
+                        '/evenimente', '/events', '/events.html'];
   const PUBLIC_PREFIXES = ['/ro/granturi/', '/en/grants/', '/ro/granturi-', '/en/grants-'];
   const path = window.location.pathname;
   const isPublic =
