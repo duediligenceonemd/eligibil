@@ -1,4 +1,8 @@
 // Grant Detail Page — supports 2 grants (EIC, Startup Moldova) + 2 modes (public, app)
+// When server injects window.__GRANT_DATA__ (rendered via /ro/granturi/:slug or
+// /en/grants/:slug), a 'live' overlay key is added below that overrides the
+// surface-level fields with real DB values while keeping the EIC template
+// for fields not yet carried by the schema (objectives, timeline, etc).
 const { useState, useEffect, useRef } = React;
 
 // ============== DATA ==============
@@ -250,6 +254,39 @@ const GRANTS = {
     ],
   },
 };
+
+// Server-injected DB grant overlay. The Pas 2 SEO routes inject window.__GRANT_DATA__
+// before this script loads, so by the time we're parsing GRANTS, that global is
+// either present (real grant from /ro/granturi/:slug or /en/grants/:slug) or
+// undefined (legacy /grant.html, dev mode, no server rendering). When present,
+// we synthesise a 'live' entry that overrides the surface fields with DB values,
+// falling back to the EIC template for fields the schema doesn't carry yet
+// (objectives, eligibility breakdown, timeline, matchScore — those land in
+// later sprint chunks).
+if (typeof window !== 'undefined' && window.__GRANT_DATA__) {
+  const _db   = window.__GRANT_DATA__;
+  const _lang = window.__LANG__ || 'ro';
+  const _isEn = _lang === 'en';
+  const _name = _isEn ? (_db.nume_program_en || _db.nume_program) : _db.nume_program;
+  const _org  = _db.funder_name || _db.organizatie || GRANTS.eic.org;
+  const _initials = _org ? _org.split(/\s+/).map(w => w[0]).filter(Boolean).join('').slice(0, 4).toUpperCase() : GRANTS.eic.orgShort;
+  const _pitch = (_isEn ? (_db.short_summary_en || _db.descriere_en) : (_db.short_summary_ro || _db.descriere)) || GRANTS.eic.pitch;
+  const _fmt = (n) => (n == null ? null : (n >= 1_000_000 ? `€${(n/1_000_000).toFixed(1).replace('.0','')}M` : `€${Math.round(n/1000)}K`));
+
+  GRANTS.live = {
+    ...GRANTS.eic,
+    id:        'live',
+    name:      _name || GRANTS.eic.name,
+    org:       _org,
+    orgShort:  _initials || GRANTS.eic.orgShort,
+    region:    _db.funder_country || _db.tara || GRANTS.eic.region,
+    type:      _db.tip || GRANTS.eic.type,
+    deadline:  _db.deadline || GRANTS.eic.deadline,
+    pitch:     _pitch,
+    amountMin: _fmt(_db.suma_min) || GRANTS.eic.amountMin,
+    amountMax: _fmt(_db.suma_max) || GRANTS.eic.amountMax,
+  };
+}
 
 // ============== HELPERS ==============
 function Ring({ value, size = 80, stroke = 7, color = 'var(--accent)' }) {
@@ -531,12 +568,14 @@ function GrantApp() {
     try { return localStorage.getItem('gp-mode') || 'app'; } catch { return 'app'; }
   });
   const [grantId, setGrantId] = useState(() => {
+    if (typeof window !== 'undefined' && window.__GRANT_DATA__) return 'live';
     try { return localStorage.getItem('gp-grant') || 'eic'; } catch { return 'eic'; }
   });
   const [active, setActive] = useState('overview');
 
   useEffect(() => { try { localStorage.setItem('gp-mode', mode); } catch {} }, [mode]);
-  useEffect(() => { try { localStorage.setItem('gp-grant', grantId); } catch {} }, [grantId]);
+  // Don't persist 'live' — it'd be wrong for the next visit (slug-specific).
+  useEffect(() => { try { if (grantId !== 'live') localStorage.setItem('gp-grant', grantId); } catch {} }, [grantId]);
 
   const g = GRANTS[grantId];
 
