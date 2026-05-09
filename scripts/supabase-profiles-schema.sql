@@ -1,5 +1,5 @@
 -- =============================================================================
--- eligibil.eu — User Profiles + Aggregate Stats Schema (Scoring v2)
+-- eligibil.org — User Profiles + Aggregate Stats Schema (Scoring v2)
 -- Run AFTER supabase-staging-schema.sql in Supabase SQL Editor
 -- =============================================================================
 

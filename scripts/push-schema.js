@@ -52,7 +52,7 @@ async function main() {
   }
 
   console.log('╔══════════════════════════════════════════╗');
-  console.log('║   eligibil.eu — Schema Push              ║');
+  console.log('║   eligibil.org — Schema Push              ║');
   console.log('╚══════════════════════════════════════════╝');
   console.log(`Fișier schema: ${SCHEMA_FILE}`);
   console.log(`Host: db.wkajytbxbjbpeuqolkwh.supabase.co`);

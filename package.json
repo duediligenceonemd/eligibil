@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "AI-powered grant matching platform for startups in Moldova, Romania & EU",
   "main": "server.js",
-  "homepage": "https://eligibil.eu",
+  "homepage": "https://eligibil.org",
   "keywords": [
     "grants",
     "startups",

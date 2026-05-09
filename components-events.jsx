@@ -171,7 +171,7 @@ function Hero({ featured, onFeaturedClick }) {
       <div>
         <div className="ev__hero-label">EVENIMENTE PARTENERI · Q2 2026</div>
         <h1 className="ev__hero-title">Unde se întâmplă<br /><em>viitorul</em> în regiunea ta.</h1>
-        <p className="ev__hero-sub">Hackathons, workshopuri, info days, pitch nights, demo days — toate evenimentele relevante pentru founder-ii din CEE, într-un singur calendar. Curate de partenerii eligibil.md.</p>
+        <p className="ev__hero-sub">Hackathons, workshopuri, info days, pitch nights, demo days — toate evenimentele relevante pentru founder-ii din CEE, într-un singur calendar. Curate de partenerii eligibil.org.</p>
       </div>
       <div className="ev__hero-stats">
         <div className="ev__hero-stat"><div className="ev__hero-stat-k">evenimente Q2</div><div className="ev__hero-stat-v">64</div><div className="ev__hero-stat-sub">+12 vs Q1</div></div>

@@ -13,7 +13,7 @@ const { getSupabase } = require('../db/supabase');
 
 const router = express.Router();
 
-const SITE_URL = process.env.SITE_URL || 'https://eligibil.eu';
+const SITE_URL = process.env.SITE_URL || 'https://eligibil.org';
 
 function tryGetSupabase() {
   try { return getSupabase(); } catch { return null; }
@@ -37,6 +37,10 @@ const STATIC_PAGES = [
   { path: '/search',     changefreq: 'daily'  },
   { path: '/evenimente', changefreq: 'daily'  },
   { path: '/events',     changefreq: 'daily'  },
+  { path: '/stiri',      changefreq: 'daily'  },
+  { path: '/news',       changefreq: 'daily'  },
+  { path: '/blog',       changefreq: 'weekly' },
+  { path: '/en/blog',    changefreq: 'weekly' },
 ];
 
 // ── Programmatic SEO listings — keep in sync with SEO_SECTORS / SEO_COUNTRIES
@@ -110,6 +114,57 @@ router.get('/sitemap.xml', async (req, res) => {
     } catch (err) {
       console.error('GET /sitemap.xml unexpected error:', err.message);
       // Fall through with whatever we have.
+    }
+  }
+
+  // News + blog per-slug entries (Iter 3). Skip silently if tables missing.
+  if (sb) {
+    for (const [table, roPath, enPath] of [
+      ['news',       '/stiri', '/news'],
+      ['blog_posts', '/blog',  '/en/blog'],
+    ]) {
+      try {
+        const { data, error } = await sb.from(table)
+          .select('slug_ro, slug_en, updated_at, published_at')
+          .eq('status', 'published')
+          .not('published_at', 'is', null);
+        if (error) {
+          if (!/relation .* does not exist/i.test(error.message || '')) {
+            console.error('GET /sitemap.xml ' + table + ' error:', error.message);
+          }
+          continue;
+        }
+        for (const it of (data || [])) {
+          const lastmod = (it.updated_at || it.published_at)
+            ? new Date(it.updated_at || it.published_at).toISOString().split('T')[0]
+            : null;
+          if (it.slug_ro) {
+            const lines = [];
+            lines.push('  <url>');
+            lines.push('    <loc>' + SITE_URL + roPath + '/' + escapeXml(it.slug_ro) + '</loc>');
+            if (lastmod) lines.push('    <lastmod>' + lastmod + '</lastmod>');
+            lines.push('    <changefreq>monthly</changefreq>');
+            if (it.slug_en) {
+              lines.push('    <xhtml:link rel="alternate" hreflang="ro" href="' + SITE_URL + roPath + '/' + escapeXml(it.slug_ro) + '" />');
+              lines.push('    <xhtml:link rel="alternate" hreflang="en" href="' + SITE_URL + enPath + '/' + escapeXml(it.slug_en) + '" />');
+              lines.push('    <xhtml:link rel="alternate" hreflang="x-default" href="' + SITE_URL + roPath + '/' + escapeXml(it.slug_ro) + '" />');
+            }
+            lines.push('  </url>');
+            urls.push(lines.join('\n'));
+          }
+          if (it.slug_en && roPath !== enPath) {
+            const lines = [];
+            lines.push('  <url>');
+            lines.push('    <loc>' + SITE_URL + enPath + '/' + escapeXml(it.slug_en) + '</loc>');
+            if (lastmod) lines.push('    <lastmod>' + lastmod + '</lastmod>');
+            lines.push('    <changefreq>monthly</changefreq>');
+            lines.push('  </url>');
+            urls.push(lines.join('\n'));
+          }
+        }
+      } catch (err) {
+        console.error('GET /sitemap.xml ' + table + ' unexpected:', err.message);
+      }
     }
   }
 

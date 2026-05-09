@@ -1,4 +1,4 @@
-// Admin panel — eligibil.eu (Iteration 1)
+// Admin panel — eligibil.org (Iteration 1)
 // CRUD over /api/admin/grants and /api/admin/events. The page is gated
 // client-side by auth.js (any logged-in session) and server-side by
 // requireAdmin in routes/admin.js. Single-file React app, vanilla.
@@ -22,6 +22,16 @@ const EVENT_TYPE_OPTIONS = [
   'networking', 'hackathon', 'accelerator_call',
 ];
 const EVENT_STATUS_OPTIONS = ['upcoming', 'live', 'past', 'cancelled'];
+const FUNDER_TYPE_OPTIONS = [
+  '', 'foundation', 'government', 'corporate', 'vc_fund',
+  'accelerator', 'eu_program', 'dao', 'other',
+];
+const FUNDER_STATUS_OPTIONS = ['active', 'inactive', 'archived'];
+const CONTENT_STATUS_OPTIONS = ['draft', 'published', 'archived'];
+const NEWS_CATEGORY_OPTIONS = ['', 'Anunț', 'Update', 'Politici', 'Eveniment', 'Press'];
+const BLOG_CATEGORY_OPTIONS = ['', 'Tutorial', 'Opinie', 'Studiu de caz', 'Interviu', 'Ghid'];
+const COMMENT_STATUS_OPTIONS = ['approved', 'hidden', 'deleted'];
+const COMMENT_CONTENT_TYPE_OPTIONS = ['grant', 'blog_post', 'news_article'];
 
 const GRANTS_CONFIG = {
   title: 'Granturi',
@@ -147,6 +157,153 @@ const EVENTS_CONFIG = {
     { name: 'source_url',       label: 'Source URL',    type: 'text',     group: 'Sursă' },
     { name: 'source_name',      label: 'Source name',   type: 'text',     group: 'Sursă' },
     { name: 'evidence_status',  label: 'Evidence status', type: 'select', group: 'Sursă', options: EVIDENCE_OPTIONS },
+  ],
+};
+
+const FUNDERS_CONFIG = {
+  title: 'Donatori',
+  apiBase: '/api/admin/funders',
+  pk: 'id',
+  pkEditable: false,    // UUID, generated server-side
+  newDefaults: { funder_type: 'foundation', status: 'active' },
+  searchKeys: ['name', 'name_en', 'short_name', 'country', 'website'],
+  listColumns: [
+    { key: 'name',         label: 'Nume',         primary: true },
+    { key: 'funder_type',  label: 'Tip',          chip: true,  width: 130 },
+    { key: 'country',      label: 'Țară',                       width: 110 },
+    { key: 'website',      label: 'Website',      width: 220, render: (v) => v ? new URL(v, 'http://x').hostname.replace(/^www\./, '') : '—' },
+    { key: 'status',       label: 'Status',       chip: true,  width: 100 },
+    { key: 'evidence_status', label: 'Evidence',
+      chipMap: { verified_primary: 'ok', verified_secondary: 'ok', hypothesis: 'warn' }, width: 130 },
+  ],
+  defaultSort: { key: 'updated_at', dir: 'desc' },
+  fields: [
+    { name: 'slug',            label: 'Slug',                type: 'text',     group: 'Identitate', help: 'URL-friendly. Folosit pentru pagini publice viitoare /donatori/<slug>.' },
+    { name: 'name',            label: 'Nume (RO)',           type: 'text',     group: 'Identitate', required: true },
+    { name: 'name_en',         label: 'Nume (EN)',           type: 'text',     group: 'Identitate' },
+    { name: 'short_name',      label: 'Acronim / nume scurt', type: 'text',    group: 'Identitate', help: 'Ex: EIC, ODIMM, NSF' },
+
+    { name: 'funder_type',     label: 'Tip donator',         type: 'select',   group: 'Tip', options: FUNDER_TYPE_OPTIONS },
+    { name: 'status',          label: 'Status',              type: 'select',   group: 'Tip', options: FUNDER_STATUS_OPTIONS },
+
+    { name: 'country',         label: 'Țară (HQ)',           type: 'text',     group: 'Geografie' },
+    { name: 'hq_city',         label: 'Oraș HQ',             type: 'text',     group: 'Geografie' },
+    { name: 'countries_funded', label: 'Țări finanțate',     type: 'json',     group: 'Geografie', help: 'Array string: ["Moldova","România","UE"]' },
+
+    { name: 'logo_url',        label: 'Logo URL',            type: 'text',     group: 'Branding' },
+    { name: 'website',         label: 'Website',             type: 'text',     group: 'Branding' },
+    { name: 'contact_email',   label: 'Email contact',       type: 'text',     group: 'Branding' },
+
+    { name: 'short_summary_ro', label: 'Sumar scurt RO',     type: 'textarea', group: 'Conținut', help: '<160 chars pentru SEO meta' },
+    { name: 'short_summary_en', label: 'Sumar scurt EN',     type: 'textarea', group: 'Conținut' },
+    { name: 'description_ro',  label: 'Descriere RO',        type: 'textarea', group: 'Conținut' },
+    { name: 'description_en',  label: 'Descriere EN',        type: 'textarea', group: 'Conținut' },
+
+    { name: 'focus_areas',     label: 'Focus areas',         type: 'json',     group: 'Targeting', help: 'Array string: ["AI","climate","deep-tech"]' },
+    { name: 'stages_funded',   label: 'Stages',              type: 'json',     group: 'Targeting' },
+
+    { name: 'founded_year',    label: 'Înființat (an)',      type: 'number',   group: 'Track record' },
+    { name: 'total_funding_eur', label: 'Total finanțat (EUR)', type: 'number', group: 'Track record', help: 'Suma agregată dezvăluită' },
+    { name: 'notable_grantees', label: 'Beneficiari notabili', type: 'json',   group: 'Track record', help: 'Array de nume' },
+
+    { name: 'evidence_status', label: 'Evidence status',     type: 'select',   group: 'Sursă', options: EVIDENCE_OPTIONS },
+  ],
+};
+
+function _contentFields(categoryOptions, isBlog) {
+  const base = [
+    { name: 'slug_ro',     label: 'Slug RO',           type: 'text',     group: 'Identitate', required: true, help: 'URL: /stiri/<slug> sau /blog/<slug>' },
+    { name: 'slug_en',     label: 'Slug EN',           type: 'text',     group: 'Identitate' },
+    { name: 'title',       label: 'Titlu (RO)',        type: 'text',     group: 'Identitate', required: true },
+    { name: 'title_en',    label: 'Titlu (EN)',        type: 'text',     group: 'Identitate' },
+
+    { name: 'category',    label: 'Categorie',         type: 'select',   group: 'Clasificare', options: categoryOptions },
+    { name: 'tags',        label: 'Tags',              type: 'json',     group: 'Clasificare', help: 'Array string: ["AI","Moldova"]' },
+    { name: 'author',      label: 'Autor',             type: 'text',     group: 'Clasificare' },
+    { name: 'hero_image',  label: 'Hero image URL',    type: 'text',     group: 'Clasificare', help: 'URL absolut. Upload nativ vine în iter 4.' },
+
+    { name: 'excerpt_ro',  label: 'Rezumat (RO)',      type: 'textarea', group: 'Conținut', help: '1-2 fraze. <200 chars pentru SEO meta + listing.' },
+    { name: 'excerpt_en',  label: 'Rezumat (EN)',      type: 'textarea', group: 'Conținut' },
+    { name: 'body_md_ro',  label: 'Body Markdown (RO)', type: 'textarea', group: 'Conținut', help: 'Markdown: # ## ### ; **bold** *italic* ; - listă ; [text](url) ; ```cod``` ; > quote' },
+    { name: 'body_md_en',  label: 'Body Markdown (EN)', type: 'textarea', group: 'Conținut' },
+
+    { name: 'status',       label: 'Status',           type: 'select',   group: 'Publicare', options: CONTENT_STATUS_OPTIONS },
+    { name: 'published_at', label: 'Publicat la (ISO)', type: 'datetime', group: 'Publicare', help: 'Lasă gol până nu vrei să fie public; status="published" + dată trecută = vizibil' },
+  ];
+  if (isBlog) {
+    base.push(
+      { name: 'reading_time_min', label: 'Reading time (min)', type: 'number',   group: 'Publicare' },
+      { name: 'is_featured',      label: 'Featured',           type: 'checkbox', group: 'Publicare' },
+    );
+  }
+  return base;
+}
+
+const NEWS_CONFIG = {
+  title: 'Știri',
+  apiBase: '/api/admin/news',
+  pk: 'id',
+  pkEditable: false,
+  newDefaults: { status: 'draft' },
+  searchKeys: ['slug_ro', 'title', 'author', 'category'],
+  listColumns: [
+    { key: 'title',        label: 'Titlu',     primary: true },
+    { key: 'slug_ro',      label: 'Slug',      mono: true,   width: 180 },
+    { key: 'category',     label: 'Categorie',               width: 120 },
+    { key: 'author',       label: 'Autor',                   width: 140 },
+    { key: 'published_at', label: 'Publicat',  mono: true,   width: 110, render: (v) => v ? new Date(v).toISOString().slice(0, 10) : '—' },
+    { key: 'status',       label: 'Status',    chip: true,   width: 110,
+      chipMap: { published: 'ok', draft: 'warn', archived: '' } },
+  ],
+  defaultSort: { key: 'published_at', dir: 'desc' },
+  fields: _contentFields(NEWS_CATEGORY_OPTIONS, false),
+};
+
+const BLOG_CONFIG = {
+  title: 'Blog',
+  apiBase: '/api/admin/blog',
+  pk: 'id',
+  pkEditable: false,
+  newDefaults: { status: 'draft', is_featured: false },
+  searchKeys: ['slug_ro', 'title', 'author', 'category'],
+  listColumns: [
+    { key: 'title',           label: 'Titlu',     primary: true },
+    { key: 'slug_ro',         label: 'Slug',      mono: true,   width: 180 },
+    { key: 'category',        label: 'Categorie',               width: 120 },
+    { key: 'reading_time_min', label: 'Min',      mono: true,   width: 60, render: (v) => v ? v + '\'' : '—' },
+    { key: 'is_featured',     label: 'Feat.',     chip: true,   width: 70, render: (v) => v ? 'Yes' : '—' },
+    { key: 'published_at',    label: 'Publicat',  mono: true,   width: 110, render: (v) => v ? new Date(v).toISOString().slice(0, 10) : '—' },
+    { key: 'status',          label: 'Status',    chip: true,   width: 110,
+      chipMap: { published: 'ok', draft: 'warn', archived: '' } },
+  ],
+  defaultSort: { key: 'published_at', dir: 'desc' },
+  fields: _contentFields(BLOG_CATEGORY_OPTIONS, true),
+};
+
+const COMMENTS_CONFIG = {
+  title: 'Comentarii',
+  apiBase: '/api/admin/comments',
+  pk: 'id',
+  pkEditable: false,
+  newDefaults: {},
+  searchKeys: ['user_email', 'user_name', 'body', 'content_id'],
+  listColumns: [
+    { key: 'created_at',   label: 'Creat',    mono: true,   width: 130, render: (v) => v ? new Date(v).toISOString().slice(0,16).replace('T',' ') : '—' },
+    { key: 'user_name',    label: 'Autor',                  width: 140 },
+    { key: 'content_type', label: 'Tip',      chip: true,   width: 120 },
+    { key: 'content_id',   label: 'Țintă',    mono: true,   width: 130 },
+    { key: 'body',         label: 'Conținut', primary: true, render: (v) => (v || '').slice(0, 100) + ((v || '').length > 100 ? '…' : '') },
+    { key: 'status',       label: 'Status',   chip: true,   width: 110,
+      chipMap: { approved: 'ok', hidden: 'warn', deleted: 'crit' } },
+  ],
+  defaultSort: { key: 'created_at', dir: 'desc' },
+  fields: [
+    { name: 'content_type', label: 'Tip conținut', type: 'select', group: 'Țintă', options: COMMENT_CONTENT_TYPE_OPTIONS },
+    { name: 'content_id',   label: 'ID țintă',     type: 'text',   group: 'Țintă' },
+    { name: 'user_email',   label: 'Email autor',  type: 'text',   group: 'Autor' },
+    { name: 'user_name',    label: 'Nume autor',   type: 'text',   group: 'Autor' },
+    { name: 'body',         label: 'Conținut',     type: 'textarea', group: 'Conținut' },
+    { name: 'status',       label: 'Status',       type: 'select', group: 'Moderare', options: COMMENT_STATUS_OPTIONS, help: '"hidden" = invizibil pe pagină ; "deleted" = șters logic' },
   ],
 };
 
@@ -507,8 +664,12 @@ function AdminApp() {
   const [tab, setTab] = useState('dashboard');
   const [stats, setStats] = useState(null);
   const [user, setUser] = useState(null);
-  const [grantsCount, setGrantsCount] = useState(null);
-  const [eventsCount, setEventsCount] = useState(null);
+  const [grantsCount, setGrantsCount]   = useState(null);
+  const [eventsCount, setEventsCount]   = useState(null);
+  const [fundersCount, setFundersCount] = useState(null);
+  const [newsCount, setNewsCount]       = useState(null);
+  const [blogCount, setBlogCount]       = useState(null);
+  const [commentsCount, setCommentsCount] = useState(null);
 
   // Wait for auth.js to populate window.__USER (it dispatches 'auth-ready')
   useEffect(() => {
@@ -524,21 +685,33 @@ function AdminApp() {
       if (r.ok) setStats(await r.json());
     } catch {}
     try {
-      const [g, e] = await Promise.all([
-        fetch('/api/admin/grants', { credentials: 'same-origin' }).then(r => r.json()),
-        fetch('/api/admin/events', { credentials: 'same-origin' }).then(r => r.json()),
+      const [g, e, f, n, b, c] = await Promise.all([
+        fetch('/api/admin/grants',   { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/events',   { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/funders',  { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/news',     { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/blog',     { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/comments', { credentials: 'same-origin' }).then(r => r.json()),
       ]);
       setGrantsCount(g.items?.length ?? 0);
       setEventsCount(e.items?.length ?? 0);
+      setFundersCount(f.items?.length ?? 0);
+      setNewsCount(n.items?.length ?? 0);
+      setBlogCount(b.items?.length ?? 0);
+      setCommentsCount(c.items?.length ?? 0);
     } catch {}
   }, []);
 
   useEffect(() => { loadCounts(); }, [loadCounts, tab]);
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard',  count: null },
-    { id: 'grants',    label: 'Granturi',   count: grantsCount },
-    { id: 'events',    label: 'Evenimente', count: eventsCount },
+    { id: 'dashboard', label: 'Dashboard',   count: null },
+    { id: 'grants',    label: 'Granturi',    count: grantsCount },
+    { id: 'events',    label: 'Evenimente',  count: eventsCount },
+    { id: 'funders',   label: 'Donatori',    count: fundersCount },
+    { id: 'news',      label: 'Știri',       count: newsCount },
+    { id: 'blog',      label: 'Blog',        count: blogCount },
+    { id: 'comments',  label: 'Comentarii',  count: commentsCount },
   ];
 
   return (
@@ -570,6 +743,10 @@ function AdminApp() {
           {tab === 'dashboard' && <Dashboard stats={stats} />}
           {tab === 'grants'    && <CrudPage config={GRANTS_CONFIG} />}
           {tab === 'events'    && <CrudPage config={EVENTS_CONFIG} />}
+          {tab === 'funders'   && <CrudPage config={FUNDERS_CONFIG} />}
+          {tab === 'news'      && <CrudPage config={NEWS_CONFIG} />}
+          {tab === 'blog'      && <CrudPage config={BLOG_CONFIG} />}
+          {tab === 'comments'  && <CrudPage config={COMMENTS_CONFIG} />}
         </main>
       </div>
     </div>
