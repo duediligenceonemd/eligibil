@@ -1,4 +1,4 @@
-# eligibil.eu — AI Grant Matching for Startups
+# eligibil.org — AI Grant Matching for Startups
 
 > Find the right grants, faster. AI-powered matching for startups in Moldova, Romania & the EU.
 
@@ -10,9 +10,9 @@
 
 ---
 
-## What is eligibil.eu?
+## What is eligibil.org?
 
-**eligibil.eu** is an AI-powered grant discovery and matching platform designed for early-stage startups in Moldova, Romania, and the EU. Instead of spending weeks manually researching funding opportunities, founders describe their startup once — and the platform instantly surfaces the most relevant grants, accelerators, and investment programs.
+**eligibil.org** is an AI-powered grant discovery and matching platform designed for early-stage startups in Moldova, Romania, and the EU. Instead of spending weeks manually researching funding opportunities, founders describe their startup once — and the platform instantly surfaces the most relevant grants, accelerators, and investment programs.
 
 ### The Problem
 
@@ -20,7 +20,7 @@ Founders waste 20–40 hours per funding round researching eligibility across 70
 
 ### The Solution
 
-eligibil.eu uses **vector embeddings + semantic search** to match startup profiles against a curated database of grants based on sector, stage, country, funding range, and eligibility criteria — not just keyword search.
+eligibil.org uses **vector embeddings + semantic search** to match startup profiles against a curated database of grants based on sector, stage, country, funding range, and eligibility criteria — not just keyword search.
 
 ---
 
@@ -264,16 +264,16 @@ Production-ready configs for 4 platforms. Pick one and deploy in <5 minutes.
 - `scripts/deploy-cloudrun.ps1` — GCP deploy with env from `.env`
 - `scripts/deploy.ps1` — multi-platform dispatcher
 
-### Custom domain (eligibil.eu)
+### Custom domain (eligibil.org)
 
 After purchasing the domain, map it to your chosen platform:
 
 ```bash
 # Google Cloud Run
-gcloud beta run domain-mappings create --service=eligibil --domain=eligibil.eu --region=europe-west1
+gcloud beta run domain-mappings create --service=eligibil --domain=eligibil.org --region=europe-west1
 
 # Fly.io
-flyctl certs create eligibil.eu
+flyctl certs create eligibil.org
 
 # Render: Settings → Custom Domains (web UI)
 # Railway: Settings → Networking → Custom Domain (web UI)
@@ -296,7 +296,7 @@ All four issue automatic Let's Encrypt SSL certificates within ~10-30 minutes af
 
 ## Why We Need API Credits
 
-eligibil.eu is at **MVP stage** with a working prototype serving early users. We use:
+eligibil.org is at **MVP stage** with a working prototype serving early users. We use:
 
 - **LLM embeddings** — generating semantic vectors for 70+ grants + user profiles (`text-embedding-3-small`)
 - **Semantic search** — matching startup profiles to relevant grants via cosine similarity
@@ -314,10 +314,10 @@ We are applying for API/cloud credits to:
 
 ## About
 
-**eligibil.eu** is built by a team of founders who experienced the grant-hunting problem firsthand while building their own startup in Moldova. We believe access to funding information should be a right, not a privilege — especially for founders in emerging markets where institutional knowledge is scarce.
+**eligibil.org** is built by a team of founders who experienced the grant-hunting problem firsthand while building their own startup in Moldova. We believe access to funding information should be a right, not a privilege — especially for founders in emerging markets where institutional knowledge is scarce.
 
-- **Website:** [eligibil.eu](https://eligibil.eu)
-- **Contact:** hello@eligibil.eu
+- **Website:** [eligibil.org](https://eligibil.org)
+- **Contact:** hello@eligibil.org
 - **Stage:** MVP / Early Traction
 - **Location:** Moldova 🇲🇩 / Romania 🇷🇴
 

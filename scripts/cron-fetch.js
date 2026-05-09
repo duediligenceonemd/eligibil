@@ -84,7 +84,7 @@ async function main() {
   const startTime = Date.now();
 
   console.log('╔═══════════════════════════════════════════════════════════╗');
-  console.log('║       eligibil.eu — Grants Fetch Orchestrator             ║');
+  console.log('║       eligibil.org — Grants Fetch Orchestrator             ║');
   console.log(`║       ${new Date().toISOString().padEnd(50)}║`);
   console.log('╚═══════════════════════════════════════════════════════════╝\n');
 

@@ -1,4 +1,4 @@
-// Admin panel — eligibil.eu (Iteration 1)
+// Admin panel — eligibil.org (Iteration 1)
 // CRUD over /api/admin/grants and /api/admin/events. The page is gated
 // client-side by auth.js (any logged-in session) and server-side by
 // requireAdmin in routes/admin.js. Single-file React app, vanilla.

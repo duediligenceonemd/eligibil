@@ -189,7 +189,7 @@ async function main() {
   obsidian.ensureVault();
 
   console.log('╔══════════════════════════════════════════╗');
-  console.log('║   eligibil.eu — Grants Inbox Processor   ║');
+  console.log('║   eligibil.org — Grants Inbox Processor   ║');
   console.log('╚══════════════════════════════════════════╝');
   console.log(`Inbox:    ${INBOX_DIR}`);
   console.log(`Vault:    ${obsidian.VAULT_ROOT}`);

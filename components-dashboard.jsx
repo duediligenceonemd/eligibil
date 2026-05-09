@@ -1,4 +1,4 @@
-// Dashboard components — app.eligibil.eu
+// Dashboard components — app.eligibil.org
 const { useState: _useState, useEffect: _useEffect } = React;
 
 // ── Shared Sidebar (used on dashboard, grant, events, consortium) ─────────────

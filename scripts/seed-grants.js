@@ -234,7 +234,7 @@ async function main() {
   const hasOpenAI      = !!process.env.OPENAI_API_KEY;
 
   console.log('╔══════════════════════════════════════════╗');
-  console.log('║   eligibil.eu — Grant Seeder v1.0        ║');
+  console.log('║   eligibil.org — Grant Seeder v1.0        ║');
   console.log('╚══════════════════════════════════════════╝');
   console.log(`Dry run    : ${dryRun ? 'DA (nu se scrie în DB)' : 'nu'}`);
   console.log(`Embeddings : ${(skipEmbeddings || !hasOpenAI) ? 'SKIP' + (!hasOpenAI ? ' (OPENAI_API_KEY lipsă)' : '') : 'da (' + OPENAI_MODEL + ')'}`);

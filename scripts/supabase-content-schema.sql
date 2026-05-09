@@ -1,5 +1,5 @@
 -- =============================================================================
--- eligibil.eu — Content tables: news (Știri) + blog_posts (Blog)
+-- eligibil.org — Content tables: news (Știri) + blog_posts (Blog)
 -- Two near-identical tables; separated for clean URL routing (/stiri vs /blog)
 -- and clear admin tabs. Kept feature-equivalent so a future merge is trivial.
 --

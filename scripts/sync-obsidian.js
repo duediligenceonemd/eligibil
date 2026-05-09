@@ -159,7 +159,7 @@ async function main() {
   const pushOnly = args.includes('--push');
 
   console.log('╔══════════════════════════════════════════╗');
-  console.log('║  eligibil.eu — Obsidian ↔ Supabase Sync ║');
+  console.log('║  eligibil.org — Obsidian ↔ Supabase Sync ║');
   console.log('╚══════════════════════════════════════════╝');
   console.log(`Vault: ${obsidian.VAULT_ROOT}\n`);
 

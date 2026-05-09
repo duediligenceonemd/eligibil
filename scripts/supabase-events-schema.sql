@@ -1,5 +1,5 @@
 -- =============================================================================
--- eligibil.eu — Events table (Brief 04)
+-- eligibil.org — Events table (Brief 04)
 -- External events (conferences, pitch nights, webinars, hackathons) shown
 -- alongside grant deadlines on /evenimente. Grant deadlines themselves are
 -- computed at request time from the grants table — they are NOT stored here.

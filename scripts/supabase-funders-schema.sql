@@ -1,5 +1,5 @@
 -- =============================================================================
--- eligibil.eu — Funders / Donatori (Admin iter 2)
+-- eligibil.org — Funders / Donatori (Admin iter 2)
 -- Normalised donor catalog. Each grant currently has free-form `funder_name`
 -- and `funder_country` text columns; this table adds a structured backing
 -- entity. The grants link is OPTIONAL (FK can be NULL) so existing rows

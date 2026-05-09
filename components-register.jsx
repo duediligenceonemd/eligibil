@@ -1,4 +1,4 @@
-// Registration / Onboarding — app.eligibil.eu/register
+// Registration / Onboarding — app.eligibil.org/register
 const { useState, useEffect } = React;
 
 const REG_SECTORS = [

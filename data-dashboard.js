@@ -1,4 +1,4 @@
-// Dashboard data — app.eligibil.eu
+// Dashboard data — app.eligibil.org
 const DASH_GRANTS = [
   { name: 'EIC Accelerator 2026 — Cut-off Mai', from: 'European Innovation Council', flag: '🇪🇺 EU',
     amount: '€2.5M max', match: 82, readiness: 68, confidence: 74,
