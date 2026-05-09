@@ -57,6 +57,94 @@ async function serveGrantPage(req, res, lang, slugColumn) {
 app.get('/ro/granturi/:slug', (req, res) => serveGrantPage(req, res, 'ro', 'slug_ro'));
 app.get('/en/grants/:slug',  (req, res) => serveGrantPage(req, res, 'en', 'slug_en'));
 
+// Programmatic SEO listings — /ro/granturi-:sector-:tara + /en/grants-:sector-:tara.
+// Distinct from the slug routes above (slash separator vs. dash). The regex
+// requires a dash immediately after granturi/grants so there's no collision
+// with /ro/granturi/<slug>. Allowlist of valid (sector, country) pairs is
+// enforced at request time — combinations not on the list fall through to 404.
+const { renderSeoListing } = require('./lib/render-seo-listing');
+const SEO_SECTORS = {
+  'ai':         { ro: 'AI',         en: 'AI',         ilike: '%AI%' },
+  'biotech':    { ro: 'biotech',    en: 'biotech',    ilike: '%biotech%' },
+  'climate':    { ro: 'climate',    en: 'climate',    ilike: '%climate%' },
+  'fintech':    { ro: 'fintech',    en: 'fintech',    ilike: '%fintech%' },
+  'edtech':     { ro: 'edtech',     en: 'edtech',     ilike: '%edtech%' },
+  'deep-tech':  { ro: 'deep tech',  en: 'deep tech',  ilike: '%deep%' },
+  'saas':       { ro: 'SaaS',       en: 'SaaS',       ilike: '%SaaS%' },
+  'healthtech': { ro: 'healthtech', en: 'healthtech', ilike: '%health%' },
+  'mobility':   { ro: 'mobility',   en: 'mobility',   ilike: '%mobility%' },
+};
+const SEO_COUNTRIES = {
+  'moldova': { ro: 'Moldova', en: 'Moldova', ilike: '%Moldova%' },
+  'romania': { ro: 'România', en: 'Romania', ilike: '%Romania%' },
+  'ucraina': { ro: 'Ucraina', en: 'Ukraine', ilike: '%Ukraine%' },
+  'ue':      { ro: 'UE',      en: 'EU',      ilike: '%EU%' },
+};
+
+app.get(/^\/(ro|en)\/(granturi|grants)-(.+)$/, async (req, res, next) => {
+  const lang = req.params[0];
+  const type = req.params[1];
+  const rest = req.params[2];
+  if ((lang === 'ro' && type !== 'granturi') ||
+      (lang === 'en' && type !== 'grants'))   return next();
+
+  // Peel country (single-token) from the END so compound sectors like
+  // "deep-tech" parse correctly: "deep-tech-moldova" → sector=deep-tech, c=moldova.
+  let sectorKey = null, countryKey = null;
+  for (const c of Object.keys(SEO_COUNTRIES)) {
+    if (rest.endsWith('-' + c)) {
+      const candidate = rest.slice(0, -(c.length + 1));
+      if (SEO_SECTORS[candidate]) { sectorKey = candidate; countryKey = c; break; }
+    }
+  }
+  // Unknown sector or country — serve the 404 directly. Calling next() would
+  // bounce through to the catch-all that serves index.html (homepage), which
+  // is wrong UX and bad for SEO (Google would dedupe many URLs to the same
+  // homepage content and penalize the listings).
+  if (!sectorKey || !countryKey) {
+    return res.status(404).sendFile(path.join(__dirname, '404.html'));
+  }
+
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).sendFile(path.join(__dirname, '404.html'));
+
+  const sectorMeta  = SEO_SECTORS[sectorKey];
+  const countryMeta = SEO_COUNTRIES[countryKey];
+
+  try {
+    const { data, error } = await sb.from('grants')
+      .select('id, slug_ro, slug_en, nume_program, nume_program_en, ' +
+              'short_summary_ro, short_summary_en, funder_name, funder_country, ' +
+              'organizatie, tara, tip, suma_min, suma_max, deadline, ' +
+              'evidence_status, dilutiv, dificultate')
+      .eq('status', 'Activ')
+      .ilike('sector', sectorMeta.ilike)
+      .ilike('tara',   countryMeta.ilike)
+      .order('dificultate', { ascending: true })
+      .limit(50);
+
+    if (error) {
+      // Pas 1 columns missing → graceful 404 rather than 500.
+      if (/column .* does not exist/i.test(error.message || '')) {
+        return res.status(404).sendFile(path.join(__dirname, '404.html'));
+      }
+      console.error('SEO listing query error:', error.message);
+      return res.status(500).sendFile(path.join(__dirname, '404.html'));
+    }
+
+    const html = renderSeoListing({
+      lang,
+      sectorKey,  sectorLabel:  sectorMeta[lang],
+      countryKey, countryLabel: countryMeta[lang],
+      grants: data || [],
+    });
+    res.type('html').send(html);
+  } catch (err) {
+    console.error('SEO listing unexpected error:', err.message);
+    res.status(500).sendFile(path.join(__dirname, '404.html'));
+  }
+});
+
 // /search — public catalog page. Static file served via the catch-all that
 // follows; we just need an explicit route ahead of the index.html fallback.
 app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'search.html')));
