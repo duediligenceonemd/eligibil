@@ -1,5 +1,5 @@
 -- =============================================================================
--- eligibil.eu — Grants Staging Schema
+-- eligibil.org — Grants Staging Schema
 -- Pipeline: Email/RSS/Web → grants_staging → review → grants (PROD)
 -- Run in Supabase SQL Editor AFTER supabase-schema.sql
 -- =============================================================================

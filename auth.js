@@ -15,9 +15,9 @@
   const PUBLIC_PAGES = ['/', '/index.html', '/login.html', '/register.html',
                         '/search', '/search.html',
                         '/evenimente', '/events', '/events.html',
-                        '/stiri', '/news', '/blog'];
+                        '/stiri', '/news', '/blog', '/en/blog'];
   const PUBLIC_PREFIXES = ['/ro/granturi/', '/en/grants/', '/ro/granturi-', '/en/grants-',
-                           '/stiri/', '/news/', '/blog/'];
+                           '/stiri/', '/news/', '/blog/', '/en/blog/'];
   const path = window.location.pathname;
   const isPublic =
     PUBLIC_PAGES.some(p => path === p || path.endsWith(p)) ||

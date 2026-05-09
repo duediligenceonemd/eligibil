@@ -1,5 +1,5 @@
 /**
- * lang.js — Runtime i18n for eligibil.eu
+ * lang.js — Runtime i18n for eligibil.org
  *
  * Strategy: phrase-based translation dictionary applied to DOM text nodes.
  * Works with all existing React-rendered components without code changes.
@@ -49,8 +49,8 @@
     'Analiză AI · Gratuit în faza beta · Fără cont necesar': 'AI Analysis · Free during beta · No account required',
     'Încarcă. Analizează. Află exact unde ești ': 'Upload. Analyze. Find out exactly where you are ',
     'eligibil': 'eligible',
-    'eligibil.eu analizează artefactele startupului tău — pitch deck, video și whitepaper — identifică automat TRL-ul, calculează scorul de potrivire pentru peste 735 de granturi și îți livrează un plan concret să devii maxim eligibil.':
-      'eligibil.eu analyzes your startup artifacts — pitch deck, video, and whitepaper — automatically identifies the TRL, calculates the match score across 735+ grants, and delivers a concrete plan to maximize eligibility.',
+    'eligibil.org analizează artefactele startupului tău — pitch deck, video și whitepaper — identifică automat TRL-ul, calculează scorul de potrivire pentru peste 735 de granturi și îți livrează un plan concret să devii maxim eligibil.':
+      'eligibil.org analyzes your startup artifacts — pitch deck, video, and whitepaper — automatically identifies the TRL, calculates the match score across 735+ grants, and delivers a concrete plan to maximize eligibility.',
     'Obține scorul tău de eligibilitate în 90 de secunde': 'Get your eligibility score in 90 seconds',
     'min. 1 necesar': 'min. 1 required',
     'gata pentru analiză': 'ready for analysis',
@@ -220,8 +220,8 @@
     'Niciun grant găsit': 'No grants found',
 
     // ── Page titles (mismatched HTML attribute won't match but we handle inline)
-    'eligibil.eu — Încarcă. Analizează. Află unde ești eligibil.':
-      'eligibil.eu — Upload. Analyze. Find where you are eligible.',
+    'eligibil.org — Încarcă. Analizează. Află unde ești eligibil.':
+      'eligibil.org — Upload. Analyze. Find where you are eligible.',
   };
 
   // EN → RO (auto-built from RO_TO_EN reverse)
@@ -443,5 +443,5 @@
     init();
   }
 
-  console.log('[i18n] eligibil.eu language engine loaded · current:', CURRENT_LANG);
+  console.log('[i18n] eligibil.org language engine loaded · current:', CURRENT_LANG);
 })();

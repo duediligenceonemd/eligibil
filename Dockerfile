@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# eligibil.eu — Node.js Express app for Cloud Run
+# eligibil.org — Node.js Express app for Cloud Run
 
 FROM node:20-alpine AS base
 WORKDIR /app

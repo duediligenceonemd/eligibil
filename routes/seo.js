@@ -13,7 +13,7 @@ const { getSupabase } = require('../db/supabase');
 
 const router = express.Router();
 
-const SITE_URL = process.env.SITE_URL || 'https://eligibil.eu';
+const SITE_URL = process.env.SITE_URL || 'https://eligibil.org';
 
 function tryGetSupabase() {
   try { return getSupabase(); } catch { return null; }
@@ -40,6 +40,7 @@ const STATIC_PAGES = [
   { path: '/stiri',      changefreq: 'daily'  },
   { path: '/news',       changefreq: 'daily'  },
   { path: '/blog',       changefreq: 'weekly' },
+  { path: '/en/blog',    changefreq: 'weekly' },
 ];
 
 // ── Programmatic SEO listings — keep in sync with SEO_SECTORS / SEO_COUNTRIES
@@ -120,7 +121,7 @@ router.get('/sitemap.xml', async (req, res) => {
   if (sb) {
     for (const [table, roPath, enPath] of [
       ['news',       '/stiri', '/news'],
-      ['blog_posts', '/blog',  '/blog'],
+      ['blog_posts', '/blog',  '/en/blog'],
     ]) {
       try {
         const { data, error } = await sb.from(table)
