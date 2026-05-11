@@ -359,7 +359,7 @@ function AppTopbar({ g }) {
 function PublicNav({ g }) {
   return (
     <div className="gp__pubnav">
-      <div className="gp__pubnav-brand">eligibil<span>.eu</span></div>
+      <div className="gp__pubnav-brand">eligibil<span>.org</span></div>
       <div className="gp__pubnav-links">
         <a href="/index.html">Cum funcționează</a>
         <a href="/index.html#granturi">Granturi</a>

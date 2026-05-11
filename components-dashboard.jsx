@@ -53,7 +53,7 @@ function Sidebar({ activePage = 'dashboard' }) {
     <aside className="sidebar">
       <div className="sidebar__brand">
         <a href="/index.html" style={{ textDecoration: 'none' }}>
-          <div className="sidebar__logo">eligibil<span style={{ color: 'var(--accent)' }}>.eu</span></div>
+          <div className="sidebar__logo">eligibil<span style={{ color: 'var(--accent)' }}>.org</span></div>
         </a>
         <span className="sidebar__env">APP</span>
       </div>

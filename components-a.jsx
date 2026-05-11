@@ -102,7 +102,7 @@ function Nav({ lang, setLang }) {
       <div className="container">
         <div className="nav__inner">
           <div className="nav__brand">
-            <div className="nav__logo">eligibil<span className="nav__logo-dot">.eu</span></div>
+            <div className="nav__logo">eligibil<span className="nav__logo-dot">.org</span></div>
             <div className="nav__tag">AI Readiness &amp;<br/>Funding Orchestrator</div>
           </div>
           <div className="nav__links">

@@ -177,7 +177,7 @@ const FAQS = [
   { q: 'Ce primesc ca accelerator sau fond dacă mă listez?',
     a: 'Profil gratuit complet (logo, descriere, call-uri active), badge "Verified", apariție prioritară în căutări relevante, acces la analize despre fondatorii interesați, și — opțional — integrare cu sistemul de matching AI care îți trimite aplicanți pre-calificați.' },
   { q: 'Am găsit o informație incorectă sau lipsă. Ce fac?',
-    a: 'Trimite-ne un mesaj la hello@eligibil.org sau folosește butonul "Raportează" de pe cardul oricărei oportunități. Orice raport e verificat în 48 de ore.' },
+    a: 'Trimite-ne un mesaj la info@eligibil.org sau folosește butonul "Raportează" de pe cardul oricărei oportunități. Orice raport e verificat în 48 de ore.' },
   { q: 'În ce limbi funcționează platforma?',
     a: 'Română · Engleză · Rusă · Ucraineană. Analiza AI a artefactelor (deck, video, whitepaper) funcționează indiferent de limba documentului.' },
   { q: 'Cum sunt protejate datele startupului meu?',

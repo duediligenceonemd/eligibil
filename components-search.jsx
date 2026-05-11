@@ -101,7 +101,7 @@ function writeUrlFilters(filters) {
 function Topbar() {
   return (
     <header className="sb__top">
-      <a className="sb__brand" href="/">eligibil<span>.eu</span></a>
+      <a className="sb__brand" href="/">eligibil<span>.org</span></a>
       <nav className="sb__nav">
         <a href="/">Acasă</a>
         <a href="/search">Caută</a>

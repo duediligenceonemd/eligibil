@@ -63,7 +63,7 @@ function StepRail({ active }) {
     <aside className="reg__rail">
       <div className="reg__brand">
         <a href="/index.html" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div className="reg__brand-logo">eligibil<span>.eu</span></div>
+          <div className="reg__brand-logo">eligibil<span>.org</span></div>
         </a>
         <span className="reg__brand-env">APP · REGISTER</span>
       </div>

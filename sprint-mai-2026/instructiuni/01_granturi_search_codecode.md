@@ -9,7 +9,7 @@
 
 ## Context
 
-eligibil.eu are deja:
+eligibil.org are deja:
 - Tabel `grants` cu 24 câmpuri (vezi `scripts/supabase-schema.sql`)
 - Vector search funcțional cu pgvector HNSW + OpenAI embeddings
 - `/api/grants` endpoint cu filtre (sector, tara, stadiu, sumă, dilutiv, tip)
@@ -32,7 +32,7 @@ Creează `scripts/supabase-grants-enrich-schema.sql` cu:
 
 ```sql
 -- ============================================================================
--- eligibil.eu — Grants schema enrichment v2
+-- eligibil.org — Grants schema enrichment v2
 -- Adds: bilingual slugs, structured eligibility, SEO meta, evidence tracking
 -- Run AFTER supabase-schema.sql
 -- ============================================================================
@@ -204,15 +204,15 @@ app.get('/grant.html', async (req, res) => {
 Creează `lib/render-grant-page.js` care citește `grant.html`, injectează în `<head>`:
 
 ```html
-<link rel="canonical" href="https://eligibil.eu/{lang}/{path}/{slug}" />
-<link rel="alternate" hreflang="ro" href="https://eligibil.eu/ro/granturi/{slug_ro}" />
-<link rel="alternate" hreflang="en" href="https://eligibil.eu/en/grants/{slug_en}" />
-<link rel="alternate" hreflang="x-default" href="https://eligibil.eu/ro/granturi/{slug_ro}" />
-<title>{nume_program} — {funder_name} | eligibil.eu</title>
+<link rel="canonical" href="https://eligibil.org/{lang}/{path}/{slug}" />
+<link rel="alternate" hreflang="ro" href="https://eligibil.org/ro/granturi/{slug_ro}" />
+<link rel="alternate" hreflang="en" href="https://eligibil.org/en/grants/{slug_en}" />
+<link rel="alternate" hreflang="x-default" href="https://eligibil.org/ro/granturi/{slug_ro}" />
+<title>{nume_program} — {funder_name} | eligibil.org</title>
 <meta name="description" content="{short_summary}" />
 <meta property="og:title" content="{nume_program}" />
 <meta property="og:description" content="{short_summary}" />
-<meta property="og:url" content="https://eligibil.eu/{lang}/{path}/{slug}" />
+<meta property="og:url" content="https://eligibil.org/{lang}/{path}/{slug}" />
 <meta property="og:type" content="article" />
 <meta name="robots" content="index, follow" />
 
@@ -225,7 +225,7 @@ Creează `lib/render-grant-page.js` care citește `grant.html`, injectează în 
   "offers": {
     "@type": "Offer",
     "name": "{nume_program}",
-    "url": "https://eligibil.eu/{lang}/{path}/{slug}",
+    "url": "https://eligibil.org/{lang}/{path}/{slug}",
     "validThrough": "{deadline_iso}"
   }
 }
@@ -255,9 +255,9 @@ Creează `search.html`:
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Caută finanțare · eligibil.eu</title>
+<title>Caută finanțare · eligibil.org</title>
 <meta name="description" content="Caută granturi, acceleratoare, capital non-dilutiv pentru startupuri din Moldova, România și UE. Filtre după sector, țară, sumă, deadline." />
-<link rel="canonical" href="https://eligibil.eu/search" />
+<link rel="canonical" href="https://eligibil.org/search" />
 <link rel="stylesheet" href="/styles.css" />
 <link rel="stylesheet" href="/styles-search.css" />
 <script src="/lang.js" defer></script>
@@ -325,8 +325,8 @@ router.get('/sitemap.xml', async (req, res) => {
 
   // Static pages
   ['', '/search', '/pricing', '/parteneri', '/about'].forEach(p => {
-    urls.push(`<url><loc>https://eligibil.eu${p}</loc><changefreq>weekly</changefreq></url>`);
-    urls.push(`<url><loc>https://eligibil.eu/en${p}</loc><changefreq>weekly</changefreq></url>`);
+    urls.push(`<url><loc>https://eligibil.org${p}</loc><changefreq>weekly</changefreq></url>`);
+    urls.push(`<url><loc>https://eligibil.org/en${p}</loc><changefreq>weekly</changefreq></url>`);
   });
 
   // Grant detail pages (bilingual with hreflang)
@@ -335,18 +335,18 @@ router.get('/sitemap.xml', async (req, res) => {
     if (g.slug_ro) {
       urls.push(`
         <url>
-          <loc>https://eligibil.eu/ro/granturi/${g.slug_ro}</loc>
+          <loc>https://eligibil.org/ro/granturi/${g.slug_ro}</loc>
           <lastmod>${lastmod}</lastmod>
           <changefreq>weekly</changefreq>
-          <xhtml:link rel="alternate" hreflang="ro" href="https://eligibil.eu/ro/granturi/${g.slug_ro}" />
-          ${g.slug_en ? `<xhtml:link rel="alternate" hreflang="en" href="https://eligibil.eu/en/grants/${g.slug_en}" />` : ''}
-          <xhtml:link rel="alternate" hreflang="x-default" href="https://eligibil.eu/ro/granturi/${g.slug_ro}" />
+          <xhtml:link rel="alternate" hreflang="ro" href="https://eligibil.org/ro/granturi/${g.slug_ro}" />
+          ${g.slug_en ? `<xhtml:link rel="alternate" hreflang="en" href="https://eligibil.org/en/grants/${g.slug_en}" />` : ''}
+          <xhtml:link rel="alternate" hreflang="x-default" href="https://eligibil.org/ro/granturi/${g.slug_ro}" />
         </url>`);
     }
     if (g.slug_en) {
       urls.push(`
         <url>
-          <loc>https://eligibil.eu/en/grants/${g.slug_en}</loc>
+          <loc>https://eligibil.org/en/grants/${g.slug_en}</loc>
           <lastmod>${lastmod}</lastmod>
           <changefreq>weekly</changefreq>
         </url>`);
@@ -357,8 +357,8 @@ router.get('/sitemap.xml', async (req, res) => {
   const SECTORS = ['ai', 'biotech', 'climate', 'fintech', 'edtech', 'deep-tech'];
   const COUNTRIES = ['moldova', 'romania', 'ucraina', 'ue'];
   SECTORS.forEach(s => COUNTRIES.forEach(c => {
-    urls.push(`<url><loc>https://eligibil.eu/ro/granturi-${s}-${c}</loc><changefreq>weekly</changefreq></url>`);
-    urls.push(`<url><loc>https://eligibil.eu/en/grants-${s}-${c}</loc><changefreq>weekly</changefreq></url>`);
+    urls.push(`<url><loc>https://eligibil.org/ro/granturi-${s}-${c}</loc><changefreq>weekly</changefreq></url>`);
+    urls.push(`<url><loc>https://eligibil.org/en/grants-${s}-${c}</loc><changefreq>weekly</changefreq></url>`);
   }));
 
   res.type('application/xml');
@@ -379,7 +379,7 @@ Disallow: /dashboard
 Disallow: /profile
 Disallow: /upload-artefact
 
-Sitemap: https://eligibil.eu/sitemap.xml`);
+Sitemap: https://eligibil.org/sitemap.xml`);
 });
 
 module.exports = router;

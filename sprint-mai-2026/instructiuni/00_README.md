@@ -1,4 +1,4 @@
-# Instrucțiuni de implementare — eligibil.eu
+# Instrucțiuni de implementare — eligibil.org
 
 **Sprint:** 4 săptămâni (Mai 2026)
 **Decizii confirmate:**

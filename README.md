@@ -317,7 +317,7 @@ We are applying for API/cloud credits to:
 **eligibil.org** is built by a team of founders who experienced the grant-hunting problem firsthand while building their own startup in Moldova. We believe access to funding information should be a right, not a privilege — especially for founders in emerging markets where institutional knowledge is scarce.
 
 - **Website:** [eligibil.org](https://eligibil.org)
-- **Contact:** hello@eligibil.org
+- **Contact:** info@eligibil.org
 - **Stage:** MVP / Early Traction
 - **Location:** Moldova 🇲🇩 / Romania 🇷🇴
 

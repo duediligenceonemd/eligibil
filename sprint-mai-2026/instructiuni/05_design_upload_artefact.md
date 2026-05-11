@@ -17,7 +17,7 @@
 
 ## Brief design
 
-Construiește pagina **`/upload-artefact`** pentru eligibil.eu. Aceasta este momentul de adevăr al produsului: utilizatorul își încarcă pitch deck-ul PDF și AI-ul îl analizează în 30-60 secunde, returnând 3 scoruri și un breakdown detaliat.
+Construiește pagina **`/upload-artefact`** pentru eligibil.org. Aceasta este momentul de adevăr al produsului: utilizatorul își încarcă pitch deck-ul PDF și AI-ul îl analizează în 30-60 secunde, returnând 3 scoruri și un breakdown detaliat.
 
 Pagina trebuie să facă utilizatorul să simtă: **încredere** (datele mele sunt în siguranță), **anticipare** (scorul vine în câteva secunde) și **claritate** (înțeleg de ce am acest scor).
 

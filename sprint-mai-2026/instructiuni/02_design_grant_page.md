@@ -18,7 +18,7 @@
 
 ## Brief design
 
-Construiește pagina de detaliu pentru un grant pe **eligibil.eu** — platforma AI care ajută startupurile din Moldova, România și UE să găsească finanțare.
+Construiește pagina de detaliu pentru un grant pe **eligibil.org** — platforma AI care ajută startupurile din Moldova, România și UE să găsească finanțare.
 
 Această pagină este **convertorul principal** al portalului: un vizitator SEO ajunge aici dintr-o căutare Google ("granturi AI Moldova") și trebuie să decidă în 30 de secunde dacă produsul merită un cont.
 
@@ -46,7 +46,7 @@ Fondatori de startup-uri early-stage (MVP, Pre-seed, Seed). Citesc rapid, scanea
 ### Structura paginii (16 secțiuni, scroll continuu)
 
 1. **Header sticky** cu scroll-progress bar
-   - Logo eligibil.eu stânga
+   - Logo eligibil.org stânga
    - Meniu: Caută · Granturi · Pentru tine · Resurse · Parteneri
    - Language switcher RO/EN/RU/UA dreapta
    - CTA primar "Verifică eligibilitatea" (deschide modal upload PDF)
@@ -140,7 +140,7 @@ Fondatori de startup-uri early-stage (MVP, Pre-seed, Seed). Citesc rapid, scanea
       - Ultima verificare: `28 Apr 2026 · acum 12 ore`
       - Confidence label: `Verified primary` (badge verde)
       - `[Raportează informație incorectă →]` link
-    - Aceasta este secțiunea care diferențiază eligibil.eu de competitori. Trebuie vizibilă, nu îngropată.
+    - Aceasta este secțiunea care diferențiază eligibil.org de competitori. Trebuie vizibilă, nu îngropată.
 
 13. **CTA mid-page** (full-width band)
     - "Vrei să vezi scorurile tale personalizate pentru acest grant?"

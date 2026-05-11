@@ -14,7 +14,7 @@ Decizii confirmate:
 - Analiză cu **Anthropic Claude** (`ANTHROPIC_API_KEY` deja există în `.env`)
 - Output: 3 scoruri normalizate 0-100 + breakdown per dimensiune
 
-eligibil.eu are deja:
+eligibil.org are deja:
 - Schema `grants` îmbogățită (după Brief 01) cu `evaluation_criteria` JSONB
 - Schema `user_profiles` cu embedding via `db/profile-sync.js`
 - Tabel `user_pool_stats` cu agregate
@@ -51,7 +51,7 @@ Creează `scripts/supabase-artefacts-schema.sql`:
 
 ```sql
 -- ============================================================================
--- eligibil.eu — Artefacts schema
+-- eligibil.org — Artefacts schema
 -- Stores user-uploaded artefacts (pitch deck PDF) + AI analysis results
 -- ============================================================================
 
@@ -501,7 +501,7 @@ Creează `upload-artefact.html`:
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Încarcă pitch deck · eligibil.eu</title>
+<title>Încarcă pitch deck · eligibil.org</title>
 <link rel="stylesheet" href="/styles.css" />
 <link rel="stylesheet" href="/styles-upload.css" />
 <script src="/lang.js" defer></script>

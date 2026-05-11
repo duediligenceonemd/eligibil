@@ -388,11 +388,11 @@ app.get('/evenimente/:slug', async (req, res) => {
 Update `events.html` cu meta tags SEO:
 
 ```html
-<title>Evenimente startup și deadline-uri granturi · eligibil.eu</title>
+<title>Evenimente startup și deadline-uri granturi · eligibil.org</title>
 <meta name="description" content="Calendar live cu deadline-uri pentru granturi, conferințe startup și webinarii pentru fondatori din Moldova, România și UE." />
-<link rel="canonical" href="https://eligibil.eu/evenimente" />
-<link rel="alternate" hreflang="ro" href="https://eligibil.eu/evenimente" />
-<link rel="alternate" hreflang="en" href="https://eligibil.eu/events" />
+<link rel="canonical" href="https://eligibil.org/evenimente" />
+<link rel="alternate" hreflang="ro" href="https://eligibil.org/evenimente" />
+<link rel="alternate" hreflang="en" href="https://eligibil.org/events" />
 ```
 
 ---
@@ -409,13 +409,13 @@ const { data: events } = await sb
   .eq('status', 'upcoming');
 
 (events || []).forEach(e => {
-  if (e.slug_ro) urls.push(`<url><loc>https://eligibil.eu/evenimente/${e.slug_ro}</loc><changefreq>weekly</changefreq></url>`);
-  if (e.slug_en) urls.push(`<url><loc>https://eligibil.eu/events/${e.slug_en}</loc><changefreq>weekly</changefreq></url>`);
+  if (e.slug_ro) urls.push(`<url><loc>https://eligibil.org/evenimente/${e.slug_ro}</loc><changefreq>weekly</changefreq></url>`);
+  if (e.slug_en) urls.push(`<url><loc>https://eligibil.org/events/${e.slug_en}</loc><changefreq>weekly</changefreq></url>`);
 });
 
 // Plus listing pages
-urls.push(`<url><loc>https://eligibil.eu/evenimente</loc><changefreq>daily</changefreq></url>`);
-urls.push(`<url><loc>https://eligibil.eu/events</loc><changefreq>daily</changefreq></url>`);
+urls.push(`<url><loc>https://eligibil.org/evenimente</loc><changefreq>daily</changefreq></url>`);
+urls.push(`<url><loc>https://eligibil.org/events</loc><changefreq>daily</changefreq></url>`);
 ```
 
 ---
@@ -441,7 +441,7 @@ window.addEventListener('load', async () => {
         'name': e.title || e.nume_program,
         'startDate': e.start_date,
         'location': e.city || 'Online',
-        'url': `https://eligibil.eu${e.url || '/evenimente/' + e.slug_ro}`,
+        'url': `https://eligibil.org${e.url || '/evenimente/' + e.slug_ro}`,
       }
     }))
   };

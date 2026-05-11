@@ -384,7 +384,7 @@ function Footer({ lang, setLang }) {
       <div className="container">
         <div className="footer__top">
           <div>
-            <div className="footer__brand">eligibil<span style={{ color: 'var(--accent)' }}>.eu</span></div>
+            <div className="footer__brand">eligibil<span style={{ color: 'var(--accent)' }}>.org</span></div>
             <div className="footer__tag">AI Readiness &amp; Funding Orchestrator</div>
             <p style={{ fontSize: 13.5, color: 'var(--ink-2)', marginTop: 16, maxWidth: 300 }}>
               Agregatorul #1 de granturi, competiții și capital non-dilutiv pentru Moldova, România și Europa de Est.
@@ -408,15 +408,15 @@ function Footer({ lang, setLang }) {
           <div className="footer__col">
             <h5>eligibil.org</h5>
             <a href="/blog?cat=about">Despre noi</a>
-            <a href="mailto:hello@eligibil.org">Contact</a>
+            <a href="mailto:info@eligibil.org">Contact</a>
             <a href="https://duediligence.one" target="_blank" rel="noopener">Ecosistem duediligence.one</a>
-            <a href="mailto:hello@eligibil.org?subject=Scrie%20pentru%20noi">Scrie pentru noi</a>
-            <a href="mailto:press@eligibil.org">Press &amp; Media</a>
+            <a href="mailto:info@eligibil.org?subject=Scrie%20pentru%20noi">Scrie pentru noi</a>
+            <a href="mailto:info@eligibil.org">Press &amp; Media</a>
           </div>
           <div className="footer__col">
             <h5>Contact</h5>
-            <a href="mailto:hello@eligibil.org">hello@eligibil.org</a>
-            <a href="mailto:hello@eligibil.org?subject=Chat%20live">Chat live (09:00–18:00 EET)</a>
+            <a href="mailto:info@eligibil.org">info@eligibil.org</a>
+            <a href="mailto:info@eligibil.org?subject=Chat%20live">Chat live (09:00–18:00 EET)</a>
             <div style={{ marginTop: 14, display: 'flex', gap: 12 }}>
               {[
                 ['LinkedIn', 'https://www.linkedin.com/company/eligibil'],

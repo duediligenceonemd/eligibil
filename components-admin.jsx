@@ -718,7 +718,7 @@ function AdminApp() {
     <div className="ap">
       <div className="ap__shell">
         <aside className="ap__side">
-          <div className="ap__brand">eligibil<span>.eu</span> · admin</div>
+          <div className="ap__brand">eligibil<span>.org</span> · admin</div>
           <nav className="ap__nav">
             {tabs.map(t => (
               <button key={t.id} className={tab === t.id ? 'is-active' : ''} onClick={() => setTab(t.id)}>

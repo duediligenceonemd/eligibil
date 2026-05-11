@@ -58,7 +58,7 @@ function LoginApp() {
             fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: 22,
             color: 'var(--bg)', textDecoration: 'none', letterSpacing: '-.02em'
           }}>
-            eligibil<span style={{ color: 'var(--accent)' }}>.eu</span>
+            eligibil<span style={{ color: 'var(--accent)' }}>.org</span>
           </a>
           <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.14em', color: 'rgba(255,255,255,.45)', marginTop: 8 }}>
             AI Readiness &amp; Funding
