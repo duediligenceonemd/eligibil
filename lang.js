@@ -473,7 +473,8 @@
       if (RO_TO_EN[trimmed]) {
         const leading = original.match(/^\s*/)[0];
         const trailing = original.match(/\s*$/)[0];
-        node.nodeValue = leading + RO_TO_EN[trimmed] + trailing;
+        const target = leading + RO_TO_EN[trimmed] + trailing;
+        if (node.nodeValue !== target) node.nodeValue = target;
         return;
       }
       // Try partial replacements (longest phrases first)
@@ -484,7 +485,7 @@
           result = result.split(phrase).join(RO_TO_EN[phrase]);
         }
       }
-      if (result !== original) node.nodeValue = result;
+      if (result !== original && node.nodeValue !== result) node.nodeValue = result;
     }
 
     if (targetLang === 'RU') {
@@ -492,7 +493,8 @@
       if (RO_TO_RU[trimmed]) {
         const leading = original.match(/^\s*/)[0];
         const trailing = original.match(/\s*$/)[0];
-        node.nodeValue = leading + RO_TO_RU[trimmed] + trailing;
+        const target = leading + RO_TO_RU[trimmed] + trailing;
+        if (node.nodeValue !== target) node.nodeValue = target;
         return;
       }
       // Try partial replacements (longest phrases first)
@@ -503,7 +505,7 @@
           result = result.split(phrase).join(RO_TO_RU[phrase]);
         }
       }
-      if (result !== original) node.nodeValue = result;
+      if (result !== original && node.nodeValue !== result) node.nodeValue = result;
     }
   }
 
@@ -563,20 +565,14 @@
   let observer = null;
   function startObserver() {
     if (observer) return;
-    observer = new MutationObserver((mutations) => {
+    // Re-translate the whole body on ANY DOM change (addedNodes OR characterData).
+    // This ensures React in-place text-node updates don't silently restore Romanian.
+    // The guard in translateNode (node.nodeValue !== target) breaks the feedback loop.
+    observer = new MutationObserver(() => {
       if (CURRENT_LANG === 'RO') return;
-      // Debounce — wait for batch of changes to settle
       clearTimeout(window.__i18nDebounce);
       window.__i18nDebounce = setTimeout(() => {
-        for (const m of mutations) {
-          for (const node of m.addedNodes) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              walkAndTranslate(node, CURRENT_LANG);
-            } else if (node.nodeType === Node.TEXT_NODE) {
-              translateNode(node, CURRENT_LANG);
-            }
-          }
-        }
+        walkAndTranslate(document.body, CURRENT_LANG);
       }, 50);
     });
     observer.observe(document.body, {
@@ -600,6 +596,8 @@
     try { localStorage.setItem('eligibil_lang', lang); } catch {}
     document.documentElement.lang = lang.toLowerCase();
     walkAndTranslate(document.body, lang);
+    // Second pass after React's async batch re-render settles
+    setTimeout(() => walkAndTranslate(document.body, lang), 120);
     window.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
   };
 
