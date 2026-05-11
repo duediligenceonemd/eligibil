@@ -181,7 +181,7 @@ async function serveContentListing(req, res, kind, lang) {
       .limit(50);
     if (error) {
       // Pre-Iter-3 schema (table missing) → empty list (still renders the page)
-      if (/relation .* does not exist/i.test(error.message || '')) {
+      if (/relation .* does not exist|Could not find the table .* in the schema cache/i.test(error.message || '')) {
         return res.type('html').send(renderListingPage({ kind, lang, items: [] }));
       }
       throw error;
@@ -203,7 +203,7 @@ async function serveContentDetail(req, res, kind, lang, slugColumn) {
       .eq('status', 'published')
       .maybeSingle();
     if (error) {
-      if (/relation .* does not exist/i.test(error.message || '')) {
+      if (/relation .* does not exist|Could not find the table .* in the schema cache/i.test(error.message || '')) {
         return res.status(404).sendFile(path.join(__dirname, '404.html'));
       }
       throw error;
