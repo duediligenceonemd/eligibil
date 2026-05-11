@@ -223,6 +223,48 @@
     'eligibil.org — Încarcă. Analizează. Află unde ești eligibil.':
       'eligibil.org — Upload. Analyze. Find where you are eligible.',
 
+    // ── Section labels (homepage flow)
+    '01 — Flow-ul de analiză': '01 — Analysis flow',
+    '02 — Preview': '02 — Preview',
+    '03 — Terminologie': '03 — Terminology',
+    '04 — Două moduri de utilizare': '04 — Two ways to use',
+    '05 — AI Document Generation · strat premium': '05 — AI Document Generation · premium layer',
+    '01 — Categorii': '01 — Categories',
+    '02 — Acoperire geografică': '02 — Geographic coverage',
+    '03 — Actualizat acum': '03 — Updated now',
+    '07 — Knowledge Hub': '07 — Knowledge Hub',
+    '08 — Verified Partners': '08 — Verified Partners',
+    '09 — Blog & insights': '09 — Blog & insights',
+    '10 — Get Listed': '10 — Get Listed',
+    '11 — Data Quality': '11 — Data Quality',
+    '12 — Întrebări frecvente': '12 — FAQ',
+    '13 — Start acum': '13 — Start now',
+    '13 — Începe acum': '13 — Start now',
+
+    // ── Section H2 subtitles
+    'De la upload la plan de eligibilitate. În 4 pași.': 'From upload to eligibility plan. In 4 steps.',
+    'Iată ce primești după 90 de secunde.': 'Here’s what you get after 90 seconds.',
+    'Ce este TRL și de ce contează atât de mult.': 'What TRL is and why it matters so much.',
+    'Agregator de 735+ surse + motor de matching AI.': 'Aggregator of 735+ sources + AI matching engine.',
+    'Găsește finanțare pentru verticala ta.': 'Find financing for your vertical.',
+    'Finanțare disponibilă în țara ta și dincolo de ea.': 'Financing available in your country and beyond.',
+    'Programe deschise pentru aplicare.': 'Programs open for application.',
+    'Peste scoring, AI-ul îți scrie direct documentele.': 'Beyond scoring, AI writes the documents for you.',
+    'Reports, whitepapers și insights despre piața finanțării.': 'Reports, whitepapers and insights about the funding market.',
+    'Acceleratoarele și fondurile care construiesc ecosistemul.': 'Accelerators and funds building the ecosystem.',
+    'Ultimele articole și analize.': 'Latest articles and analyses.',
+    'Listează-te în catalog. Ajungi la fondatorii potriviți.': 'List yourself in the catalog. Reach the right founders.',
+    'Obsesia noastră: zero linkuri moarte, zero informații expirate.': 'Our obsession: zero dead links, zero stale info.',
+    'Cum funcționează matching-ul AI?': 'How does AI matching work?',
+
+    // ── Pas (step) headers
+    'Pas': 'Step',
+    'Încarci artefactele': 'You upload artifacts',
+    'AI-ul analizează și construiește profilul': 'AI analyzes and builds the profile',
+    'Primești trei scoruri per program': 'You get three scores per program',
+    'Plan de îmbunătățire: cum devii maxim eligibil': 'Improvement plan: how to become maximally eligible',
+    'Formate acceptate': 'Accepted formats',
+
     // ── Hero upload panel / register CTAs
     'artefacte': 'artifacts',
     'fișier': 'file',
@@ -232,6 +274,41 @@
     'Încarcă fișier sau trage aici': 'Upload file or drag here',
     'Schimbă fișierul': 'Change file',
     'Încearcă gratuit →': 'Try free →',
+    'Listează-te gratuit →': 'List yourself free →',
+    'Listează-te gratuit': 'List yourself free',
+    'Răsfoiește catalogul': 'Browse catalog',
+    'Revendică profil': 'Claim profile',
+    'Revendică profil existent': 'Claim existing profile',
+    'Ești fondator sau cercetător?': 'Are you a founder or researcher?',
+    'Reprezinți un accelerator, fond sau program?': 'Do you represent an accelerator, fund or program?',
+    'Analizează-mi startupul gratuit →': 'Analyze my startup for free →',
+    'Activează AI Document Generation →': 'Activate AI Document Generation →',
+    'Generează →': 'Generate →',
+    'Pentru fondatori': 'For founders',
+    'Pentru parteneri': 'For partners',
+    'Toate verticalele': 'All verticals',
+    'Cohorte trimestriale · aplicare continuă': 'Quarterly cohorts · rolling applications',
+
+    // ── Trust/stats grid
+    'Surse': 'Sources',
+    'Țări acoperite': 'Countries covered',
+    'Programe verificate': 'Verified programs',
+
+    // ── Footer
+    'Start aici': 'Start here',
+    'Listează-te': 'List yourself',
+    'Revendică platformă': 'Claim platform',
+    'Caută surse de finanțare': 'Search funding sources',
+    'Knowledge': 'Knowledge',
+    'Reports & whitepapers': 'Reports & whitepapers',
+    'Blog': 'Blog',
+    'Glosar de finanțare': 'Funding glossary',
+    'Video & webinarii': 'Video & webinars',
+    'Investește în Moldova': 'Invest in Moldova',
+    'Ecosistem duediligence.one': 'duediligence.one ecosystem',
+    'Scrie pentru noi': 'Write for us',
+    'Press & Media': 'Press & Media',
+    'Chat live (09:00–18:00 EET)': 'Live chat (09:00–18:00 EET)',
     'Cu cât mai multe artefacte încarci, cu atât mai precisă analiza.':
       'The more artifacts you upload, the more accurate the analysis.',
     'Un singur document e suficient pentru a începe — sistemul îți spune explicit ce scor câștigi dacă adaugi încă unul.':
@@ -459,6 +536,48 @@
     'eligibil.org — Încarcă. Analizează. Află unde ești eligibil.':
       'eligibil.org — Загружай. Анализируй. Узнай, где ты подходишь.',
 
+    // ── Section labels (homepage flow)
+    '01 — Flow-ul de analiză': '01 — Процесс анализа',
+    '02 — Preview': '02 — Превью',
+    '03 — Terminologie': '03 — Терминология',
+    '04 — Două moduri de utilizare': '04 — Два режима использования',
+    '05 — AI Document Generation · strat premium': '05 — AI Document Generation · премиум-слой',
+    '01 — Categorii': '01 — Категории',
+    '02 — Acoperire geografică': '02 — Географическое покрытие',
+    '03 — Actualizat acum': '03 — Обновлено сейчас',
+    '07 — Knowledge Hub': '07 — База знаний',
+    '08 — Verified Partners': '08 — Проверенные партнёры',
+    '09 — Blog & insights': '09 — Блог и аналитика',
+    '10 — Get Listed': '10 — Разместить программу',
+    '11 — Data Quality': '11 — Качество данных',
+    '12 — Întrebări frecvente': '12 — Частые вопросы',
+    '13 — Start acum': '13 — Начать сейчас',
+    '13 — Începe acum': '13 — Начать сейчас',
+
+    // ── Section H2 subtitles
+    'De la upload la plan de eligibilitate. În 4 pași.': 'От загрузки до плана соответствия. За 4 шага.',
+    'Iată ce primești după 90 de secunde.': 'Вот что вы получите через 90 секунд.',
+    'Ce este TRL și de ce contează atât de mult.': 'Что такое TRL и почему это так важно.',
+    'Agregator de 735+ surse + motor de matching AI.': 'Агрегатор 735+ источников + AI-движок подбора.',
+    'Găsește finanțare pentru verticala ta.': 'Найдите финансирование для вашей вертикали.',
+    'Finanțare disponibilă în țara ta și dincolo de ea.': 'Финансирование в вашей стране и за её пределами.',
+    'Programe deschise pentru aplicare.': 'Открытые программы для подачи заявок.',
+    'Peste scoring, AI-ul îți scrie direct documentele.': 'Помимо скоринга, AI пишет документы за вас.',
+    'Reports, whitepapers și insights despre piața finanțării.': 'Отчёты, whitepaper и аналитика о рынке финансирования.',
+    'Acceleratoarele și fondurile care construiesc ecosistemul.': 'Акселераторы и фонды, создающие экосистему.',
+    'Ultimele articole și analize.': 'Последние статьи и аналитика.',
+    'Listează-te în catalog. Ajungi la fondatorii potriviți.': 'Разместите программу в каталоге. Дойдите до нужных основателей.',
+    'Obsesia noastră: zero linkuri moarte, zero informații expirate.': 'Наша одержимость: ноль мёртвых ссылок, ноль устаревшей информации.',
+    'Cum funcționează matching-ul AI?': 'Как работает AI-подбор?',
+
+    // ── Pas (step) headers
+    'Pas': 'Шаг',
+    'Încarci artefactele': 'Вы загружаете артефакты',
+    'AI-ul analizează și construiește profilul': 'AI анализирует и строит профиль',
+    'Primești trei scoruri per program': 'Вы получаете три балла на программу',
+    'Plan de îmbunătățire: cum devii maxim eligibil': 'План улучшения: как стать максимально подходящим',
+    'Formate acceptate': 'Поддерживаемые форматы',
+
     // ── Hero upload panel / register CTAs
     'artefacte': 'артефакта',
     'fișier': 'файл',
@@ -479,6 +598,37 @@
     'PDF / PPTX · ≤50MB · max 30 slide': 'PDF / PPTX · ≤50MB · до 30 слайдов',
     'PDF / DOCX · ≤30MB · max 10 pag': 'PDF / DOCX · ≤30MB · до 10 стр',
     'MP4 / MOV · ≤500MB · max 3 min': 'MP4 / MOV · ≤500MB · до 3 мин',
+    'Listează-te gratuit →': 'Разместить бесплатно →',
+    'Listează-te gratuit': 'Разместить бесплатно',
+    'Răsfoiește catalogul': 'Просмотреть каталог',
+    'Revendică profil': 'Заявить профиль',
+    'Revendică profil existent': 'Заявить существующий профиль',
+    'Ești fondator sau cercetător?': 'Вы основатель или исследователь?',
+    'Reprezinți un accelerator, fond sau program?': 'Вы представляете акселератор, фонд или программу?',
+    'Analizează-mi startupul gratuit →': 'Проанализировать стартап бесплатно →',
+    'Activează AI Document Generation →': 'Активировать AI Document Generation →',
+    'Generează →': 'Сгенерировать →',
+    'Pentru fondatori': 'Для основателей',
+    'Pentru parteneri': 'Для партнёров',
+    'Toate verticalele': 'Все вертикали',
+    'Cohorte trimestriale · aplicare continuă': 'Ежеквартальные когорты · постоянный приём заявок',
+    'Surse': 'Источников',
+    'Țări acoperite': 'Стран охвачено',
+    'Programe verificate': 'Проверенных программ',
+    'Start aici': 'Начать здесь',
+    'Listează-te': 'Разместиться',
+    'Revendică platformă': 'Заявить платформу',
+    'Caută surse de finanțare': 'Поиск источников финансирования',
+    'Knowledge': 'Знания',
+    'Reports & whitepapers': 'Отчёты и whitepaper',
+    'Blog': 'Блог',
+    'Glosar de finanțare': 'Глоссарий финансирования',
+    'Video & webinarii': 'Видео и вебинары',
+    'Investește în Moldova': 'Инвестируйте в Молдову',
+    'Ecosistem duediligence.one': 'Экосистема duediligence.one',
+    'Scrie pentru noi': 'Пишите для нас',
+    'Press & Media': 'Пресса и медиа',
+    'Chat live (09:00–18:00 EET)': 'Живой чат (09:00–18:00 EET)',
   };
 
   // =============================================================================
@@ -491,6 +641,21 @@
 
   // Track originals so we can switch back
   const originalText = new WeakMap();
+
+  // Word-boundary replacement: only replace `phrase` when not surrounded by
+  // letters/digits. Prevents "Activ" from corrupting "Activează" → "Activeează".
+  // Uses Unicode property escapes (\p{L}, \p{N}) so Romanian/Cyrillic diacritics
+  // are correctly recognized as letters.
+  const wbRegexCache = new Map();
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function wordBoundaryReplace(text, phrase, replacement) {
+    let re = wbRegexCache.get(phrase);
+    if (!re) {
+      re = new RegExp('(?<![\\p{L}\\p{N}])' + escapeRe(phrase) + '(?![\\p{L}\\p{N}])', 'gu');
+      wbRegexCache.set(phrase, re);
+    }
+    return text.replace(re, replacement);
+  }
 
   function translateNode(node, targetLang) {
     if (!node || node.nodeType !== Node.TEXT_NODE) return;
@@ -519,12 +684,11 @@
         if (node.nodeValue !== target) node.nodeValue = target;
         return;
       }
-      // Try partial replacements (longest phrases first)
+      // Word-boundary partial replacement (longest phrases first).
       let result = original;
-      const phrases = Object.keys(RO_TO_EN).sort((a, b) => b.length - a.length);
-      for (const phrase of phrases) {
+      for (const phrase of EN_KEYS_SORTED) {
         if (result.includes(phrase)) {
-          result = result.split(phrase).join(RO_TO_EN[phrase]);
+          result = wordBoundaryReplace(result, phrase, RO_TO_EN[phrase]);
         }
       }
       if (result !== original && node.nodeValue !== result) node.nodeValue = result;
@@ -539,17 +703,20 @@
         if (node.nodeValue !== target) node.nodeValue = target;
         return;
       }
-      // Try partial replacements (longest phrases first)
+      // Word-boundary partial replacement (longest phrases first).
       let result = original;
-      const phrases = Object.keys(RO_TO_RU).sort((a, b) => b.length - a.length);
-      for (const phrase of phrases) {
+      for (const phrase of RU_KEYS_SORTED) {
         if (result.includes(phrase)) {
-          result = result.split(phrase).join(RO_TO_RU[phrase]);
+          result = wordBoundaryReplace(result, phrase, RO_TO_RU[phrase]);
         }
       }
       if (result !== original && node.nodeValue !== result) node.nodeValue = result;
     }
   }
+
+  // Pre-compute sorted key arrays once for the substring fallback hot path.
+  const EN_KEYS_SORTED = Object.keys(RO_TO_EN).sort((a, b) => b.length - a.length);
+  const RU_KEYS_SORTED = Object.keys(RO_TO_RU).sort((a, b) => b.length - a.length);
 
   function walkAndTranslate(root, targetLang) {
     if (!root) root = document.body;
