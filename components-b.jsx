@@ -120,7 +120,7 @@ function AISection({ showAI }) {
             </div>
 
             <div className="ai-hero__cta">
-              <button className="btn btn--accent">Încearcă analiza AI în 90 de secunde →</button>
+              <a className="btn btn--accent" href="/register.html">Încearcă analiza AI în 90 de secunde →</a>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@ function Reports() {
         </div>
         <div className="reports">
           {REPORTS.map((r, i) => (
-            <div className="report" key={i}>
+            <a className="report" key={i} href={`/blog?cat=reports&q=${encodeURIComponent(r.title)}`}>
               <div className="report__cover">
                 <Thumb kind={r.thumb} seed={i + 11} />
               </div>
@@ -157,11 +157,11 @@ function Reports() {
                   <span>→</span>
                 </div>
               </div>
-            </div>
+            </a>
           ))}
         </div>
         <div style={{ marginTop: 28 }}>
-          <button className="btn--link">Vezi toate rapoartele →</button>
+          <a className="btn--link" href="/blog?cat=reports">Vezi toate rapoartele →</a>
         </div>
       </div>
     </section>
@@ -180,7 +180,7 @@ function Partners() {
         </div>
         <div className="partners">
           {PARTNERS.map((p, i) => (
-            <div className="partner" key={i}>
+            <a className="partner" key={i} href={`/search?q=${encodeURIComponent(p.name)}`}>
               <div className="partner__logo"><Thumb kind={p.thumb} seed={i + 21} /></div>
               <div>
                 <div className="partner__head">
@@ -198,11 +198,11 @@ function Partners() {
                   <span>→</span>
                 </div>
               </div>
-            </div>
+            </a>
           ))}
         </div>
         <div style={{ marginTop: 28 }}>
-          <button className="btn--link">Vezi toți partenerii verificați (48+) →</button>
+          <a className="btn--link" href="/search?tip=Accelerator">Vezi toți partenerii verificați (48+) →</a>
         </div>
       </div>
     </section>
@@ -221,7 +221,7 @@ function Blog() {
         </div>
         <div className="blog">
           {POSTS.map((p, i) => (
-            <a className="post" key={i} href="#">
+            <a className="post" key={i} href={p.slug ? `/blog/${p.slug}` : `/blog?q=${encodeURIComponent(p.title)}`}>
               <div className="post__cover"><Thumb kind={p.thumb} seed={i + 31} /></div>
               <div className="post__body">
                 <div className="post__meta">
@@ -236,7 +236,7 @@ function Blog() {
           ))}
         </div>
         <div style={{ marginTop: 28 }}>
-          <button className="btn--link">Citește toate articolele →</button>
+          <a className="btn--link" href="/blog">Citește toate articolele →</a>
         </div>
       </div>
     </section>
@@ -264,8 +264,8 @@ function GetListed() {
               Fondatorii, cercetătorii și startup-urile vin pe eligibil.org pentru a găsi cele mai bune oportunități de finanțare. Apari în catalog și fii descoperit — gratuit. Crește vizibilitatea programului tău în Moldova, România, Europa de Est și mai departe.
             </p>
             <div style={{ display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap' }}>
-              <button className="btn btn--accent">Listează-te gratuit →</button>
-              <button className="btn btn--ghost">Revendică profil existent</button>
+              <a className="btn btn--accent" href="/register.html?type=partner">Listează-te gratuit →</a>
+              <a className="btn btn--ghost" href="/register.html?claim=1">Revendică profil existent</a>
             </div>
           </div>
           <div className="listed-right">
@@ -358,8 +358,8 @@ function FinalCTA() {
             <h3>Cauți finanțare?</h3>
             <p>Răsfoiește 735+ oportunități verificate, salvează favoritele tale și primește analiză AI de pregătire pentru fiecare program.</p>
             <div className="cta-card__btns">
-              <button className="btn btn--accent">Explorează catalogul →</button>
-              <button className="btn btn--ghost" style={{ color: 'var(--bg)', borderColor: 'var(--bg)' }}>Încearcă analiza AI</button>
+              <a className="btn btn--accent" href="/search">Explorează catalogul →</a>
+              <a className="btn btn--ghost" href="/register.html" style={{ color: 'var(--bg)', borderColor: 'var(--bg)' }}>Încearcă analiza AI</a>
             </div>
           </div>
           <div className="cta-card">
@@ -367,8 +367,8 @@ function FinalCTA() {
             <h3>Reprezinți un program sau fond?</h3>
             <p>Listează-te gratuit în catalog și ajunge la mii de fondatori, cercetători și startup-uri din Moldova, România și Europa de Est.</p>
             <div className="cta-card__btns">
-              <button className="btn btn--accent">Listează-te gratuit →</button>
-              <button className="btn btn--ghost">Revendică profil</button>
+              <a className="btn btn--accent" href="/register.html?type=partner">Listează-te gratuit →</a>
+              <a className="btn btn--ghost" href="/register.html?claim=1">Revendică profil</a>
             </div>
           </div>
         </div>
@@ -392,34 +392,39 @@ function Footer({ lang, setLang }) {
           </div>
           <div className="footer__col">
             <h5>Începe aici</h5>
-            <a href="/register.html">Listează-te</a>
-            <a href="/register.html">Revendică platformă</a>
-            <a href="/grant.html">Caută surse de finanțare</a>
+            <a href="/register.html?type=partner">Listează-te</a>
+            <a href="/register.html?claim=1">Revendică platformă</a>
+            <a href="/search">Caută surse de finanțare</a>
             <a href="/register.html">Analiză AI</a>
           </div>
           <div className="footer__col">
             <h5>Knowledge</h5>
-            <a href="#">Rapoarte &amp; whitepapers</a>
-            <a href="#">Blog</a>
-            <a href="#">Glosar de finanțare</a>
-            <a href="#">Video &amp; webinarii</a>
-            <a href="#">Investește în Moldova</a>
+            <a href="/blog?cat=reports">Rapoarte &amp; whitepapers</a>
+            <a href="/blog">Blog</a>
+            <a href="/blog?cat=glosar">Glosar de finanțare</a>
+            <a href="/evenimente">Video &amp; webinarii</a>
+            <a href="/stiri">Investește în Moldova</a>
           </div>
           <div className="footer__col">
             <h5>eligibil.org</h5>
-            <a href="#">Despre noi</a>
-            <a href="#">Contact</a>
-            <a href="#">Ecosistem duediligence.one</a>
-            <a href="#">Scrie pentru noi</a>
-            <a href="#">Press &amp; Media</a>
+            <a href="/blog?cat=about">Despre noi</a>
+            <a href="mailto:hello@eligibil.org">Contact</a>
+            <a href="https://duediligence.one" target="_blank" rel="noopener">Ecosistem duediligence.one</a>
+            <a href="mailto:hello@eligibil.org?subject=Scrie%20pentru%20noi">Scrie pentru noi</a>
+            <a href="mailto:press@eligibil.org">Press &amp; Media</a>
           </div>
           <div className="footer__col">
             <h5>Contact</h5>
             <a href="mailto:hello@eligibil.org">hello@eligibil.org</a>
-            <a href="#">Chat live (09:00–18:00 EET)</a>
+            <a href="mailto:hello@eligibil.org?subject=Chat%20live">Chat live (09:00–18:00 EET)</a>
             <div style={{ marginTop: 14, display: 'flex', gap: 12 }}>
-              {['LinkedIn', 'YouTube', 'X', 'Telegram'].map(s => (
-                <a key={s} href="#" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.08em', borderBottom: '1px solid currentColor', paddingBottom: 2 }}>{s}</a>
+              {[
+                ['LinkedIn', 'https://www.linkedin.com/company/eligibil'],
+                ['YouTube',  'https://www.youtube.com/@eligibil'],
+                ['X',        'https://x.com/eligibil_org'],
+                ['Telegram', 'https://t.me/eligibil'],
+              ].map(([s, url]) => (
+                <a key={s} href={url} target="_blank" rel="noopener" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.08em', borderBottom: '1px solid currentColor', paddingBottom: 2 }}>{s}</a>
               ))}
             </div>
           </div>
@@ -434,10 +439,10 @@ function Footer({ lang, setLang }) {
             </div>
           </div>
           <div>
-            <a href="#">Imprint</a>
-            <a href="#">Disclaimer</a>
-            <a href="#">Cookie policy</a>
-            <a href="#">Privacy policy</a>
+            <a href="/legal/imprint">Imprint</a>
+            <a href="/legal/disclaimer">Disclaimer</a>
+            <a href="/legal/cookie">Cookie policy</a>
+            <a href="/legal/privacy">Privacy policy</a>
           </div>
         </div>
       </div>

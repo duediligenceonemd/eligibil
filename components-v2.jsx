@@ -65,7 +65,7 @@ function HeroV2() {
                 <span>✓ Datele tale nu sunt partajate, nu antrenăm AI-ul pe ele</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
-                <span className="upload-panel__alt">sau <a href="#">completează formular minim (30s)</a></span>
+                <span className="upload-panel__alt">sau <a href="/register.html">completează formular minim (30s)</a></span>
                 <button className="upload-panel__cta" disabled={filled === 0}>
                   ANALIZEAZĂ-MĂ ACUM →
                 </button>
@@ -294,7 +294,7 @@ function MatchingFlow() {
                   </div>
                   <div className="plan__total">
                     <div className="plan__total-left">După acțiuni → <strong>Match 90 · Readiness 93</strong> · aplicație competitivă</div>
-                    <button className="btn btn--accent btn--sm">Activează AI Document Generation →</button>
+                    <a className="btn btn--accent btn--sm" href="/register.html">Activează AI Document Generation →</a>
                   </div>
                 </div>
               </div>
@@ -459,7 +459,7 @@ function DualMode() {
               <li>Primești alerte la deadline-uri</li>
               <li>Exporți listă în CSV / PDF</li>
             </ul>
-            <button className="btn btn--ghost">Deschide catalogul →</button>
+            <a className="btn btn--ghost" href="/search">Deschide catalogul →</a>
           </div>
           <div className="dmode">
             <div className="dmode__tag">● Mod Matching AI — gratuit în beta</div>
@@ -472,7 +472,7 @@ function DualMode() {
               <li>Primești plan de îmbunătățire cu impact numeric</li>
               <li>Generare AI de documente pentru aplicare</li>
             </ul>
-            <button className="btn btn--accent">Încarcă acum →</button>
+            <a className="btn btn--accent" href="/register.html">Încarcă acum →</a>
           </div>
         </div>
       </div>
@@ -498,12 +498,12 @@ function DocGen() {
         </div>
         <div className="docgen">
           {items.map(([n, h, d]) => (
-            <div className="docgen__col" key={n}>
+            <a className="docgen__col" key={n} href="/register.html">
               <div className="docgen__icon">{n}</div>
               <div className="docgen__h">{h}</div>
               <div className="docgen__d">{d}</div>
               <div className="mono" style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.1em' }}>Generează →</div>
-            </div>
+            </a>
           ))}
         </div>
       </div>

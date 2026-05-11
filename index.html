@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="styles-v2.css" />
-<script src="/lang.js?v=20260511e" defer></script>
+<script src="/lang.js?v=20260511f" defer></script>
 </head>
 <body class="d-balanced">
 
@@ -158,6 +158,7 @@ function NavItemV2({ label, k, open, openMenu }) {
 function MegaMenuV2({ k, onMouseEnter, onMouseLeave }) {
   const data = MEGA[k];
   if (!data) return null;
+  // megaItemUrl / megaBannerUrl are defined globally in components-a.jsx
   return (
     <div className="mega" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <div className="container">
@@ -167,7 +168,7 @@ function MegaMenuV2({ k, onMouseEnter, onMouseLeave }) {
               <div className="mega__col-title">{c.t}</div>
               <div className="mega__list">
                 {c.items.map(([name, n], j) => (
-                  <a key={j} className="mega__link" href="#">
+                  <a key={j} className="mega__link" href={megaItemUrl(c.t, name)}>
                     <span>{name}</span>{n && <span className="mono">{n}</span>}
                   </a>
                 ))}
@@ -179,7 +180,7 @@ function MegaMenuV2({ k, onMouseEnter, onMouseLeave }) {
               <h4>{data.banner.h}</h4>
               <div className="mega__banner-stats" style={{ marginTop: 8 }}>{data.banner.sub}</div>
             </div>
-            <a href="#" style={{ color: 'var(--bg)', borderBottom: '1px solid var(--bg)', paddingBottom: 2, fontSize: 13, width: 'fit-content' }}>{data.banner.cta}</a>
+            <a href={megaBannerUrl(k)} style={{ color: 'var(--bg)', borderBottom: '1px solid var(--bg)', paddingBottom: 2, fontSize: 13, width: 'fit-content' }}>{data.banner.cta}</a>
           </div>
         </div>
       </div>
@@ -227,7 +228,7 @@ function FinalCTAV2() {
             <p>Încarcă pitch deck-ul, video-ul sau whitepaper-ul. În 90 de secunde afli la ce granturi ești eligibil și exact ce trebuie să faci să devii maxim competitiv.</p>
             <div className="cta-card__btns">
               <a href="/register.html" className="btn btn--accent">Analizează-mi startupul gratuit →</a>
-              <a href="/grant.html" className="btn btn--ghost" style={{ color: 'var(--bg)', borderColor: 'var(--bg)' }}>Răsfoiește catalogul</a>
+              <a href="/search" className="btn btn--ghost" style={{ color: 'var(--bg)', borderColor: 'var(--bg)' }}>Răsfoiește catalogul</a>
             </div>
           </div>
           <div className="cta-card">

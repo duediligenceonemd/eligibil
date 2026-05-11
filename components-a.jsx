@@ -1,6 +1,91 @@
 // Main components for the eligibil.org prototype
 const { useState, useEffect, useRef, useMemo } = React;
 
+/* ---------- Discovery URL builders ----------
+   Convert MegaMenu / grid labels into /search?... query strings so every
+   homepage link lands the user inside the public catalog with the right
+   filters pre-applied. */
+
+function stripFlag(s) {
+  // "🇲🇩 Moldova" → "Moldova"; "🌍 Global" → "Global"
+  return s.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}️‍\u{1F1E6}-\u{1F1FF}]+\s*/u, '').replace(/\s*→\s*$/, '').trim();
+}
+
+function amountRangeQuery(label) {
+  // "< €50K" / "€50K – €250K" / "€1M+" → min/max in EUR
+  const norm = label.replace(/[€\s]/g, '').replace(/–|—|-/g, '-');
+  const num = (s) => {
+    const m = s.match(/(\d+(?:\.\d+)?)(K|M)?/);
+    if (!m) return null;
+    return Math.round(parseFloat(m[1]) * (m[2] === 'M' ? 1_000_000 : m[2] === 'K' ? 1_000 : 1));
+  };
+  if (norm.startsWith('<')) return `max=${num(norm.slice(1))}`;
+  if (norm.endsWith('+'))  return `min=${num(norm.slice(0, -1))}`;
+  const [a, b] = norm.split('-');
+  return `min=${num(a)}&max=${num(b)}`;
+}
+
+const STADIU_MAP = {
+  'Idea Stage': 'idea', 'Early-stage': 'early', 'Growth': 'growth',
+  'Scale-up': 'growth', 'R&D / Cercetare': 'rd', 'Idea': 'idea', 'R&D': 'rd',
+};
+
+function megaItemUrl(colTitle, name) {
+  const clean = name.replace(/\s*→\s*$/, '').trim();
+  const ct = (colTitle || '').toLowerCase();
+
+  // Resurse column routing (most specific first)
+  if (ct.includes('evenimente') || ct.includes('webinar') || ct.includes('video & event')) {
+    return /^toate\b/i.test(clean) ? '/evenimente' : `/evenimente?q=${encodeURIComponent(clean)}`;
+  }
+  if (ct === 'blog' || ct.includes('articol')) {
+    return /^toate\b/i.test(clean) ? '/blog' : `/blog?q=${encodeURIComponent(clean)}`;
+  }
+  if (ct.includes('rapoarte') || ct.includes('whitepaper') || ct.includes('reports')) {
+    return /^toate\b/i.test(clean) ? '/blog?cat=reports' : `/blog?cat=reports&q=${encodeURIComponent(clean)}`;
+  }
+  if (ct.includes('glosar') || ct.includes('glossary')) {
+    return /^toate\b/i.test(clean) ? '/blog?cat=glosar' : `/blog?cat=glosar&q=${encodeURIComponent(clean)}`;
+  }
+  // Partners columns: acceleratoare / fonduri / programe donor / instituții
+  if (ct.includes('accelerat') || ct.includes('fond') || ct.includes('donor') || ct.includes('instituți') || ct.includes('institut')) {
+    return /^toate\b/i.test(clean) ? '/search?tip=Accelerator' : `/search?q=${encodeURIComponent(clean)}`;
+  }
+
+  // Catalog filter columns (Surse de finanțare + Programe active mega menus)
+  if (/^toate\b/i.test(clean) || /^all\b/i.test(clean)) return '/search';
+  if (ct === 'după sector' || ct === 'by sector')
+    return `/search?sector=${encodeURIComponent(clean)}`;
+  if (ct === 'după țară' || ct === 'by country')
+    return `/search?tara=${encodeURIComponent(stripFlag(clean))}`;
+  if (ct === 'după tip' || ct === 'by type')
+    return `/search?tip=${encodeURIComponent(clean)}`;
+  if (ct === 'după regiune' || ct === 'by region')
+    return `/search?tara=${encodeURIComponent(stripFlag(clean))}`;
+  if (ct === 'după stadiu' || ct === 'by stage') {
+    const id = STADIU_MAP[clean] || clean.toLowerCase().split(/[\s/]/)[0];
+    return `/search?stadiu=${encodeURIComponent(id)}`;
+  }
+  if (ct === 'după sumă' || ct === 'by amount')
+    return `/search?${amountRangeQuery(clean)}`;
+  if (ct === 'după deadline' || ct === 'by deadline')
+    return `/search?sort=deadline`;
+  if (ct === 'featured acum' || ct === 'featured now')
+    return `/search?q=${encodeURIComponent(clean)}`;
+
+  // Fallback: free-text search
+  return `/search?q=${encodeURIComponent(stripFlag(clean))}`;
+}
+
+function megaBannerUrl(menuKey) {
+  // The 4 top-level mega menus
+  if (menuKey === 'finantari') return '/search';
+  if (menuKey === 'programe')  return '/search?status=open&sort=deadline';
+  if (menuKey === 'parteneri') return '/search?tip=Accelerator';
+  if (menuKey === 'resurse')   return '/blog';
+  return '/search';
+}
+
 /* ---------- Nav + Mega-menu ---------- */
 function Nav({ lang, setLang }) {
   const [open, setOpen] = useState(null);
@@ -67,7 +152,7 @@ function MegaMenu({ k, onMouseEnter, onMouseLeave }) {
               <div className="mega__col-title">{c.t}</div>
               <div className="mega__list">
                 {c.items.map(([name, n], j) => (
-                  <a key={j} className="mega__link" href="#">
+                  <a key={j} className="mega__link" href={megaItemUrl(c.t, name)}>
                     <span>{name}</span>
                     {n && <span className="mono">{n}</span>}
                   </a>
@@ -80,7 +165,7 @@ function MegaMenu({ k, onMouseEnter, onMouseLeave }) {
               <h4>{data.banner.h}</h4>
               <div className="mega__banner-stats" style={{ marginTop: 8 }}>{data.banner.sub}</div>
             </div>
-            <a href="#" style={{ color: 'var(--bg)', borderBottom: '1px solid var(--bg)', paddingBottom: 2, fontSize: 13, width: 'fit-content' }}>
+            <a href={megaBannerUrl(k)} style={{ color: 'var(--bg)', borderBottom: '1px solid var(--bg)', paddingBottom: 2, fontSize: 13, width: 'fit-content' }}>
               {data.banner.cta}
             </a>
           </div>
@@ -92,8 +177,27 @@ function MegaMenu({ k, onMouseEnter, onMouseLeave }) {
 
 /* ---------- Hero ---------- */
 function Hero({ heroStyle, setSectorFilter }) {
-  const [activeChip, setActiveChip] = useState(null);
+  const [sector, setSector] = useState('');
+  const [tara, setTara]     = useState('');
+  const [tip, setTip]       = useState('');
+  const [amount, setAmount] = useState('');
   const suggestions = ['Granturi AI Moldova', 'SBIR Phase I', 'EIC Accelerator 2026', 'Horizon Europe biotech', 'Capital non-dilutiv RO'];
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const p = new URLSearchParams();
+    if (sector) p.set('sector', sector);
+    if (tara)   p.set('tara', tara);
+    if (tip)    p.set('tip', tip);
+    if (amount) {
+      const ar = amountRangeQuery(amount);
+      for (const part of ar.split('&')) {
+        const [k, v] = part.split('=');
+        if (k && v) p.set(k, v);
+      }
+    }
+    window.location.href = `/search?${p.toString()}`;
+  };
 
   return (
     <section className="section hero" data-screen-label="01 Hero">
@@ -111,39 +215,39 @@ function Hero({ heroStyle, setSectorFilter }) {
               Agregatorul #1 de granturi, competiții și capital non-dilutiv pentru Moldova, România și Europa de Est. Peste 735 de oportunități verificate, actualizate zilnic, cu analiză AI de pregătire pentru fiecare.
             </p>
 
-            <div className="search">
+            <form className="search" onSubmit={onSubmit}>
               <div className="search__row">
                 <div className="search__icon">
                   <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" strokeWidth="1.5"/><line x1="11" y1="11" x2="15" y2="15" stroke="currentColor" strokeWidth="1.5"/></svg>
                 </div>
-                <select className="search__select" defaultValue="">
+                <select className="search__select" value={sector} onChange={e => setSector(e.target.value)}>
                   <option value="">Sector</option>
-                  {SECTORS.slice(0, 8).map(s => <option key={s.id}>{s.name}</option>)}
+                  {SECTORS.slice(0, 8).map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
                 </select>
-                <select className="search__select" defaultValue="">
+                <select className="search__select" value={tara} onChange={e => setTara(e.target.value)}>
                   <option value="">Țară</option>
                   <option>Moldova</option><option>România</option><option>EU</option><option>SUA</option>
                 </select>
-                <select className="search__select" defaultValue="">
+                <select className="search__select" value={tip} onChange={e => setTip(e.target.value)}>
                   <option value="">Tip finanțare</option>
                   <option>Grant</option><option>SBIR</option><option>Equity</option><option>Non-dilutiv</option>
                 </select>
-                <select className="search__select" defaultValue="">
+                <select className="search__select" value={amount} onChange={e => setAmount(e.target.value)}>
                   <option value="">Sumă</option>
                   <option>&lt; €50K</option><option>€50K – €250K</option><option>€250K – €1M</option><option>€1M+</option>
                 </select>
-                <button className="search__btn">Caută</button>
+                <button type="submit" className="search__btn">Caută</button>
               </div>
-            </div>
+            </form>
 
             <div className="search__suggest">
               <span className="search__suggest-label">Populare</span>
               {suggestions.map(s => (
-                <button
+                <a
                   key={s}
-                  className={`chip ${activeChip === s ? 'is-active' : ''}`}
-                  onClick={() => setActiveChip(activeChip === s ? null : s)}
-                >{s}</button>
+                  className="chip"
+                  href={`/search?q=${encodeURIComponent(s)}`}
+                >{s}</a>
               ))}
             </div>
           </div>
@@ -222,7 +326,7 @@ function SectorGrid() {
 
         <div className="grid-cats">
           {filtered.map((s, i) => (
-            <a key={s.id} className="cat" href="#">
+            <a key={s.id} className="cat" href={`/search?sector=${encodeURIComponent(s.name)}`}>
               <div className="cat__thumb"><Thumb kind={s.thumb} seed={i + 3} /></div>
               <div className="cat__name">{s.name}</div>
               <div>
@@ -252,7 +356,7 @@ function CountryGrid() {
             <div className="country-region" key={region}>
               <div className="country-region__title">{region}</div>
               {list.map((c) => (
-                <a className="country" href="#" key={c.name}>
+                <a className="country" href={`/search?tara=${encodeURIComponent(c.name)}`} key={c.name}>
                   <span>{c.flag} {c.name}</span>
                   <span className="country__n">{c.n}+</span>
                 </a>
@@ -261,7 +365,7 @@ function CountryGrid() {
           ))}
         </div>
         <div style={{ marginTop: 20 }}>
-          <button className="btn--link">Vezi toate țările (60+) →</button>
+          <a className="btn--link" href="/search">Vezi toate țările (60+) →</a>
         </div>
       </div>
     </section>
@@ -339,15 +443,15 @@ function ActivePrograms() {
                 <div className="program__action-note">{p.note}</div>
               </div>
               <div className="program__action">
-                <button className="btn btn--accent btn--sm">Vezi detalii →</button>
-                <button className="btn btn--ghost btn--sm">Analizează șansele</button>
+                <a className="btn btn--accent btn--sm" href={`/search?q=${encodeURIComponent(p.name)}`}>Vezi detalii →</a>
+                <a className="btn btn--ghost btn--sm" href="/register.html">Analizează șansele</a>
               </div>
             </div>
           ))}
         </div>
 
         <div style={{ marginTop: 28 }}>
-          <button className="btn--link">Vezi toate programele active →</button>
+          <a className="btn--link" href="/search?status=open&sort=deadline">Vezi toate programele active →</a>
         </div>
       </div>
     </section>
