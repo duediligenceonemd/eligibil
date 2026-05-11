@@ -17,7 +17,7 @@ const CLAUDE_MODEL   = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-2025092
 // =============================================================================
 // Extraction prompt — instructs Claude to return strict JSON
 // =============================================================================
-const EXTRACTION_PROMPT = `You are a grant intelligence extractor for eligibil.eu, a platform that matches startups in Moldova, Romania, and the EU with funding programs.
+const EXTRACTION_PROMPT = `You are a grant intelligence extractor for eligibil.org, a platform that matches startups in Moldova, Romania, and the EU with funding programs.
 
 Extract structured information from the text below. Return ONLY a JSON object — no prose, no markdown, no code fences.
 

@@ -155,7 +155,7 @@ async function pollGmail(opts = {}) {
 
 async function main() {
   console.log('╔══════════════════════════════════════════╗');
-  console.log('║       eligibil.eu — Gmail IMAP Poller    ║');
+  console.log('║       eligibil.org — Gmail IMAP Poller    ║');
   console.log('╚══════════════════════════════════════════╝');
   try {
     const stats = await pollGmail();

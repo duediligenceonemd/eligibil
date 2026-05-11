@@ -32,7 +32,7 @@ const { processInput } = require('./process-grants-inbox');
 
 const rss = new Parser({
   timeout: 15000,
-  headers: { 'User-Agent': 'eligibil.eu-bot/1.0 (+https://eligibil.eu)' },
+  headers: { 'User-Agent': 'eligibil.org-bot/1.0 (+https://eligibil.org)' },
 });
 
 const FETCH_TIMEOUT = 15000;
@@ -42,7 +42,7 @@ async function fetchHTML(url) {
   try {
     const res = await fetch(url, {
       signal: ctrl.signal,
-      headers: { 'User-Agent': 'eligibil.eu-bot/1.0', 'Accept-Language': 'ro,en;q=0.9' },
+      headers: { 'User-Agent': 'eligibil.org-bot/1.0', 'Accept-Language': 'ro,en;q=0.9' },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.text();

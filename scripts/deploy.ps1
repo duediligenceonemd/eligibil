@@ -1,5 +1,5 @@
 # =============================================================================
-# eligibil.eu — Multi-platform deploy script
+# eligibil.org — Multi-platform deploy script
 #
 # Usage:
 #   .\scripts\deploy.ps1 gcp        # Google Cloud Run

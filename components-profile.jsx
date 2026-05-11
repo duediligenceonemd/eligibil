@@ -1,4 +1,4 @@
-// Profile components — app.eligibil.eu
+// Profile components — app.eligibil.org
 const { useState, useEffect, useRef, useCallback } = React;
 
 // ── Constants ─────────────────────────────────────────────────────────────────

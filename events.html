@@ -3,8 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Evenimente · eligibil.md</title>
-<meta name="description" content="Hackathons, workshopuri, pitch nights, demo days — toate evenimentele relevante pentru founder-ii din CEE · eligibil.md" />
+<title>Evenimente startup și deadline-uri granturi · eligibil.org</title>
+<meta name="description" content="Calendar live cu deadline-uri pentru granturi, conferințe startup și webinarii pentru fondatori din Moldova, România și UE. Verificat săptămânal." />
+<link rel="canonical" href="https://eligibil.org/evenimente" />
+<link rel="alternate" hreflang="ro" href="https://eligibil.org/evenimente" />
+<link rel="alternate" hreflang="en" href="https://eligibil.org/events" />
+<link rel="alternate" hreflang="x-default" href="https://eligibil.org/evenimente" />
+<meta property="og:title" content="Evenimente startup și deadline-uri granturi" />
+<meta property="og:description" content="Calendar live cu deadline-uri pentru granturi, conferințe startup și webinarii pentru fondatori din Moldova, România și UE." />
+<meta property="og:url" content="https://eligibil.org/evenimente" />
+<meta property="og:type" content="website" />
+<meta name="robots" content="index, follow" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,6 +45,41 @@ const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a
 
 <script src="auth.js"></script>
 <script type="text/babel" src="components-events.jsx"></script>
+
+<!-- Schema.org ItemList for SEO — runs after components mount, fetches the
+     same /api/events the page consumes and injects up to 20 entries. -->
+<script>
+window.addEventListener('load', async () => {
+  try {
+    const r = await fetch('/api/events');
+    if (!r.ok) return;
+    const data = await r.json();
+    const items = [...(data.grant_deadlines || []), ...(data.events || [])].slice(0, 20);
+    if (!items.length) return;
+    const json = {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      'itemListElement': items.map((e, i) => ({
+        '@type': 'ListItem',
+        'position': i + 1,
+        'item': {
+          '@type': e.event_type === 'grant_deadline' ? 'Thing' : 'Event',
+          'name': e.title || e.short_summary || '',
+          'startDate': e.start_date,
+          'location': e.is_online ? 'Online' : (e.city || e.country || 'Online'),
+          'url': e.url
+            ? new URL(e.url, location.origin).toString()
+            : (e.slug_ro ? location.origin + '/evenimente/' + e.slug_ro : location.href),
+        },
+      })),
+    };
+    const s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.textContent = JSON.stringify(json);
+    document.head.appendChild(s);
+  } catch { /* JSON-LD is best-effort; never break the page */ }
+});
+</script>
 
 </body>
 </html>

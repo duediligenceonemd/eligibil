@@ -7,10 +7,17 @@
   'use strict';
 
   // Pages that don't require auth (marketing + auth pages + public catalog).
-  // /search and the bilingual grant detail pages (/ro/granturi/*, /en/grants/*)
-  // are meant for SEO traffic — anonymous visitors must be able to browse.
-  const PUBLIC_PAGES = ['/', '/index.html', '/login.html', '/register.html', '/search', '/search.html'];
-  const PUBLIC_PREFIXES = ['/ro/granturi/', '/en/grants/'];
+  // /search, the bilingual grant detail pages (/ro/granturi/*, /en/grants/*),
+  // and the programmatic SEO listings (/ro/granturi-* and /en/grants-*) are
+  // meant for SEO traffic — anonymous visitors must be able to browse.
+  // Note: the listing prefixes use a dash separator (matching the route
+  // pattern in server.js) which is distinct from the slash-based slug routes.
+  const PUBLIC_PAGES = ['/', '/index.html', '/login.html', '/register.html',
+                        '/search', '/search.html',
+                        '/evenimente', '/events', '/events.html',
+                        '/stiri', '/news', '/blog', '/en/blog'];
+  const PUBLIC_PREFIXES = ['/ro/granturi/', '/en/grants/', '/ro/granturi-', '/en/grants-',
+                           '/stiri/', '/news/', '/blog/', '/en/blog/'];
   const path = window.location.pathname;
   const isPublic =
     PUBLIC_PAGES.some(p => path === p || path.endsWith(p)) ||

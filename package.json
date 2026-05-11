@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "AI-powered grant matching platform for startups in Moldova, Romania & EU",
   "main": "server.js",
-  "homepage": "https://eligibil.eu",
+  "homepage": "https://eligibil.org",
   "keywords": [
     "grants",
     "startups",
@@ -31,7 +31,9 @@
     "grants:scrape": "node scripts/web-scrapers.js",
     "grants:fetch": "node scripts/cron-fetch.js",
     "stats:refresh": "node scripts/compute-user-stats.js",
-    "stats:rescore": "node scripts/compute-user-stats.js --sync-json --rescore"
+    "stats:rescore": "node scripts/compute-user-stats.js --sync-json --rescore",
+    "grants:enrich": "node scripts/enrich-grants-claude.js",
+    "grants:enrich:dry": "node scripts/enrich-grants-claude.js --dry-run"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",

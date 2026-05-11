@@ -110,7 +110,7 @@ const GRANTS = {
     faq: [
       { q: 'Pot aplica dacă sunt din Moldova?', a: 'Da. Moldova este țară asociată Horizon Europe din 2024 și beneficiază de aceleași condiții ca statele membre UE pentru EIC Accelerator.' },
       { q: 'Trebuie să accept și componenta de equity?', a: 'Nu. Poți aplica doar pentru grant (până la €2.5M). Componenta de equity prin EIC Fund e opțională și se discută separat după aprobarea grantului.' },
-      { q: 'Cât costă pregătirea unei aplicații?', a: 'Estimare: 200–400 ore de lucru intern + €5–15K consultanță externă (opțional). Pe eligibil.eu, AI-ul nostru reduce timpul cu ~60% prin generarea draft-urilor.' },
+      { q: 'Cât costă pregătirea unei aplicații?', a: 'Estimare: 200–400 ore de lucru intern + €5–15K consultanță externă (opțional). Pe eligibil.org, AI-ul nostru reduce timpul cu ~60% prin generarea draft-urilor.' },
       { q: 'Ce se întâmplă dacă pic Step 1?', a: 'Poți reaplica la cut-off-ul următor, dar trebuie să aduci modificări substanțiale (recomandat: 6+ luni între aplicări).' },
       { q: 'Cine deține IP-ul după finanțare?', a: 'Compania deține integral IP-ul. UE cere doar drepturi de utilizare pentru scopuri non-comerciale și diseminare.' },
     ],
@@ -324,7 +324,7 @@ function ModeStrip({ mode, setMode, grantId, setGrantId }) {
     <div className="gp__mode">
       <div className="gp__mode-left">
         <span className="gp__mode-dot"></span>
-        <span>{mode === 'app' ? 'app.eligibil.eu/grants/' + grantId : 'eligibil.eu/grants/' + grantId}</span>
+        <span>{mode === 'app' ? 'app.eligibil.org/grants/' + grantId : 'eligibil.org/grants/' + grantId}</span>
       </div>
       <div className="gp__mode-grant">
         <button className={grantId === 'eic' ? 'is-active' : ''} onClick={() => setGrantId('eic')}>🇪🇺 EIC Accelerator</button>

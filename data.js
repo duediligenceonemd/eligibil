@@ -1,4 +1,4 @@
-// Data for the eligibil.eu prototype
+// Data for the eligibil.org prototype
 // Sectors, countries, programs, reports, partners, posts, FAQ
 
 const SECTORS = [
@@ -123,7 +123,7 @@ const REPORTS = [
     desc: 'Ghid pentru startup-uri din afara SUA care vor să acceseze SBIR/STTR. Eligibilitate, parteneriate, timeline-uri și costuri.', thumb: 'cross' },
   { title: 'Deep Tech în Europa de Est — Industry Overview', pages: 64, kind: 'PDF',
     desc: 'Profil de piață, investitori activi, granturi specializate, TRL benchmarks, case studies din 5 țări CEE.', thumb: 'hex' },
-  { title: 'State of Funding 2025 — Raport anual eligibil.eu', pages: 32, kind: 'PDF',
+  { title: 'State of Funding 2025 — Raport anual eligibil.org', pages: 32, kind: 'PDF',
     desc: 'Cifre cheie, cele mai căutate programe, rate de succes, lecții învățate din 5.000+ analize AI realizate în 2025.', thumb: 'bars' },
   { title: 'De la spinout la grant — ghid pentru cercetători', pages: 40, kind: 'PDF',
     desc: 'Cum traduci TRL-ul real în limbajul evaluatorilor. IP landscape, ResearchMatch, strategia de consorțiu.', thumb: 'squareNest' },
@@ -131,7 +131,7 @@ const REPORTS = [
 
 const PARTNERS = [
   { name: 'Upcelerator', verified: true, country: 'Moldova', flag: '🇲🇩', sub: 'Accelerator · Early-stage · MD & RO',
-    desc: 'Programul de accelerare al ecosistemului Moldova Growth Plan. Cohorte de 3–4 luni, mentorat, Demo Day și acces la rețea de investitori. Integrat nativ cu eligibil.eu.',
+    desc: 'Programul de accelerare al ecosistemului Moldova Growth Plan. Cohorte de 3–4 luni, mentorat, Demo Day și acces la rețea de investitori. Integrat nativ cu eligibil.org.',
     tags: ['AI', 'SaaS', 'Fintech', 'Deep Tech'], thumb: 'ring' },
   { name: 'How to Web Spotlight', verified: true, country: 'România', flag: '🇷🇴', sub: 'Accelerator · Growth · RO + CEE',
     desc: 'Unul dintre acceleratoarele de referință din CEE. 3 luni intensive cu mentori internaționali, acces la investitori top-tier din regiune.',
@@ -160,12 +160,12 @@ const POSTS = [
 ];
 
 const FAQS = [
-  { q: 'Ce este eligibil.eu?',
-    a: 'eligibil.eu este un agregator de surse de finanțare care face mai ușor să găsești programe relevante pentru startupul tău, bazat pe țară, sector, tip de finanțare și stadiu. Fiecare oportunitate include metadate complete — eligibilitate, sumă, deadline, criterii — și poate fi analizată AI pentru a calcula scorul tău de potrivire și pregătire.' },
-  { q: 'Trebuie să plătesc pentru a folosi eligibil.eu?',
+  { q: 'Ce este eligibil.org?',
+    a: 'eligibil.org este un agregator de surse de finanțare care face mai ușor să găsești programe relevante pentru startupul tău, bazat pe țară, sector, tip de finanțare și stadiu. Fiecare oportunitate include metadate complete — eligibilitate, sumă, deadline, criterii — și poate fi analizată AI pentru a calcula scorul tău de potrivire și pregătire.' },
+  { q: 'Trebuie să plătesc pentru a folosi eligibil.org?',
     a: 'Răsfoirea catalogului este 100% gratuită, fără cont necesar. Crearea unui cont de utilizator îți oferă beneficii — salvarea oportunităților, notificări de deadline, istoric de aplicări. Analiza AI (Match, Readiness, Confidence + generare documente) e în faza beta gratuită acum.' },
   { q: 'Poți recomanda programul potrivit pentru obiectivele mele?',
-    a: 'Ca agregator, eligibil.eu nu oferă consultanță financiară directă. Oferim însă o colecție vastă de surse filtrabile pe multiple criterii și un sistem de scoring AI care calculează potrivirea ta cu fiecare program. Decizia finală îți aparține — recomandăm totuși să consulți un consilier înainte de aplicări la programe dilutive.' },
+    a: 'Ca agregator, eligibil.org nu oferă consultanță financiară directă. Oferim însă o colecție vastă de surse filtrabile pe multiple criterii și un sistem de scoring AI care calculează potrivirea ta cu fiecare program. Decizia finală îți aparține — recomandăm totuși să consulți un consilier înainte de aplicări la programe dilutive.' },
   { q: 'Cum vă asigurați că informațiile sunt actualizate?',
     a: 'Folosim monitorizare automată zilnică (crawlers care verifică site-urile oficiale și detectează modificări), colaborare cu reprezentanții programelor (partenerii verificați își mențin profilurile), feedback din comunitate (oricine poate raporta inadvertențe sau programe noi) și audit periodic trimestrial.' },
   { q: 'Cum sunt selectate programele din catalog?',
@@ -177,7 +177,7 @@ const FAQS = [
   { q: 'Ce primesc ca accelerator sau fond dacă mă listez?',
     a: 'Profil gratuit complet (logo, descriere, call-uri active), badge "Verified", apariție prioritară în căutări relevante, acces la analize despre fondatorii interesați, și — opțional — integrare cu sistemul de matching AI care îți trimite aplicanți pre-calificați.' },
   { q: 'Am găsit o informație incorectă sau lipsă. Ce fac?',
-    a: 'Trimite-ne un mesaj la hello@eligibil.eu sau folosește butonul "Raportează" de pe cardul oricărei oportunități. Orice raport e verificat în 48 de ore.' },
+    a: 'Trimite-ne un mesaj la hello@eligibil.org sau folosește butonul "Raportează" de pe cardul oricărei oportunități. Orice raport e verificat în 48 de ore.' },
   { q: 'În ce limbi funcționează platforma?',
     a: 'Română · Engleză · Rusă · Ucraineană. Analiza AI a artefactelor (deck, video, whitepaper) funcționează indiferent de limba documentului.' },
   { q: 'Cum sunt protejate datele startupului meu?',

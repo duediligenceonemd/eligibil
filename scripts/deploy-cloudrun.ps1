@@ -1,5 +1,5 @@
 # =============================================================================
-# eligibil.eu — Cloud Run Deploy Script (Windows PowerShell)
+# eligibil.org — Cloud Run Deploy Script (Windows PowerShell)
 #
 # Usage:
 #   .\scripts\deploy-cloudrun.ps1
@@ -25,7 +25,7 @@ if (-not $Project) {
 }
 
 Write-Host "==========================================="
-Write-Host " eligibil.eu - Cloud Run Deploy"
+Write-Host " eligibil.org - Cloud Run Deploy"
 Write-Host "==========================================="
 Write-Host "Project: $Project"
 Write-Host "Region:  $Region"
@@ -101,5 +101,5 @@ Write-Host "URL: $url"
 Write-Host ""
 Write-Host "Next:"
 Write-Host "  - Test: $url/api/grants"
-Write-Host "  - Map custom domain (eligibil.eu) when DNS is ready:"
-Write-Host "      gcloud run domain-mappings create --service=$Service --domain=eligibil.eu --region=$Region"
+Write-Host "  - Map custom domain (eligibil.org) when DNS is ready:"
+Write-Host "      gcloud run domain-mappings create --service=$Service --domain=eligibil.org --region=$Region"
