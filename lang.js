@@ -231,6 +231,215 @@
   }
 
   // =============================================================================
+  // RO → RU translation dictionary
+  // =============================================================================
+  const RO_TO_RU = {
+    // ── Navigation / global
+    'Intră în cont': 'Войти',
+    'Cont nou': 'Регистрация',
+    'Înregistrează-te': 'Зарегистрироваться',
+    'Înscrie-te gratuit': 'Зарегистрироваться бесплатно',
+    'Conectează-te': 'Войти',
+    'Logare': 'Вход',
+    'Deconectează-te': 'Выйти',
+    'Salvează': 'Сохранить',
+    'Anulează': 'Отмена',
+    'Încarcă': 'Загрузить',
+    'Analizează': 'Анализировать',
+    'Trimite': 'Отправить',
+    'Aplică': 'Подать заявку',
+    'Continuă': 'Продолжить',
+    'Înapoi': 'Назад',
+    'Începe': 'Начать',
+    'Vezi mai mult': 'Посмотреть больше',
+    'Detalii': 'Подробности',
+    'nou': 'новый',
+    'Activ': 'Активный',
+    'Inactiv': 'Неактивный',
+    'Toate': 'Все',
+    'Niciunul': 'Нет',
+
+    // ── Hero
+    'AI Readiness & Funding Orchestrator': 'AI Readiness & Funding Orchestrator',
+    'Analiză AI · Gratuit în faza beta · Fără cont necesar': 'Анализ AI · Бесплатно в бета · Без регистрации',
+    'Încarcă. Analizează. Află exact unde ești ': 'Загрузи. Анализируй. Узнай точно, где ты ',
+    'eligibil': 'подходишь',
+    'eligibil.org analizează artefactele startupului tău — pitch deck, video și whitepaper — identifică automat TRL-ul, calculează scorul de potrivire pentru peste 735 de granturi și îți livrează un plan concret să devii maxim eligibil.':
+      'eligibil.org анализирует артефакты вашего стартапа — питч-дек, видео и whitepaper — автоматически определяет TRL, рассчитывает балл соответствия по более чем 735 грантам и предоставляет конкретный план для максимального соответствия.',
+    'Obține scorul tău de eligibilitate în 90 de secunde': 'Получи свой балл соответствия за 90 секунд',
+    'min. 1 necesar': 'мин. 1 обязательно',
+    'gata pentru analiză': 'готово к анализу',
+    'Pitch Deck': 'Pitch Deck',
+    'Video Pitch': 'Video Pitch',
+    'Whitepaper': 'Whitepaper',
+    'Minimum ': 'Минимум ',
+    ' pentru a începe': ' для начала',
+    '1 artefact': '1 артефакт',
+    'Datele tale nu sunt partajate, nu antrenăm AI-ul pe ele': 'Ваши данные не передаются, мы не обучаем на них AI',
+    'sau ': 'или ',
+    'completează formular minim (30s)': 'заполните краткую форму (30 сек)',
+    'ANALIZEAZĂ-MĂ ACUM →': 'АНАЛИЗИРОВАТЬ СЕЙЧАС →',
+    'Analiză AI': 'Анализ AI',
+
+    // ── Stats
+    'Surse indexate': 'Индексированные источники',
+    'Surse verificate': 'Проверенные источники',
+    'Timp până la scor': 'Время до результата',
+    'Agenți AI de evaluare': 'Агенты AI оценки',
+    'Cost în faza beta': 'Стоимость в бета-фазе',
+    'Limbi RO·EN·RU·UA': 'Языки RO·EN·RU·UA',
+    'Surse de finanțare': 'Источники финансирования',
+    'Programe active': 'Активные программы',
+    'Parteneri': 'Партнёры',
+    'Resurse': 'Ресурсы',
+
+    // ── Auth
+    'Email': 'Email',
+    'Parolă': 'Пароль',
+    'Confirmă parola': 'Подтвердите пароль',
+    'Numele complet': 'Полное имя',
+    'Numele tău': 'Ваше имя',
+    'Numele firmei': 'Название компании',
+    'Telefon': 'Телефон',
+    'Țară': 'Страна',
+    'Sector': 'Сектор',
+    'Stadiu': 'Стадия',
+    'Bună!': 'Привет!',
+    'Bun venit': 'Добро пожаловать',
+    'Salut': 'Привет',
+    'Nu ai cont?': 'Нет аккаунта?',
+    'Ai deja cont?': 'Уже есть аккаунт?',
+    'Ai uitat parola?': 'Забыли пароль?',
+    'Resetează parola': 'Сбросить пароль',
+    'Neautentificat': 'Не авторизован',
+    'Autentificare reușită': 'Вход выполнен',
+    'Cont creat': 'Аккаунт создан',
+
+    // ── Dashboard
+    'Tablou de bord': 'Панель управления',
+    'Profilul meu': 'Мой профиль',
+    'Granturi': 'Гранты',
+    'Pipeline': 'Пайплайн',
+    'Aplicații': 'Заявки',
+    'Evenimente': 'События',
+    'Notificări': 'Уведомления',
+    'Rapoarte': 'Отчёты',
+    'Setări': 'Настройки',
+    'Top match-uri': 'Лучшие совпадения',
+    'Granturi recomandate': 'Рекомендованные гранты',
+    'Următoarele deadline-uri': 'Ближайшие дедлайны',
+    'Status profil': 'Статус профиля',
+    'Completitudine profil': 'Заполненность профиля',
+    'Match': 'Совпадение',
+    'Potrivire': 'Совпадение',
+    'Recomandare AI': 'Рекомендация AI',
+
+    // ── Grants
+    'Sumă': 'Сумма',
+    'Suma': 'Сумма',
+    'Suma minimă': 'Мин. сумма',
+    'Suma maximă': 'Макс. сумма',
+    'Deadline': 'Дедлайн',
+    'Termen limită': 'Срок подачи',
+    'Cerințe': 'Требования',
+    'Eligibilitate': 'Соответствие',
+    'Descriere': 'Описание',
+    'Organizație': 'Организация',
+    'Tip program': 'Тип программы',
+    'Dilutiv': 'Долевое',
+    'Nedilutiv': 'Безвозмездное',
+    'Dificultate': 'Сложность',
+    'Zile pentru pregătire': 'Дней на подготовку',
+    'Status': 'Статус',
+    'Aplică acum': 'Подать сейчас',
+    'Vezi grant': 'Посмотреть грант',
+    'Detalii grant': 'Детали гранта',
+    'Înapoi la dashboard': 'Назад на панель',
+    'Adaugă în pipeline': 'Добавить в пайплайн',
+    'Marchează ca aplicat': 'Отметить как поданный',
+
+    // ── Filters
+    'Filtre': 'Фильтры',
+    'Toate țările': 'Все страны',
+    'Toate sectoarele': 'Все сектора',
+    'Toate stadiile': 'Все стадии',
+    'Sortează după': 'Сортировать по',
+    'Cele mai noi': 'Новейшие',
+    'Cele mai relevante': 'Наиболее релевантные',
+    'Deadline apropiat': 'Ближайший дедлайн',
+    'Caută': 'Поиск',
+    'Caută granturi': 'Поиск грантов',
+
+    // ── Profile
+    'Date generale': 'Общие данные',
+    'Despre proiect': 'О проекте',
+    'Echipa': 'Команда',
+    'Documente': 'Документы',
+    'Salvează modificările': 'Сохранить изменения',
+    'Modificările au fost salvate': 'Изменения сохранены',
+    'Numele proiectului': 'Название проекта',
+    'Anul fondării': 'Год основания',
+    'Numărul de angajați': 'Количество сотрудников',
+    'TRL (Technology Readiness Level)': 'TRL (Technology Readiness Level)',
+    'Website': 'Сайт',
+    'Descrierea proiectului': 'Описание проекта',
+    'Pitch în 30 secunde': 'Питч за 30 секунд',
+
+    // ── Pipeline
+    'Aplicații în pregătire': 'Заявки в подготовке',
+    'Trimise': 'Отправленные',
+    'Aprobate': 'Одобренные',
+    'Respinse': 'Отклонённые',
+    'În evaluare': 'На рассмотрении',
+    'Adaugă aplicație': 'Добавить заявку',
+    'Status aplicație': 'Статус заявки',
+    'Note': 'Заметки',
+    'Documente atașate': 'Прикреплённые документы',
+
+    // ── Common verbs/phrases
+    'verificat': 'проверено',
+    'verificate': 'проверенные',
+    'oportunități': 'возможности',
+    'oportunități verificate': 'проверенные возможности',
+    'granturi': 'гранты',
+    'startup-uri': 'стартапы',
+    'startup-uri tech': 'технологические стартапы',
+    'AI de evaluare': 'AI оценки',
+    'în 90 de secunde': 'за 90 секунд',
+    'gratuit': 'бесплатно',
+    'beta': 'бета',
+    'În faza beta': 'В бета-фазе',
+
+    // ── Footer
+    'Despre noi': 'О нас',
+    'Contact': 'Контакт',
+    'Termeni': 'Условия',
+    'Confidențialitate': 'Конфиденциальность',
+    'Politica de cookies': 'Политика cookies',
+    'Toate drepturile rezervate': 'Все права защищены',
+    'Făcut cu': 'Сделано с',
+    'în Moldova și România': 'в Молдове и Румынии',
+
+    // ── Errors / messages
+    'Eroare': 'Ошибка',
+    'A apărut o eroare': 'Произошла ошибка',
+    'Câmp obligatoriu': 'Обязательное поле',
+    'Email invalid': 'Недействительный email',
+    'Parolă prea scurtă': 'Пароль слишком короткий',
+    'Parolele nu coincid': 'Пароли не совпадают',
+    'Email-ul există deja': 'Email уже существует',
+    'Date incorecte': 'Неверные данные',
+    'Se încarcă...': 'Загрузка...',
+    'Se procesează...': 'Обработка...',
+    'Niciun rezultat': 'Нет результатов',
+    'Niciun grant găsit': 'Грантов не найдено',
+
+    // ── Page titles
+    'eligibil.org — Încarcă. Analizează. Află unde ești eligibil.':
+      'eligibil.org — Загружай. Анализируй. Узнай, где ты подходишь.',
+  };
+
+  // =============================================================================
   // Translation engine
   // =============================================================================
   let CURRENT_LANG = (() => {
@@ -273,6 +482,25 @@
       for (const phrase of phrases) {
         if (result.includes(phrase)) {
           result = result.split(phrase).join(RO_TO_EN[phrase]);
+        }
+      }
+      if (result !== original) node.nodeValue = result;
+    }
+
+    if (targetLang === 'RU') {
+      // Try exact match first
+      if (RO_TO_RU[trimmed]) {
+        const leading = original.match(/^\s*/)[0];
+        const trailing = original.match(/\s*$/)[0];
+        node.nodeValue = leading + RO_TO_RU[trimmed] + trailing;
+        return;
+      }
+      // Try partial replacements (longest phrases first)
+      let result = original;
+      const phrases = Object.keys(RO_TO_RU).sort((a, b) => b.length - a.length);
+      for (const phrase of phrases) {
+        if (result.includes(phrase)) {
+          result = result.split(phrase).join(RO_TO_RU[phrase]);
         }
       }
       if (result !== original) node.nodeValue = result;
@@ -322,6 +550,8 @@
           if (val !== original) el.setAttribute(attr, original);
         } else if (targetLang === 'EN' && RO_TO_EN[original.trim()]) {
           el.setAttribute(attr, RO_TO_EN[original.trim()]);
+        } else if (targetLang === 'RU' && RO_TO_RU[original.trim()]) {
+          el.setAttribute(attr, RO_TO_RU[original.trim()]);
         }
       });
     });
@@ -361,8 +591,8 @@
   // =============================================================================
   window.setLanguage = function(lang) {
     lang = (lang || 'RO').toUpperCase();
-    if (!['RO', 'EN'].includes(lang)) {
-      // For RU/UA fallback to RO until those dictionaries exist
+    if (!['RO', 'EN', 'RU'].includes(lang)) {
+      // UA falls back to RO until that dictionary exists
       console.warn('[i18n] Language not yet supported:', lang, '— falling back to RO');
       lang = 'RO';
     }
@@ -376,6 +606,7 @@
   window.getLanguage = function() { return CURRENT_LANG; };
   window.t = function(text) {
     if (CURRENT_LANG === 'EN' && RO_TO_EN[text]) return RO_TO_EN[text];
+    if (CURRENT_LANG === 'RU' && RO_TO_RU[text]) return RO_TO_RU[text];
     return text;
   };
 
@@ -398,7 +629,7 @@
       font-size: 13px; font-weight: 600;
       backdrop-filter: blur(8px);
     `;
-    ['RO', 'EN'].forEach(code => {
+    ['RO', 'EN', 'RU'].forEach(code => {
       const btn = document.createElement('button');
       btn.textContent = code;
       btn.dataset.lang = code;
@@ -443,5 +674,5 @@
     init();
   }
 
-  console.log('[i18n] eligibil.org language engine loaded · current:', CURRENT_LANG);
+  console.log('[i18n] eligibil.org language engine loaded · RO/EN/RU · current:', CURRENT_LANG);
 })();
