@@ -222,6 +222,27 @@
     // ── Page titles (mismatched HTML attribute won't match but we handle inline)
     'eligibil.org — Încarcă. Analizează. Află unde ești eligibil.':
       'eligibil.org — Upload. Analyze. Find where you are eligible.',
+
+    // ── Hero upload panel / register CTAs
+    'artefacte': 'artifacts',
+    'fișier': 'file',
+    'fișierul': 'the file',
+    'Opțional': 'Optional',
+    'Încărcat': 'Uploaded',
+    'Încarcă fișier sau trage aici': 'Upload file or drag here',
+    'Schimbă fișierul': 'Change file',
+    'Încearcă gratuit →': 'Try free →',
+    'Cu cât mai multe artefacte încarci, cu atât mai precisă analiza.':
+      'The more artifacts you upload, the more accurate the analysis.',
+    'Un singur document e suficient pentru a începe — sistemul îți spune explicit ce scor câștigi dacă adaugi încă unul.':
+      'A single document is enough to start — the system tells you exactly what score you gain by adding another one.',
+    'gata pentru analiză': 'ready for analysis',
+    'Timp până la scor': 'Time to score',
+    'Agenți AI de evaluare': 'AI evaluation agents',
+    'Cost în faza beta': 'Cost during beta',
+    'PDF / PPTX · ≤50MB · max 30 slide': 'PDF / PPTX · ≤50MB · max 30 slides',
+    'PDF / DOCX · ≤30MB · max 10 pag': 'PDF / DOCX · ≤30MB · max 10 pages',
+    'MP4 / MOV · ≤500MB · max 3 min': 'MP4 / MOV · ≤500MB · max 3 min',
   };
 
   // EN → RO (auto-built from RO_TO_EN reverse)
@@ -437,6 +458,27 @@
     // ── Page titles
     'eligibil.org — Încarcă. Analizează. Află unde ești eligibil.':
       'eligibil.org — Загружай. Анализируй. Узнай, где ты подходишь.',
+
+    // ── Hero upload panel / register CTAs
+    'artefacte': 'артефакта',
+    'fișier': 'файл',
+    'fișierul': 'файл',
+    'Opțional': 'Опционально',
+    'Încărcat': 'Загружено',
+    'Încarcă fișier sau trage aici': 'Загрузите файл или перетащите сюда',
+    'Schimbă fișierul': 'Заменить файл',
+    'Încearcă gratuit →': 'Попробовать бесплатно →',
+    'Cu cât mai multe artefacte încarci, cu atât mai precisă analiza.':
+      'Чем больше артефактов вы загружаете, тем точнее анализ.',
+    'Un singur document e suficient pentru a începe — sistemul îți spune explicit ce scor câștigi dacă adaugi încă unul.':
+      'Достаточно одного документа для старта — система точно покажет, какой балл вы получите, добавив ещё один.',
+    'gata pentru analiză': 'готово к анализу',
+    'Timp până la scor': 'Время до результата',
+    'Agenți AI de evaluare': 'Агенты AI оценки',
+    'Cost în faza beta': 'Стоимость в бета-фазе',
+    'PDF / PPTX · ≤50MB · max 30 slide': 'PDF / PPTX · ≤50MB · до 30 слайдов',
+    'PDF / DOCX · ≤30MB · max 10 pag': 'PDF / DOCX · ≤30MB · до 10 стр',
+    'MP4 / MOV · ≤500MB · max 3 min': 'MP4 / MOV · ≤500MB · до 3 мин',
   };
 
   // =============================================================================
@@ -595,17 +637,9 @@
     CURRENT_LANG = lang;
     try { localStorage.setItem('eligibil_lang', lang); } catch {}
     document.documentElement.lang = lang.toLowerCase();
-    const t0 = Date.now();
     walkAndTranslate(document.body, lang);
     // Second pass after React's async batch re-render settles
-    setTimeout(() => {
-      walkAndTranslate(document.body, lang);
-      // Count text nodes actually in DOM for diagnostics
-      let n = 0;
-      const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      while (tw.nextNode()) n++;
-      console.log('[i18n] setLanguage(' + lang + ') done — ' + n + ' text nodes, ' + (Date.now()-t0) + 'ms');
-    }, 120);
+    setTimeout(() => walkAndTranslate(document.body, lang), 120);
     window.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
   };
 
@@ -681,20 +715,4 @@
   }
 
   console.log('[i18n] eligibil.org language engine loaded · RO/EN/RU · current:', CURRENT_LANG);
-  // Expose debug: window.__i18nTest('EN') to test from console
-  window.__i18nTest = (lang) => {
-    window.setLanguage(lang);
-    setTimeout(() => {
-      const sample = [];
-      const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-        acceptNode: n => n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
-      });
-      let node;
-      while ((node = tw.nextNode()) && sample.length < 10) {
-        const p = node.parentElement;
-        if (p && p.tagName !== 'SCRIPT') sample.push(node.nodeValue.trim().substring(0, 40));
-      }
-      console.log('[i18n] Sample text nodes after', lang + ':', sample);
-    }, 200);
-  };
 })();
