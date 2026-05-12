@@ -19,7 +19,7 @@ const express = require('express');
 const router  = express.Router();
 
 const { getSupabase } = require('../db/supabase');
-const obsidian        = require('../db/obsidian');
+const db             = require('../db/database');
 const { processInput } = require('../scripts/process-grants-inbox');
 
 function tryGetSupabase() {
@@ -54,7 +54,7 @@ function requireAdmin(req, res, next) {
   if (!req.session?.userId) {
     return res.status(401).json({ error: 'Authentication required' });
   }
-  const user = obsidian.findOne('users', { id: req.session.userId });
+  const user = db.findOne('users', { id: req.session.userId });
   if (!user) {
     return res.status(401).json({ error: 'Session user not found' });
   }
