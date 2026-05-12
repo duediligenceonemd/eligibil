@@ -20,11 +20,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="styles-events.css" />
-<script src="/lang.js?v=20260511g" defer></script>
+<script src="/lang.js?v=20260512a" defer></script>
 </head>
 <body class="d-balanced">
 
 <div id="ev-root"></div>
+
+<!-- Mount-failure diagnostic: if React hasn't filled #ev-root within 2.5s,
+     show a visible message + the last JS error so the issue isn't an
+     invisible blank page. -->
+<script>
+window.__evErrors = [];
+window.addEventListener('error', (e) => {
+  window.__evErrors.push((e.error && e.error.message) || e.message || 'error');
+});
+setTimeout(() => {
+  const root = document.getElementById('ev-root');
+  if (root && root.childElementCount === 0) {
+    root.innerHTML = '<div style="font-family:system-ui,sans-serif;padding:60px 32px;max-width:780px;margin:0 auto;color:#1a1a1a">' +
+      '<h2 style="font-size:24px;margin-bottom:12px">Pagina nu s-a încărcat complet</h2>' +
+      '<p style="color:#666;margin-bottom:20px">React mount-ul nu s-a finalizat în 2.5s. Probabil un script JS a eșuat să se descarce sau a aruncat o eroare.</p>' +
+      (window.__evErrors.length
+        ? '<pre style="background:#fff5f5;border:1px solid #fca;padding:12px;font-size:12px;overflow:auto;white-space:pre-wrap">' + window.__evErrors.map(e => String(e).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))).join('\\n') + '</pre>'
+        : '<p style="color:#999;font-size:13px">(nicio eroare globală capturată — verifică consola browser pentru detalii)</p>') +
+      '<p style="margin-top:24px"><a href="/search" style="color:#1f3a5f;text-decoration:underline">Răsfoiește catalogul de granturi →</a></p>' +
+      '</div>';
+  }
+}, 2500);
+</script>
 
 <script>
 const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
