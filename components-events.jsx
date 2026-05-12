@@ -111,6 +111,12 @@ function _normalizeEvent(e) {
     registration_url: e.registration_url || e.online_url || '',
     evidence_status: e.evidence_status,
     _sortDate: e.start_date,
+    // Defaults so FeaturedCard / EvRow / EvCard don't crash when the API
+    // doesn't supply these (DB doesn't track speakers/capacity yet).
+    speakers: [],
+    attending: 0,
+    capacity: 0,
+    live: false,
   }, dates);
 }
 
@@ -184,23 +190,32 @@ function Hero({ featured, onFeaturedClick }) {
 }
 
 function FeaturedCard({ e }) {
+  const topics    = Array.isArray(e.topics)   ? e.topics   : [];
+  const speakers  = Array.isArray(e.speakers) ? e.speakers : [];
+  const time      = e.time || '';
+  const capacity  = Number(e.capacity)  || 0;
+  const attending = Number(e.attending) || 0;
+  const hasCapacity = capacity > 0;
+  const url = e.registration_url || '#';
   return (
     <div className="featured">
       <div className="featured__cal">
         <div>
-          <div className="featured__cal-tag">FEATURED · DEMOREA</div>
+          <div className="featured__cal-tag">FEATURED</div>
           <div className="featured__cal-day">{e.day}</div>
           <div className="featured__cal-month">{e.month}</div>
           <div className="featured__cal-year">{e.year}</div>
         </div>
-        <div className="featured__cal-time">
-          <strong>{e.time.split(' ')[0]}</strong>
-          <span>{e.time}</span>
-        </div>
+        {time && (
+          <div className="featured__cal-time">
+            <strong>{time.split(' ')[0]}</strong>
+            <span>{time}</span>
+          </div>
+        )}
       </div>
       <div className="featured__body">
         <div className="featured__meta">
-          <span className="featured__type">{e.type.toUpperCase()}</span>
+          <span className="featured__type">{(e.type || '').toUpperCase()}</span>
           {e.live && <span className="featured__live">● LIVE SOON</span>}
           <span className="featured__meta-item">· {e.flag} {e.city}</span>
           <span className="featured__meta-item">· {e.format}</span>
@@ -210,27 +225,38 @@ function FeaturedCard({ e }) {
         <div className="featured__org">
           <div className="featured__org-logo">{e.orgLogo}</div>
           <span>Organizat de <strong style={{ color: 'var(--ink)' }}>{e.org}</strong></span>
-          <span style={{ marginLeft: 'auto' }}>#{e.topics.join(' #')}</span>
+          {topics.length > 0 && (
+            <span style={{ marginLeft: 'auto' }}>#{topics.join(' #')}</span>
+          )}
         </div>
       </div>
       <div className="featured__side">
-        <div>
-          <div className="featured__side-stat-k">Înscriși</div>
-          <div className="featured__side-stat-v">{e.attending}<small style={{ fontSize: 13, color: 'var(--muted)', fontFamily: 'JetBrains Mono' }}> / {e.capacity}</small></div>
-        </div>
-        <div>
-          <div className="featured__side-stat-k">Locuri rămase</div>
-          <div className="featured__side-stat-v hot">{e.capacity - e.attending}</div>
-        </div>
-        <div>
-          <div className="featured__side-stat-k">Speakers</div>
-          <div className="featured__side-avatars">
-            {e.speakers.map((s, i) => <div key={i} style={{ background: i % 2 ? 'var(--accent)' : 'var(--ink)' }}>{s}</div>)}
+        {hasCapacity && (
+          <>
+            <div>
+              <div className="featured__side-stat-k">Înscriși</div>
+              <div className="featured__side-stat-v">
+                {attending}
+                <small style={{ fontSize: 13, color: 'var(--muted)', fontFamily: 'JetBrains Mono' }}> / {capacity}</small>
+              </div>
+            </div>
+            <div>
+              <div className="featured__side-stat-k">Locuri rămase</div>
+              <div className="featured__side-stat-v hot">{capacity - attending}</div>
+            </div>
+          </>
+        )}
+        {speakers.length > 0 && (
+          <div>
+            <div className="featured__side-stat-k">Speakers</div>
+            <div className="featured__side-avatars">
+              {speakers.map((s, i) => <div key={i} style={{ background: i % 2 ? 'var(--accent)' : 'var(--ink)' }}>{s}</div>)}
+            </div>
           </div>
-        </div>
+        )}
         <div className="featured__cta">
-          <button className="btn btn--accent">Înscriere gratuită →</button>
-          <button className="btn btn--ghost btn--sm">Adaugă în calendar</button>
+          <a className="btn btn--accent" href={url} target={url !== '#' ? '_blank' : undefined} rel="noopener">{e.priceKind === 'free' ? 'Înscriere gratuită →' : 'Detalii înscriere →'}</a>
+          <a className="btn btn--ghost btn--sm" href={url} target="_blank" rel="noopener">Adaugă în calendar</a>
         </div>
       </div>
     </div>
