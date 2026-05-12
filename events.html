@@ -20,7 +20,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="styles-events.css" />
-<script src="/lang.js?v=20260512b" defer></script>
+<script src="/lang.js?v=20260512c" defer></script>
 </head>
 <body class="d-balanced">
 
@@ -55,23 +55,42 @@ window.addEventListener('unhandledrejection', (e) => {
   const errBox = document.getElementById('ev-skeleton-error');
   if (errBox) { errBox.style.display = 'block'; errBox.textContent = window.__evErrors.join('\n'); }
 });
-// After 3s, if the skeleton is still in the DOM (React didn't overwrite it),
-// show whatever errors we captured.
+// After 3s, audit what React actually rendered. Two failure modes:
+//  (a) skeleton still in DOM → React never mounted
+//  (b) skeleton gone but root has 0 height/width → invisible mount
 setTimeout(() => {
-  if (document.getElementById('ev-skeleton')) {
-    const errBox = document.getElementById('ev-skeleton-error');
-    if (errBox && !errBox.textContent) {
-      errBox.style.display = 'block';
-      errBox.textContent =
-        '⚠ React did NOT mount in 3s.\n\n' +
-        'Loaded scripts:\n' +
-        Array.from(document.scripts).map(s => '  ' + (s.src || '(inline)') + (s.type ? ' [' + s.type + ']' : '')).join('\n') +
-        '\n\nReact in window: ' + (typeof window.React) +
-        '\nReactDOM in window: ' + (typeof window.ReactDOM) +
-        '\nBabel in window: ' + (typeof window.Babel) +
-        '\n\nCaptured errors: ' + (window.__evErrors.join(' | ') || '(none — check DevTools console)');
-    }
-  }
+  const root = document.getElementById('ev-root');
+  const skel = document.getElementById('ev-skeleton');
+  if (!root) return;
+  const rect = root.getBoundingClientRect();
+  const first = root.firstElementChild;
+  const firstRect = first ? first.getBoundingClientRect() : null;
+
+  // If mounted normally (Topbar visible, height > 100), do nothing
+  if (rect.height > 200 && !skel) return;
+
+  // Otherwise, inject a visible diagnostic panel as a FRESH sibling of root
+  const diag = document.createElement('div');
+  diag.style.cssText = 'position:fixed;inset:0;background:#fff;color:#000;font-family:monospace;font-size:12px;padding:24px;overflow:auto;z-index:99998;white-space:pre-wrap;line-height:1.5;border:4px solid red';
+  diag.textContent =
+    '═══ /evenimente DIAGNOSTIC ═══\n\n' +
+    'Skeleton present: ' + !!skel + '\n' +
+    'Root tag: ' + root.tagName + '\n' +
+    'Root rect: w=' + rect.width.toFixed(0) + ' h=' + rect.height.toFixed(0) + ' top=' + rect.top.toFixed(0) + '\n' +
+    'Root childElementCount: ' + root.childElementCount + '\n' +
+    'Root innerHTML length: ' + root.innerHTML.length + '\n' +
+    'Root first child: ' + (first ? first.tagName + '.' + (first.className || '(no class)') : '(none)') + '\n' +
+    'First child rect: ' + (firstRect ? 'w=' + firstRect.width.toFixed(0) + ' h=' + firstRect.height.toFixed(0) : 'n/a') + '\n' +
+    'Root computed display: ' + getComputedStyle(root).display + '\n' +
+    'Root computed visibility: ' + getComputedStyle(root).visibility + '\n' +
+    'Root computed opacity: ' + getComputedStyle(root).opacity + '\n\n' +
+    'window.React: ' + (typeof window.React) + ' v=' + (window.React && window.React.version) + '\n' +
+    'window.ReactDOM: ' + (typeof window.ReactDOM) + ' v=' + (window.ReactDOM && window.ReactDOM.version) + '\n' +
+    'window.Babel: ' + (typeof window.Babel) + '\n\n' +
+    'Errors captured: ' + (window.__evErrors.join('\n  • ') || '(none)') + '\n\n' +
+    'innerHTML preview (first 400 chars):\n' +
+    root.innerHTML.substring(0, 400);
+  document.body.appendChild(diag);
 }, 3000);
 </script>
 
