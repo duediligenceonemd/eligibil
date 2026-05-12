@@ -27,13 +27,43 @@ function tryGetSupabase() {
 }
 
 // =============================================================================
-// Simple admin guard — for now, any logged-in session OR ADMIN_TOKEN header
+// Admin guard
+// Two ways to pass:
+//   1. X-Admin-Token header matches process.env.ADMIN_TOKEN (server-to-server)
+//   2. Authenticated user (req.session.userId) whose JSON record has
+//      `is_admin: true`. Plain "logged in" is NOT sufficient — every
+//      registered founder used to pass this guard previously.
 // =============================================================================
+// Admin allowlist: comma-separated emails in ADMIN_EMAILS env var, plus any
+// user with is_admin: true persisted in the JSON store. Promote-by-email is
+// container-restart-safe because env vars survive; the JSON store doesn't.
+function isAdminUser(user) {
+  if (!user) return false;
+  if (user.is_admin === true) return true;
+  const allowlist = (process.env.ADMIN_EMAILS || '')
+    .toLowerCase()
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+  return allowlist.includes(String(user.email || '').toLowerCase());
+}
+
 function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
   if (process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN) return next();
-  if (req.session?.userId) return next();
-  return res.status(401).json({ error: 'Admin authentication required' });
+  if (!req.session?.userId) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  const user = obsidian.findOne('users', { id: req.session.userId });
+  if (!user) {
+    return res.status(401).json({ error: 'Session user not found' });
+  }
+  if (!isAdminUser(user)) {
+    return res.status(403).json({ error: 'Admin privilege required' });
+  }
+  // Expose for downstream handlers that want to audit/log who did it
+  req.adminUser = user;
+  next();
 }
 
 router.use(requireAdmin);
