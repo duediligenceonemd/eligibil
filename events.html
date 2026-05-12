@@ -20,33 +20,59 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="styles-events.css" />
-<script src="/lang.js?v=20260512a" defer></script>
+<script src="/lang.js?v=20260512b" defer></script>
 </head>
 <body class="d-balanced">
 
-<div id="ev-root"></div>
+<!-- Diagnostic: pre-fill root with skeleton + visible error panel that lang.js
+     can translate but won't be overwritten unless React's createRoot succeeds. -->
+<div id="ev-root">
+  <div id="ev-skeleton" style="font-family:system-ui,sans-serif;padding:60px 32px;max-width:980px;margin:0 auto;color:#1a1a1a">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#666;margin-bottom:14px">Calendar · Loading…</div>
+    <h1 style="font-size:48px;line-height:1.05;letter-spacing:-.02em;margin:0 0 16px">Unde se întâmplă <em style="color:#1f3a5f;font-style:normal">viitorul</em> în regiunea ta.</h1>
+    <p style="color:#666;font-size:17px;max-width:600px;margin-bottom:32px">Se încarcă evenimente live din API…</p>
+    <div id="ev-skeleton-error" style="display:none;background:#fff5f5;border:1px solid #fca;padding:14px;font-family:monospace;font-size:12px;overflow:auto;white-space:pre-wrap;max-width:980px"></div>
+  </div>
+</div>
 
-<!-- Mount-failure diagnostic: if React hasn't filled #ev-root within 2.5s,
-     show a visible message + the last JS error so the issue isn't an
-     invisible blank page. -->
 <script>
 window.__evErrors = [];
 window.addEventListener('error', (e) => {
-  window.__evErrors.push((e.error && e.error.message) || e.message || 'error');
-});
-setTimeout(() => {
-  const root = document.getElementById('ev-root');
-  if (root && root.childElementCount === 0) {
-    root.innerHTML = '<div style="font-family:system-ui,sans-serif;padding:60px 32px;max-width:780px;margin:0 auto;color:#1a1a1a">' +
-      '<h2 style="font-size:24px;margin-bottom:12px">Pagina nu s-a încărcat complet</h2>' +
-      '<p style="color:#666;margin-bottom:20px">React mount-ul nu s-a finalizat în 2.5s. Probabil un script JS a eșuat să se descarce sau a aruncat o eroare.</p>' +
-      (window.__evErrors.length
-        ? '<pre style="background:#fff5f5;border:1px solid #fca;padding:12px;font-size:12px;overflow:auto;white-space:pre-wrap">' + window.__evErrors.map(e => String(e).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))).join('\\n') + '</pre>'
-        : '<p style="color:#999;font-size:13px">(nicio eroare globală capturată — verifică consola browser pentru detalii)</p>') +
-      '<p style="margin-top:24px"><a href="/search" style="color:#1f3a5f;text-decoration:underline">Răsfoiește catalogul de granturi →</a></p>' +
-      '</div>';
+  const msg = (e.error && e.error.message) || e.message || 'error';
+  const src = e.filename ? ' [' + e.filename.split('/').pop() + ':' + e.lineno + ']' : '';
+  window.__evErrors.push(msg + src);
+  console.error('[ev-diag]', msg, e);
+  const errBox = document.getElementById('ev-skeleton-error');
+  if (errBox) {
+    errBox.style.display = 'block';
+    errBox.textContent = window.__evErrors.join('\n');
   }
-}, 2500);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  const msg = (e.reason && e.reason.message) || String(e.reason);
+  window.__evErrors.push('PROMISE: ' + msg);
+  console.error('[ev-diag promise]', e.reason);
+  const errBox = document.getElementById('ev-skeleton-error');
+  if (errBox) { errBox.style.display = 'block'; errBox.textContent = window.__evErrors.join('\n'); }
+});
+// After 3s, if the skeleton is still in the DOM (React didn't overwrite it),
+// show whatever errors we captured.
+setTimeout(() => {
+  if (document.getElementById('ev-skeleton')) {
+    const errBox = document.getElementById('ev-skeleton-error');
+    if (errBox && !errBox.textContent) {
+      errBox.style.display = 'block';
+      errBox.textContent =
+        '⚠ React did NOT mount in 3s.\n\n' +
+        'Loaded scripts:\n' +
+        Array.from(document.scripts).map(s => '  ' + (s.src || '(inline)') + (s.type ? ' [' + s.type + ']' : '')).join('\n') +
+        '\n\nReact in window: ' + (typeof window.React) +
+        '\nReactDOM in window: ' + (typeof window.ReactDOM) +
+        '\nBabel in window: ' + (typeof window.Babel) +
+        '\n\nCaptured errors: ' + (window.__evErrors.join(' | ') || '(none — check DevTools console)');
+    }
+  }
+}, 3000);
 </script>
 
 <script>
