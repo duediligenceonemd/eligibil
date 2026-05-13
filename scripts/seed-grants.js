@@ -146,7 +146,11 @@ function readExcelGrants() {
         sector_arr:   parseSlash(row.sector),
         deadline:     String(row.deadline ?? '').trim() || null,
         luna:         row.luna       != null ? Number(row.luna)       : null,
-        dificultate:  row.dificultate != null ? Number(row.dificultate) : null,
+        // Schema check constraint: dificultate ∈ [1, 3]. Excel uses 1–5, so
+        // 4–5 (very-hard / impossible-solo) collapse onto 3.
+        dificultate:  row.dificultate != null
+          ? Math.max(1, Math.min(3, Number(row.dificultate)))
+          : null,
         zile_min:     row.zile_min  != null ? Number(row.zile_min)   : null,
         zile_max:     row.zile_max  != null ? Number(row.zile_max)   : null,
         cerinte:      String(row.cerinte   ?? '').trim() || null,

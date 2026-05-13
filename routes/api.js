@@ -85,11 +85,16 @@ const GRANT_SELECT_BASE = [
   'deadline', 'luna', 'dificultate', 'zile_min', 'zile_max',
   'cerinte', 'descriere', 'website', 'status',
 ];
+// Only the enrichment columns that actually exist on `grants` today.
+// The wider set (nume_program_en, short_summary_*, funder_name, evidence_status,
+// application_languages) was scoped for a follow-up Pas 1 extension and would
+// trigger the "column does not exist" fallback to BASE — losing slugs too.
 const GRANT_SELECT_PAS1 = [
-  'slug_ro', 'slug_en', 'nume_program_en',
-  'short_summary_ro', 'short_summary_en',
-  'funder_name', 'funder_country',
-  'evidence_status', 'application_languages',
+  'slug_ro', 'slug_en',
+  'trl_min', 'trl_max',
+  'amount_min_eur', 'amount_max_eur',
+  'sectors_en', 'application_url', 'is_equity_free',
+  'funder_id', 'enriched_at',
 ];
 const GRANT_SELECT      = GRANT_SELECT_BASE.join(', ');
 const GRANT_SELECT_FULL = GRANT_SELECT_BASE.concat(GRANT_SELECT_PAS1).join(', ');
