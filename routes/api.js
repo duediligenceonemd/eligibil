@@ -1,7 +1,7 @@
 'use strict';
 
 const express         = require('express');
-const db              = require('../db/database');
+const db              = require('../db/users-supabase');
 const { getSupabase } = require('../db/supabase');
 
 const router = express.Router();
@@ -208,7 +208,7 @@ router.get('/grants/match', requireAuth, async (req, res) => {
   if (!supabase) return res.status(503).json({ error: 'Supabase neconfigurat' });
 
   try {
-    const startup = db.findOne('startups', { user_id: req.session.userId });
+    const startup = await db.findOne('startups', { user_id: req.session.userId });
     if (!startup) return res.status(400).json({ error: 'Profil startup incomplet. Completează profilul mai întâi.' });
 
     const limit       = Math.min(Number(req.query.limit) || 10, 50);
@@ -473,7 +473,7 @@ router.post('/comments', requireAuth, async (req, res) => {
   const body = String(req.body?.body || '').trim();
   if (body.length < 1 || body.length > 5000) return res.status(400).json({ error: 'body must be 1..5000 chars' });
   // Look up user for denormalised email/name
-  const user = db.findOne('users', { id: req.session.userId });
+  const user = await db.findOne('users', { id: req.session.userId });
   const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(' ') : '';
   try {
     const { data, error } = await sb.from('comments').insert({
@@ -549,9 +549,9 @@ router.post('/reactions/toggle', requireAuth, async (req, res) => {
 // =============================================================================
 // GET /api/profile
 // =============================================================================
-router.get('/profile', requireAuth, (req, res) => {
-  const user    = db.findOne('users',    { id: req.session.userId });
-  const startup = db.findOne('startups', { user_id: req.session.userId });
+router.get('/profile', requireAuth, async (req, res) => {
+  const user    = await db.findOne('users',    { id: req.session.userId });
+  const startup = await db.findOne('startups', { user_id: req.session.userId });
   if (!user) return res.status(404).json({ error: 'Utilizator negăsit' });
 
   res.json({
@@ -604,17 +604,17 @@ router.put('/profile', requireAuth, async (req, res) => {
     priority:   priority    || null,
   };
 
-  const existing = db.findOne('startups', { user_id: req.session.userId });
+  const existing = await db.findOne('startups', { user_id: req.session.userId });
   let startup;
   if (existing) {
-    startup = db.update('startups', { user_id: req.session.userId }, data);
+    startup = await db.update('startups', { user_id: req.session.userId }, data);
   } else {
-    startup = db.insert('startups', { user_id: req.session.userId, ...data });
+    startup = await db.insert('startups', { user_id: req.session.userId, ...data });
   }
 
   // Sync to Supabase for Scoring v2 (best-effort, non-blocking)
   try {
-    const user = db.findOne('users', { id: req.session.userId });
+    const user = await db.findOne('users', { id: req.session.userId });
     const { syncProfile } = require('../db/profile-sync');
     syncProfile(req.session.userId, user?.email, {
       startupName, website, pitch, sector, stage, trl, country,
@@ -630,7 +630,7 @@ router.put('/profile', requireAuth, async (req, res) => {
 // Returns readiness + completeness + top 3 matched grants + alerts
 // =============================================================================
 router.get('/dashboard', requireAuth, async (req, res) => {
-  const startup  = db.findOne('startups', { user_id: req.session.userId });
+  const startup  = await db.findOne('startups', { user_id: req.session.userId });
   const supabase = tryGetSupabase();
 
   let topGrants = [];
@@ -704,17 +704,17 @@ router.get('/dashboard', requireAuth, async (req, res) => {
 // =============================================================================
 // GET /api/pipeline
 // =============================================================================
-router.get('/pipeline', requireAuth, (req, res) => {
-  const items = db.findAll('pipeline_items', { user_id: req.session.userId });
+router.get('/pipeline', requireAuth, async (req, res) => {
+  const items = await db.findAll('pipeline_items', { user_id: req.session.userId });
   res.json({ ok: true, items });
 });
 
 // =============================================================================
 // POST /api/pipeline
 // =============================================================================
-router.post('/pipeline', requireAuth, (req, res) => {
+router.post('/pipeline', requireAuth, async (req, res) => {
   const { grantId, grantName, stage, notes, deadline } = req.body;
-  const item = db.insert('pipeline_items', {
+  const item = await db.insert('pipeline_items', {
     user_id:    req.session.userId,
     grant_id:   grantId   || null,
     grant_name: grantName || null,

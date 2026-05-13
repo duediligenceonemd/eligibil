@@ -19,7 +19,7 @@ const express = require('express');
 const router  = express.Router();
 
 const { getSupabase } = require('../db/supabase');
-const db             = require('../db/database');
+const usersDb        = require('../db/users-supabase');
 const { processInput } = require('../scripts/process-grants-inbox');
 
 function tryGetSupabase() {
@@ -48,22 +48,26 @@ function isAdminUser(user) {
   return allowlist.includes(String(user.email || '').toLowerCase());
 }
 
-function requireAdmin(req, res, next) {
+async function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
   if (process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN) return next();
   if (!req.session?.userId) {
     return res.status(401).json({ error: 'Authentication required' });
   }
-  const user = db.findOne('users', { id: req.session.userId });
-  if (!user) {
-    return res.status(401).json({ error: 'Session user not found' });
+  try {
+    const user = await usersDb.findOne('users', { id: req.session.userId });
+    if (!user) {
+      return res.status(401).json({ error: 'Session user not found' });
+    }
+    if (!isAdminUser(user)) {
+      return res.status(403).json({ error: 'Admin privilege required' });
+    }
+    req.adminUser = user;
+    next();
+  } catch (err) {
+    console.error('requireAdmin error:', err);
+    return res.status(500).json({ error: 'Auth check failed' });
   }
-  if (!isAdminUser(user)) {
-    return res.status(403).json({ error: 'Admin privilege required' });
-  }
-  // Expose for downstream handlers that want to audit/log who did it
-  req.adminUser = user;
-  next();
 }
 
 router.use(requireAdmin);

@@ -2,7 +2,7 @@
 
 const express = require('express');
 const bcrypt  = require('bcryptjs');
-const db      = require('../db/database');
+const db      = require('../db/users-supabase');
 
 const router = express.Router();
 
@@ -20,15 +20,15 @@ router.post('/register', async (req, res) => {
 
   const normalEmail = email.toLowerCase().trim();
 
-  // Duplicate check
-  if (db.findOne('users', { email: normalEmail })) {
-    return res.status(409).json({ error: 'Email deja înregistrat' });
-  }
-
   try {
+    // Duplicate check
+    if (await db.findOne('users', { email: normalEmail })) {
+      return res.status(409).json({ error: 'Email deja înregistrat' });
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const user = db.insert('users', {
+    const user = await db.insert('users', {
       email: normalEmail,
       password_hash: passwordHash,
       first_name: firstName || null,
@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
     });
 
     if (startupName) {
-      db.insert('startups', {
+      await db.insert('startups', {
         user_id:    user.id,
         name:       startupName  || null,
         website:    website      || null,
@@ -75,22 +75,27 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: 'Email și parola sunt obligatorii' });
   }
 
-  const user = db.findOne('users', { email: email.toLowerCase().trim() });
-  if (!user) {
-    return res.status(401).json({ error: 'Email sau parolă incorectă' });
+  try {
+    const user = await db.findOne('users', { email: email.toLowerCase().trim() });
+    if (!user) {
+      return res.status(401).json({ error: 'Email sau parolă incorectă' });
+    }
+
+    const ok = await bcrypt.compare(password, user.password_hash);
+    if (!ok) {
+      return res.status(401).json({ error: 'Email sau parolă incorectă' });
+    }
+
+    req.session.userId = user.id;
+
+    return res.json({
+      ok: true,
+      user: { id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name, role: user.role },
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    return res.status(500).json({ error: 'Eroare internă de server' });
   }
-
-  const ok = await bcrypt.compare(password, user.password_hash);
-  if (!ok) {
-    return res.status(401).json({ error: 'Email sau parolă incorectă' });
-  }
-
-  req.session.userId = user.id;
-
-  return res.json({
-    ok: true,
-    user: { id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name, role: user.role },
-  });
 });
 
 // POST /api/auth/logout
@@ -102,27 +107,32 @@ router.post('/logout', (req, res) => {
 });
 
 // GET /api/auth/me
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   if (!req.session.userId) return res.json({ ok: false });
 
-  const user = db.findOne('users', { id: req.session.userId });
-  if (!user) {
-    req.session.destroy(() => {});
+  try {
+    const user = await db.findOne('users', { id: req.session.userId });
+    if (!user) {
+      req.session.destroy(() => {});
+      return res.json({ ok: false });
+    }
+
+    const startup = await db.findOne('startups', { user_id: user.id });
+
+    return res.json({
+      ok: true,
+      user: { id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name, role: user.role },
+      startup: startup ? {
+        name:    startup.name,
+        sector:  startup.sector,
+        stage:   startup.stage,
+        country: startup.country,
+      } : null,
+    });
+  } catch (err) {
+    console.error('/me error:', err);
     return res.json({ ok: false });
   }
-
-  const startup = db.findOne('startups', { user_id: user.id });
-
-  return res.json({
-    ok: true,
-    user: { id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name, role: user.role },
-    startup: startup ? {
-      name:    startup.name,
-      sector:  startup.sector,
-      stage:   startup.stage,
-      country: startup.country,
-    } : null,
-  });
 });
 
 module.exports = router;

@@ -272,7 +272,7 @@ app.get('*', (req, res, next) => {
 });
 
 // Initialise DB and start server
-require('./db/database').init();
+require('./db/users-supabase').init();
 
 // Bind to 0.0.0.0 for Cloud Run / Docker (default localhost-only would not accept external requests)
 app.listen(PORT, '0.0.0.0', () => {
