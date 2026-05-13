@@ -294,7 +294,7 @@ function MatchingFlow() {
                   </div>
                   <div className="plan__total">
                     <div className="plan__total-left">După acțiuni → <strong>Match 90 · Readiness 93</strong> · aplicație competitivă</div>
-                    <a className="btn btn--accent btn--sm" href="/register.html">Activează AI Document Generation →</a>
+                    <a className="btn btn--accent btn--sm" href="/upload-artefact">Activează AI Document Generation →</a>
                   </div>
                 </div>
               </div>

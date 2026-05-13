@@ -148,6 +148,7 @@ app.get(/^\/(ro|en)\/(granturi|grants)-(.+)$/, async (req, res, next) => {
 // /search — public catalog page. Static file served via the catch-all that
 // follows; we just need an explicit route ahead of the index.html fallback.
 app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'search.html')));
+app.get('/upload-artefact', (req, res) => res.sendFile(path.join(__dirname, 'upload-artefact.html')));
 
 // /evenimente (RO) + /events (EN) — public events listing page (Brief 04).
 // Both routes serve the same events.html shell; components-events.jsx
@@ -261,6 +262,7 @@ app.use(express.static(__dirname));
 // API routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/artefacts', require('./routes/artefacts'));
 app.use('/api', require('./routes/api'));
 
 // Catch-all: serve index.html for non-API routes

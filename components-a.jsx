@@ -444,7 +444,7 @@ function ActivePrograms() {
               </div>
               <div className="program__action">
                 <a className="btn btn--accent btn--sm" href={`/search?q=${encodeURIComponent(p.name)}`}>Vezi detalii →</a>
-                <a className="btn btn--ghost btn--sm" href="/register.html">Analizează șansele</a>
+                <a className="btn btn--ghost btn--sm" href="/upload-artefact">Analizează șansele</a>
               </div>
             </div>
           ))}

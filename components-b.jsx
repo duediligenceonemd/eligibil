@@ -120,7 +120,7 @@ function AISection({ showAI }) {
             </div>
 
             <div className="ai-hero__cta">
-              <a className="btn btn--accent" href="/register.html">Încearcă analiza AI în 90 de secunde →</a>
+              <a className="btn btn--accent" href="/upload-artefact">Încearcă analiza AI în 90 de secunde →</a>
             </div>
           </div>
         </div>
@@ -359,7 +359,7 @@ function FinalCTA() {
             <p>Răsfoiește 735+ oportunități verificate, salvează favoritele tale și primește analiză AI de pregătire pentru fiecare program.</p>
             <div className="cta-card__btns">
               <a className="btn btn--accent" href="/search">Explorează catalogul →</a>
-              <a className="btn btn--ghost" href="/register.html" style={{ color: 'var(--bg)', borderColor: 'var(--bg)' }}>Încearcă analiza AI</a>
+              <a className="btn btn--ghost" href="/upload-artefact" style={{ color: 'var(--bg)', borderColor: 'var(--bg)' }}>Încearcă analiza AI</a>
             </div>
           </div>
           <div className="cta-card">
