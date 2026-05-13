@@ -288,7 +288,20 @@ router.get('/grants/:id', async (req, res) => {
       .single();
 
     if (error || !data) return res.status(404).json({ error: 'Grant negăsit' });
-    res.json(data);
+
+    // Per-user scores: computed (and cached 7 days) only when authenticated.
+    // Anonymous visitors get the raw grant row — UI shows "log in for scores".
+    let user_scores = null;
+    if (req.session?.userId) {
+      try {
+        const { computeUserGrantScores } = require('../lib/score-engine');
+        user_scores = await computeUserGrantScores(req.session.userId, req.params.id);
+      } catch (e) {
+        console.error('user_grant_scores compute error:', e.message);
+      }
+    }
+
+    res.json({ ...data, user_scores });
   } catch (err) {
     console.error('GET /api/grants/:id error:', err.message);
     res.status(500).json({ error: 'Eroare internă' });

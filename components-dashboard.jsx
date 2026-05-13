@@ -342,15 +342,94 @@ function QuickActions() {
   );
 }
 
+function ArtefactCard() {
+  const [data, setData] = _useState({ loading: true });
+  _useEffect(() => {
+    let cancelled = false;
+    fetch('/api/artefacts/current', { credentials: 'same-origin' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (!cancelled) setData({ loading: false, ...(j || {}) }); })
+      .catch(() => { if (!cancelled) setData({ loading: false, artefact: null }); });
+    return () => { cancelled = true; };
+  }, []);
+
+  if (data.loading) {
+    return <div className="arte"><div className="arte__head"><div className="arte__name">Pitch deck</div></div><div style={{fontSize:13,color:'var(--muted)',fontFamily:'JetBrains Mono'}}>se încarcă…</div></div>;
+  }
+
+  // Pre-artefact state — onboarding CTA
+  if (!data.artefact) {
+    return (
+      <div className="arte">
+        <div className="arte__head">
+          <div className="arte__name">Pitch deck</div>
+          <span className="arte__badge stale">Lipsă</span>
+        </div>
+        <div className="arte__score"><span style={{fontSize:14,color:'var(--muted)',fontFamily:'JetBrains Mono'}}>— niciun deck încărcat —</span></div>
+        <div className="arte__meta"><span>Încarcă → 3 scoruri AI</span><span>≈ 60 s</span></div>
+        <a href="/upload-artefact" className="arte__cta" style={{ color: 'var(--accent)' }}>Încarcă PDF →</a>
+      </div>
+    );
+  }
+
+  // Processing
+  if (data.artefact.status === 'pending' || data.artefact.status === 'processing') {
+    return (
+      <div className="arte">
+        <div className="arte__head">
+          <div className="arte__name">Pitch deck</div>
+          <span className="arte__badge proc">Proces.</span>
+        </div>
+        <div className="arte__score"><span style={{fontSize:14,color:'var(--muted)',fontFamily:'JetBrains Mono'}}>— AI analizează —</span></div>
+        <div className="arte__meta"><span>{data.artefact.file_name}</span><span>{new Date(data.artefact.uploaded_at).toLocaleDateString('ro-RO')}</span></div>
+        <a href="/upload-artefact" className="arte__cta">Vezi status →</a>
+      </div>
+    );
+  }
+
+  // Failed
+  if (data.artefact.status === 'failed') {
+    return (
+      <div className="arte">
+        <div className="arte__head">
+          <div className="arte__name">Pitch deck</div>
+          <span className="arte__badge stale">Eșuat</span>
+        </div>
+        <div className="arte__score"><span style={{fontSize:13,color:'var(--hot)'}}>{data.artefact.error_message?.slice(0, 80) || 'Eroare analiză'}</span></div>
+        <a href="/upload-artefact" className="arte__cta" style={{ color: 'var(--accent)' }}>Re-încarcă →</a>
+      </div>
+    );
+  }
+
+  // Analyzed / awaiting_credits
+  const s = data.scores || {};
+  const stub = data.artefact.status === 'awaiting_credits';
+  return (
+    <div className="arte">
+      <div className="arte__head">
+        <div className="arte__name">Pitch deck {stub && <span style={{fontSize:10,color:'var(--muted)',marginLeft:6}}>(stub)</span>}</div>
+        <span className={`arte__badge ${stub ? 'proc' : 'up'}`}>{stub ? 'Stub' : 'OK'}</span>
+      </div>
+      <div className="arte__score"><strong>{s.readiness_score ?? '—'}</strong><span>/ 100</span></div>
+      <div className="arte__meta">
+        <span>R {s.readiness_score ?? '—'} · C {s.completeness_score ?? '—'} · F {s.fit_score ?? '—'}</span>
+        <span>{data.artefact.analyzed_at ? new Date(data.artefact.analyzed_at).toLocaleDateString('ro-RO') : ''}</span>
+      </div>
+      <a href="/upload-artefact" className="arte__cta">Re-analizează →</a>
+    </div>
+  );
+}
+
 function Artefacts() {
   return (
     <>
       <div className="sec-h">
         <h2>Artefactele tale</h2>
-        <span className="mono">4 / 4 · Profil AI construit</span>
+        <span className="mono">Pitch deck → 3 scoruri AI</span>
       </div>
       <div className="artefacts">
-        {DASH_ARTEFACTS.map((a, i) => (
+        <ArtefactCard />
+        {DASH_ARTEFACTS.filter(a => a.name !== 'Pitch deck').map((a, i) => (
           <div className="arte" key={i}>
             <div className="arte__head">
               <div className="arte__name">{a.name}</div>
