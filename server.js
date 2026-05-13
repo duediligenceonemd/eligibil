@@ -112,11 +112,12 @@ app.get(/^\/(ro|en)\/(granturi|grants)-(.+)$/, async (req, res, next) => {
   const countryMeta = SEO_COUNTRIES[countryKey];
 
   try {
+    // Trim to columns that exist on `grants` today. Future Pas 1 extension
+    // can add nume_program_en, short_summary_*, funder_name, evidence_status.
     const { data, error } = await sb.from('grants')
-      .select('id, slug_ro, slug_en, nume_program, nume_program_en, ' +
-              'short_summary_ro, short_summary_en, funder_name, funder_country, ' +
+      .select('id, slug_ro, slug_en, nume_program, ' +
               'organizatie, tara, tip, suma_min, suma_max, deadline, ' +
-              'evidence_status, dilutiv, dificultate')
+              'dilutiv, dificultate, descriere, cerinte')
       .eq('status', 'Activ')
       .ilike('sector', sectorMeta.ilike)
       .ilike('tara',   countryMeta.ilike)
