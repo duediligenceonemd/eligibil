@@ -290,7 +290,7 @@ function FooterOrg({ lang, setLang }) {
           </div>
           <div className="footer__col">
             <h5>eligibil.org</h5>
-            <a href="#about">About</a>
+            <a href="/about">About</a>
             <a href="mailto:info@eligibil.org">Contact</a>
             <a href="/blog?cat=metodologie">Metodologie</a>
             <a href="/blog?cat=data-quality">Calitatea datelor</a>

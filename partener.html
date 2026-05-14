@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Partener · eligibil.org</title>
+<meta name="description" content="Profil partener verificat eligibil.org — accelerator, fond, universitate sau program. Descriere, regiune, sectoare, contact." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/styles-v2.css" />
+<link rel="stylesheet" href="/styles-org.css" />
+<link rel="stylesheet" href="/styles-mobile.css?v=20260514g" />
+<script src="/lang.js?v=20260514g" defer></script>
+
+<style>
+  .pt__hero { padding: 64px 0 28px; border-bottom: 1px solid var(--border-soft); }
+  .pt__crumbs { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+  .pt__crumbs a { color: inherit; text-decoration: none; }
+  .pt__head { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+  .pt__logo { width: 96px; height: 96px; flex-shrink: 0; background: var(--bg-2); border: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: center; }
+  .pt__meta { flex: 1; min-width: 280px; }
+  .pt__verified { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #ecfdf5; color: #047857; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; border-radius: 3px; }
+  .pt__region { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-2); margin-left: 8px; }
+  .pt__title { font-size: clamp(28px, 5vw, 44px); font-weight: 700; margin: 12px 0 4px; font-family: 'Space Grotesk', sans-serif; line-height: 1.1; }
+  .pt__sub { font-size: 14px; color: var(--ink-2); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
+  .pt__desc { font-size: 17px; line-height: 1.55; color: var(--ink-1); margin: 18px 0 0; max-width: 760px; }
+  .pt__tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 0; }
+  .pt__tag { padding: 4px 10px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .pt__body { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 48px; padding: 48px 0; }
+  @media (max-width: 800px) { .pt__body { grid-template-columns: 1fr; gap: 28px; } }
+  .pt__section { margin-bottom: 32px; }
+  .pt__sidehead { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 8px; }
+  .pt__section h3 { font-size: 22px; margin: 0 0 12px; font-family: 'Space Grotesk', sans-serif; }
+  .pt__section p { font-size: 15px; line-height: 1.6; color: var(--ink-1); margin: 0 0 12px; }
+  .pt__aside { padding: 24px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 4px; }
+  .pt__aside dt { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-top: 14px; }
+  .pt__aside dt:first-child { margin-top: 0; }
+  .pt__aside dd { margin: 4px 0 0; font-size: 14px; color: var(--ink-1); }
+  .pt__cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+</style>
+</head>
+<body class="d-balanced">
+
+<div id="root"><div style="padding:48px;text-align:center;color:#666">Se încarcă…</div></div>
+
+<script>
+const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
+let tweaks = { accent: 'navy', density: 'balanced', dark: false };
+(function () {
+  document.documentElement.style.setProperty('--accent', ACCENTS[tweaks.accent]);
+  document.body.classList.add('d-' + tweaks.density);
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script src="/data.js?v=20260514g"></script>
+<script src="/data-org.js?v=20260514g"></script>
+<script type="text/babel" src="/thumbs.js?v=20260514g"></script>
+<script type="text/babel" src="/components-org-a.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-org-b.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-org-c.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-email-capture.jsx?v=20260514g"></script>
+
+<script type="text/babel">
+const { useState: useStatePt, useEffect: useEffectPt } = React;
+
+const DIACRITICS = { 'ă':'a','â':'a','î':'i','ș':'s','ț':'t' };
+function slugify(s) {
+  return (s || '').toLowerCase().replace(/[ăâîșț]/g, c => DIACRITICS[c] || c)
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function PartnerPage() {
+  const slug = (location.pathname.match(/^\/parteneri\/([a-z0-9-]+)/i) || [])[1];
+  const partners = window.ORG_PARTNERS || [];
+  const p = partners.find(x => slugify(x.name) === slug);
+
+  if (!p) {
+    return (
+      <section className="section">
+        <div className="container">
+          <div className="pt__crumbs"><a href="/">Acasă</a> › <a href="/parteneri">Parteneri</a></div>
+          <h1 className="pt__title">Partener negăsit</h1>
+          <p className="pt__desc">Slug-ul <code>/parteneri/{slug || '(gol)'}</code> nu corespunde niciunui partener listat. Vezi <a href="/parteneri">catalogul complet</a>.</p>
+        </div>
+      </section>
+    );
+  }
+
+  const programs = p.programs || [];
+
+  return (
+    <>
+      <section className="pt__hero">
+        <div className="container">
+          <div className="pt__crumbs">
+            <a href="/">Acasă</a> › <a href="/parteneri">Parteneri</a> › <span>{p.name}</span>
+          </div>
+          <div className="pt__head">
+            <div className="pt__logo"><Thumb kind={p.thumb} seed={p.name.length} /></div>
+            <div className="pt__meta">
+              <div>
+                {p.verified && <span className="pt__verified">✓ Verified</span>}
+                <span className="pt__region">{p.flag} {p.region}</span>
+              </div>
+              <h1 className="pt__title">{p.name}</h1>
+              <div className="pt__sub">{p.type}</div>
+              <p className="pt__desc">{p.desc}</p>
+              <div className="pt__tags">
+                {p.tags?.map(t => <span className="pt__tag" key={t}>{t}</span>)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="container pt__body">
+        <div>
+          <div className="pt__section">
+            <div className="pt__sidehead">Despre organizație</div>
+            <h3>Ce face {p.name}</h3>
+            <p>
+              {p.about || `${p.name} este un ${p.type.toLowerCase()} cu sediul în ${p.region}, activ în ecosistemul de finanțare pentru startupuri și IMM-uri inovatoare. Lucrează cu fondatori, cercetători și echipe care vor să acceseze granturi, capital non-dilutiv, programe colaborative europene sau acceleratoare.`}
+            </p>
+            <p>
+              {p.focus || `Focusul principal include sectoarele ${(p.tags || []).join(', ')} și colaborări cu programe europene precum Horizon Europe, EIC sau parteneriate cu fonduri și universități din regiune.`}
+            </p>
+          </div>
+
+          {programs.length > 0 && (
+            <div className="pt__section">
+              <div className="pt__sidehead">Programe active</div>
+              <h3>Apeluri și inițiative</h3>
+              {programs.map((pr, i) => (
+                <div key={i} style={{ padding: '14px 0', borderBottom: '1px solid var(--border-soft)' }}>
+                  <strong>{pr.name}</strong> — <span style={{ color: 'var(--ink-2)' }}>{pr.desc}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="pt__section">
+            <div className="pt__sidehead">Cum poți colabora</div>
+            <h3>Următorii pași</h3>
+            <p>
+              Dacă ești fondator care vrea să aplice la programe susținute de {p.name}, începe prin a încărca pitch deck-ul sau whitepaper-ul în eligibil.org. Vei primi un raport cu Match Score față de tipologia partenerului, plus recomandări concrete pentru îmbunătățirea aplicării.
+            </p>
+            <div className="pt__cta-row">
+              <a className="btn btn--accent" href="/register.html">Înregistrează startupul →</a>
+              <a className="btn btn--ghost" href="/upload-artefact">Analizează pitch deck</a>
+              <a className="btn btn--ghost" href={`/search?q=${encodeURIComponent(p.name)}`}>Granturi asociate</a>
+            </div>
+          </div>
+
+          <EmailCapture
+            context={`partener:${slug}`}
+            heading={`Update-uri de la ${p.name}`}
+            sub={`Primește notificări când ${p.name} lansează apeluri noi, programe sau evenimente publice. Frecvență redusă, fără spam.`}
+          />
+        </div>
+
+        <aside>
+          <div className="pt__aside">
+            <dl style={{ margin: 0 }}>
+              <dt>Tip organizație</dt>
+              <dd>{p.type}</dd>
+              <dt>Regiune</dt>
+              <dd>{p.flag} {p.region}</dd>
+              <dt>Status</dt>
+              <dd>{p.verified ? 'Verificat eligibil.org ✓' : 'În verificare'}</dd>
+              <dt>Sectoare</dt>
+              <dd>{(p.tags || []).join(', ') || '—'}</dd>
+              {p.website && (<><dt>Website</dt><dd><a href={p.website} target="_blank" rel="noopener">{p.website}</a></dd></>)}
+              {p.email && (<><dt>Contact</dt><dd><a href={`mailto:${p.email}`}>{p.email}</a></dd></>)}
+            </dl>
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-soft)' }}>
+              <a className="btn btn--ghost btn--sm" href="/parteneri" style={{ width: '100%', justifyContent: 'center' }}>← Toți partenerii</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </>
+  );
+}
+
+function App() {
+  const [lang, setLangState] = useStatePt((window.getLanguage && window.getLanguage()) || 'RO');
+  const setLang = (l) => { setLangState(l); if (window.setLanguage) window.setLanguage(l); };
+  useEffectPt(() => {
+    const onLang = (e) => setLangState(e.detail.lang);
+    window.addEventListener('languagechange', onLang);
+    return () => window.removeEventListener('languagechange', onLang);
+  }, []);
+  return (
+    <>
+      <NavOrg lang={lang} setLang={setLang} />
+      <PartnerPage />
+      <FooterOrg lang={lang} setLang={setLang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>

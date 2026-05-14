@@ -16,10 +16,10 @@
                         '/search', '/search.html',
                         '/evenimente', '/events', '/events.html',
                         '/stiri', '/news', '/blog', '/en/blog',
-                        '/parteneri', '/startupuri', '/glosar', '/produse'];
+                        '/parteneri', '/startupuri', '/glosar', '/produse', '/about'];
   const PUBLIC_PREFIXES = ['/ro/granturi/', '/en/grants/', '/ro/granturi-', '/en/grants-',
                            '/stiri/', '/news/', '/blog/', '/en/blog/',
-                           '/produs/'];
+                           '/produs/', '/parteneri/'];
   // Pages where the upload flow is the primary action — anonymous users get
   // bounced to /register.html (sign-up first) instead of /login.html.
   const REGISTER_FIRST_PAGES = ['/upload-artefact'];

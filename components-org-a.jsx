@@ -34,10 +34,10 @@ function NavOrg({ lang, setLang }) {
     <nav className="nav" onMouseLeave={scheduleClose}>
       <div className="container">
         <div className="nav__inner">
-          <div className="nav__brand">
+          <a href="/" className="nav__brand" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="nav__logo">eligibil<span className="nav__logo-dot">.org</span></div>
             <div className="nav__tag">AI Readiness &amp;<br/>Funding Orchestrator</div>
-          </div>
+          </a>
 
           <button
             className="nav__toggle"
@@ -50,7 +50,7 @@ function NavOrg({ lang, setLang }) {
 
           <div className={`nav__panel ${mobileOpen ? 'is-open' : ''}`}>
           <div className="nav__links">
-            <a className="nav__item" href="#catalog" onMouseEnter={() => openMenu(null)}>
+            <a className="nav__item" href="/search" onMouseEnter={() => openMenu(null)}>
               Catalog finanțări
             </a>
 
@@ -105,7 +105,7 @@ function NavOrg({ lang, setLang }) {
               )}
             </div>
 
-            <a className="nav__item" href="#about" onMouseEnter={() => openMenu(null)}>
+            <a className="nav__item" href="/about" onMouseEnter={() => openMenu(null)}>
               About
             </a>
           </div>

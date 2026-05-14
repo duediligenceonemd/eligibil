@@ -13,8 +13,8 @@
 <link rel="stylesheet" href="/styles.css" />
 <link rel="stylesheet" href="/styles-v2.css" />
 <link rel="stylesheet" href="/styles-org.css" />
-<link rel="stylesheet" href="/styles-mobile.css?v=20260514f" />
-<script src="/lang.js?v=20260514f" defer></script>
+<link rel="stylesheet" href="/styles-mobile.css?v=20260514g" />
+<script src="/lang.js?v=20260514g" defer></script>
 </head>
 <body class="d-balanced">
 
@@ -33,12 +33,13 @@ let tweaks = { accent: 'navy', density: 'balanced', dark: false };
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
-<script src="/data.js?v=20260514f"></script>
-<script src="/data-org.js?v=20260514f"></script>
-<script type="text/babel" src="/thumbs.js?v=20260514f"></script>
-<script type="text/babel" src="/components-org-a.jsx?v=20260514f"></script>
-<script type="text/babel" src="/components-org-b.jsx?v=20260514f"></script>
-<script type="text/babel" src="/components-org-c.jsx?v=20260514f"></script>
+<script src="/data.js?v=20260514g"></script>
+<script src="/data-org.js?v=20260514g"></script>
+<script type="text/babel" src="/thumbs.js?v=20260514g"></script>
+<script type="text/babel" src="/components-org-a.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-org-b.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-org-c.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-email-capture.jsx?v=20260514g"></script>
 
 <script type="text/babel">
 const { useState: useStateProduse, useEffect: useEffectProduse } = React;
@@ -89,14 +90,14 @@ function ProductListPage() {
         </div>
 
         <div style={{ marginTop: 48, padding: 28, background: 'var(--bg-2)', border: '1px solid var(--border-soft)' }}>
-          <h3 style={{ fontSize: 22, marginBottom: 8 }}>Nu știi care produs ți se potrivește?</h3>
+          <h3 style={{ fontSize: 22, marginBottom: 8 }}>Începe analiza startupului tău</h3>
           <p style={{ color: 'var(--ink-2)', fontSize: 14, marginBottom: 16 }}>
-            Începe cu analiza pitch deck-ului — primești scor de pregătire, recomandări de granturi și sugestii de îmbunătățire în mai puțin de un minut.
+            Creează cont gratuit în 30 de secunde, încarcă pitch deck-ul sau whitepaper-ul și primește primul raport AI cu scoruri de pregătire, recomandări de granturi și pași concreți de aplicare.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <a className="btn btn--accent" href="/produs/pitch">Analizează pitch deck →</a>
+            <a className="btn btn--accent" href="/register.html">Înregistrează startupul →</a>
+            <a className="btn btn--ghost" href="/produs/pitch">Analizează pitch deck</a>
             <a className="btn btn--ghost" href="/search">Vezi catalogul de granturi</a>
-            <a className="btn btn--ghost" href="/glosar">Glosar de termeni</a>
           </div>
         </div>
       </div>

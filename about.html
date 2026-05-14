@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Despre eligibil.org · AI Funding Orchestrator</title>
+<meta name="description" content="eligibil.org este platforma AI care ajută startupuri și IMM-uri din Moldova, România și Europa de Est să găsească granturi, capital non-dilutiv, parteneri pentru consorții și să-și pregătească aplicațiile de finanțare." />
+<link rel="canonical" href="https://eligibil.org/about" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/styles-v2.css" />
+<link rel="stylesheet" href="/styles-org.css" />
+<link rel="stylesheet" href="/styles-mobile.css?v=20260514g" />
+<script src="/lang.js?v=20260514g" defer></script>
+
+<style>
+  .ab__hero { padding: 80px 0 32px; border-bottom: 1px solid var(--border-soft); }
+  .ab__crumbs { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+  .ab__crumbs a { color: inherit; text-decoration: none; }
+  .ab__title { font-size: clamp(32px, 5vw, 56px); font-weight: 700; line-height: 1.05; margin: 0 0 12px; font-family: 'Space Grotesk', sans-serif; }
+  .ab__lead { font-size: 19px; line-height: 1.5; color: var(--ink-1); max-width: 780px; margin: 16px 0 0; }
+  .ab__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 56px; padding: 56px 0; }
+  @media (max-width: 900px) { .ab__grid { grid-template-columns: 1fr; gap: 32px; } }
+  .ab__sidehead { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; }
+  .ab__h2 { font-size: 28px; margin: 8px 0 16px; font-family: 'Space Grotesk', sans-serif; }
+  .ab__prose p { margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: var(--ink-1); }
+  .ab__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 32px 0; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+  @media (max-width: 600px) { .ab__stats { grid-template-columns: 1fr 1fr; } }
+  .ab__stat { padding: 16px; }
+  .ab__stat-v { font-size: 36px; font-weight: 700; color: var(--accent); font-family: 'Space Grotesk', sans-serif; line-height: 1; }
+  .ab__stat-l { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-top: 6px; }
+  .ab__values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; padding: 48px 0; }
+  @media (max-width: 800px) { .ab__values { grid-template-columns: 1fr; } }
+  .ab__value { padding: 24px; background: var(--bg-2); border: 1px solid var(--border-soft); }
+  .ab__value h4 { font-size: 18px; margin: 0 0 8px; font-family: 'Space Grotesk', sans-serif; }
+  .ab__value p { font-size: 14px; color: var(--ink-2); margin: 0; line-height: 1.55; }
+  .ab__cta { padding: 56px 0; background: var(--bg-2); }
+  .ab__cta h2 { font-size: 28px; margin: 0 0 12px; }
+  .ab__cta-btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+</style>
+</head>
+<body class="d-balanced">
+
+<div id="root"><div style="padding:48px;text-align:center;color:#666">Se încarcă…</div></div>
+
+<script>
+const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
+let tweaks = { accent: 'navy', density: 'balanced', dark: false };
+(function () {
+  document.documentElement.style.setProperty('--accent', ACCENTS[tweaks.accent]);
+  document.body.classList.add('d-' + tweaks.density);
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script src="/data.js?v=20260514g"></script>
+<script src="/data-org.js?v=20260514g"></script>
+<script type="text/babel" src="/thumbs.js?v=20260514g"></script>
+<script type="text/babel" src="/components-org-a.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-org-b.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-org-c.jsx?v=20260514g"></script>
+<script type="text/babel" src="/components-email-capture.jsx?v=20260514g"></script>
+
+<script type="text/babel">
+const { useState: useStateA, useEffect: useEffectA } = React;
+
+function AboutPage() {
+  return (
+    <>
+      <section className="ab__hero">
+        <div className="container">
+          <div className="ab__crumbs"><a href="/">Acasă</a> › <span>Despre</span></div>
+          <h1 className="ab__title">Construim infrastructura de finanțare pentru startupuri din Europa de Est.</h1>
+          <p className="ab__lead">
+            eligibil.org este o platformă AI care ajută fondatorii să găsească granturi, capital non-dilutiv, parteneri pentru consorții și să-și pregătească aplicații competitive — în Moldova, România, Ucraina și Europa de Est.
+          </p>
+        </div>
+      </section>
+
+      <div className="container">
+        <div className="ab__grid">
+          <div>
+            <div className="ab__sidehead">Misiune</div>
+            <h2 className="ab__h2">De ce existăm</h2>
+          </div>
+          <div className="ab__prose">
+            <p>
+              În fiecare an, sute de miliarde de euro din granturi europene, programe naționale și fonduri non-dilutive sunt distribuite startupurilor și IMM-urilor. Dar accesul la aceste resurse e dezechilibrat: ecosistemele mature (Berlin, Paris, Amsterdam) au consultanți, advisori și rețele care fac diferența. Moldova, România, Ucraina și restul Europei de Est rămân subreprezentate.
+            </p>
+            <p>
+              Construim instrumentele care egalizează acest acces. AI care citește pitch deck-ul tău și îți spune unde ești eligibil. Match Score pe baza datelor reale, nu a presupunerilor. Glosar deschis cu termeni explicați simplu. Catalog de parteneri verificați. Și o comunitate de fondatori care nu mai pierd timp căutând pe pagini web obscure.
+            </p>
+          </div>
+        </div>
+
+        <div className="ab__stats">
+          <div className="ab__stat">
+            <div className="ab__stat-v">70+</div>
+            <div className="ab__stat-l">Granturi în catalog</div>
+          </div>
+          <div className="ab__stat">
+            <div className="ab__stat-v">4</div>
+            <div className="ab__stat-l">Limbi acoperite (RO/EN/RU/UA)</div>
+          </div>
+          <div className="ab__stat">
+            <div className="ab__stat-v">5</div>
+            <div className="ab__stat-l">Produse AI live</div>
+          </div>
+          <div className="ab__stat">
+            <div className="ab__stat-v">140+</div>
+            <div className="ab__stat-l">Termeni în glosar</div>
+          </div>
+          <div className="ab__stat">
+            <div className="ab__stat-v">3</div>
+            <div className="ab__stat-l">Țări prioritare</div>
+          </div>
+          <div className="ab__stat">
+            <div className="ab__stat-v">2026</div>
+            <div className="ab__stat-l">Lansare publică</div>
+          </div>
+        </div>
+
+        <div className="ab__grid">
+          <div>
+            <div className="ab__sidehead">Cum funcționează</div>
+            <h2 className="ab__h2">Trei produse de bază</h2>
+          </div>
+          <div className="ab__prose">
+            <p>
+              <strong>1. Catalog public de granturi.</strong> Bază de date verificată cu deadline-uri, sume, criterii de eligibilitate, sectoare și țări. Filtrabilă, fără cont necesar.
+            </p>
+            <p>
+              <strong>2. Analiză AI a startupului.</strong> Încarci pitch deck, video sau whitepaper. Sistemul scorează pregătirea (Readiness), potrivirea cu programe (Match), completitudinea (Confidence) și sugerează acțiuni concrete.
+            </p>
+            <p>
+              <strong>3. Consorții și parteneri.</strong> Listă verificată de acceleratoare, fonduri, universități și RTO-uri. Recomandări de parteneri pentru proiecte colaborative europene (Horizon, EIC, Eureka).
+            </p>
+          </div>
+        </div>
+
+        <div className="ab__sidehead" style={{ marginTop: 32 }}>Valori</div>
+        <h2 className="ab__h2">Cum lucrăm</h2>
+        <div className="ab__values">
+          <div className="ab__value">
+            <h4>Calitatea datelor</h4>
+            <p>Fiecare grant, partener, eveniment trece printr-un proces de verificare. Erorile se corectează rapid și transparent.</p>
+          </div>
+          <div className="ab__value">
+            <h4>Acces deschis</h4>
+            <p>Catalogul, glosarul și informațiile de bază sunt gratuite. Cont necesar doar pentru analize AI personalizate.</p>
+          </div>
+          <div className="ab__value">
+            <h4>Privacy first</h4>
+            <p>Documentele tale (pitch deck, whitepaper) rămân criptate, accesibile doar din contul tău. Nu le partajăm cu nimeni fără acordul tău explicit.</p>
+          </div>
+          <div className="ab__value">
+            <h4>Local + global</h4>
+            <p>Acoperim deopotrivă programe naționale (ANCD, Innofund, USAID, GIZ) și europene (EIC, Horizon, ERDF). Interfață în RO, EN, RU, UA.</p>
+          </div>
+          <div className="ab__value">
+            <h4>AI explicabil</h4>
+            <p>Fiecare scor are o explicație. Nu spunem doar "Readiness: 72/100" — arătăm ce contribuie la el și ce poți face să crești.</p>
+          </div>
+          <div className="ab__value">
+            <h4>Open ecosystem</h4>
+            <p>Acceleratoarele, fondurile și partenerii își pot lista profilul gratuit. Parteneriat win-win cu ecosistemul, nu silos închis.</p>
+          </div>
+        </div>
+      </div>
+
+      <section className="ab__cta">
+        <div className="container">
+          <div className="ab__sidehead">Contact</div>
+          <h2>Vrei să colaborezi sau să te listezi?</h2>
+          <p style={{ fontSize: 16, color: 'var(--ink-2)', maxWidth: 640 }}>
+            Suntem deschiși pentru parteneriate cu acceleratoare, fonduri, instituții publice și programe donor. Scrie-ne pe info@eligibil.org sau abonează-te la newsletter pentru update-uri de produs.
+          </p>
+          <div className="ab__cta-btns">
+            <a className="btn btn--accent" href="/register.html">Înregistrează startupul →</a>
+            <a className="btn btn--ghost" href="mailto:info@eligibil.org">info@eligibil.org</a>
+            <a className="btn btn--ghost" href="/register.html?type=partner">Listează organizația</a>
+          </div>
+          <div style={{ marginTop: 32 }}>
+            <EmailCapture context="about" />
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function App() {
+  const [lang, setLangState] = useStateA((window.getLanguage && window.getLanguage()) || 'RO');
+  const setLang = (l) => { setLangState(l); if (window.setLanguage) window.setLanguage(l); };
+  useEffectA(() => {
+    const onLang = (e) => setLangState(e.detail.lang);
+    window.addEventListener('languagechange', onLang);
+    return () => window.removeEventListener('languagechange', onLang);
+  }, []);
+  return (
+    <>
+      <NavOrg lang={lang} setLang={setLang} />
+      <AboutPage />
+      <FooterOrg lang={lang} setLang={setLang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>

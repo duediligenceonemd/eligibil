@@ -151,7 +151,9 @@ app.get(/^\/(ro|en)\/(granturi|grants)-(.+)$/, async (req, res, next) => {
 app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'search.html')));
 app.get('/upload-artefact', (req, res) => res.sendFile(path.join(__dirname, 'upload-artefact.html')));
 app.get('/parteneri',  (req, res) => res.sendFile(path.join(__dirname, 'parteneri.html')));
+app.get('/parteneri/:slug', (req, res) => res.sendFile(path.join(__dirname, 'partener.html')));
 app.get('/startupuri', (req, res) => res.sendFile(path.join(__dirname, 'startupuri.html')));
+app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'about.html')));
 app.get('/produs/:slug', (req, res) => res.sendFile(path.join(__dirname, 'produs.html')));
 app.get('/glosar', (req, res) => res.sendFile(path.join(__dirname, 'glosar.html')));
 app.get('/produse', (req, res) => res.sendFile(path.join(__dirname, 'produse.html')));
@@ -269,6 +271,7 @@ app.use(express.static(__dirname));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/artefacts', require('./routes/artefacts'));
+app.use('/api/newsletter', require('./routes/newsletter'));
 app.use('/api', require('./routes/api'));
 
 // Catch-all: serve index.html for non-API routes
