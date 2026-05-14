@@ -1,0 +1,186 @@
+/* =============================================================================
+ * styles-mobile.css — mobile-responsive overlay for eligibil.org
+ * Loaded AFTER styles.css / styles-v2.css / styles-org.css so its rules win.
+ * All overrides scoped to @media (max-width: 768px) and ≤480px.
+ * ===========================================================================*/
+
+/* ---------- NavOrg hamburger toggle (default = hidden) ---------- */
+.nav__toggle {
+  display: none;
+  background: none;
+  border: 1px solid var(--border-soft, #e5e5e5);
+  border-radius: 4px;
+  font-size: 18px;
+  padding: 8px 12px;
+  cursor: pointer;
+  line-height: 1;
+  color: var(--ink-1, #1a1a1a);
+  font-family: inherit;
+}
+.nav__panel {
+  display: contents; /* desktop: children flow into parent flex */
+}
+
+/* =============================================================================
+ * ≤ 768px — tablet + landscape phones
+ * ===========================================================================*/
+@media (max-width: 768px) {
+  /* container padding */
+  .container { padding: 0 20px; }
+
+  /* NavOrg → hamburger reveals stacked menu */
+  .nav__toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .nav__panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 16px 20px;
+    background: var(--bg-1, #fff);
+    border-top: 1px solid var(--border-soft, #e5e5e5);
+    border-bottom: 1px solid var(--border-soft, #e5e5e5);
+    z-index: 100;
+  }
+  .nav__panel.is-open { display: flex; }
+  .nav__panel .nav__links,
+  .nav__panel .nav__right { display: flex; flex-direction: column; gap: 8px; }
+  .nav__panel a, .nav__panel .btn { min-height: 44px; display: flex; align-items: center; padding: 10px 14px; }
+  .nav__inner { position: relative; }
+
+  /* Hide sticky aside columns at tablet width */
+  .reg__rail, .sidebar, .filter-rail { position: relative !important; height: auto !important; max-height: none !important; }
+
+  /* Search bar — 1 column for mobile */
+  .search__row { grid-template-columns: 1fr !important; gap: 8px; }
+  .search__icon { display: none; }
+  .search__select, .search__input { min-height: 44px; padding: 12px; font-size: 15px; width: 100%; }
+
+  /* Multi-col grids → fewer cols */
+  .products, .docgen, .verticals, .deadlines, .partners,
+  .upload-cards, .tiles, .tiles.cols-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .stab__head { display: none !important; }
+  .stab__row {
+    display: block !important;
+    grid-template-columns: none !important;
+    padding: 20px 16px !important;
+    border-bottom: 1px solid var(--border-soft, #e5e5e5);
+  }
+  .stab__row > span {
+    display: block;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--border-soft, #eee);
+  }
+  .stab__row > span:last-child { border-bottom: none; }
+  .stab__row > span[data-label]::before {
+    content: attr(data-label) ":";
+    display: inline-block;
+    min-width: 96px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-2, #666);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-right: 8px;
+  }
+
+  /* Register / form — full-width */
+  .reg { grid-template-columns: 1fr !important; }
+  .reg__rail {
+    border-right: none;
+    border-bottom: 1px solid var(--border-soft, #e5e5e5);
+    padding: 24px 20px;
+  }
+  .input-row, .input-row.cols-2, .input-row.cols-3 { grid-template-columns: 1fr !important; }
+  .input-row input, .input-row select, .input-row textarea { width: 100%; min-height: 44px; }
+
+  /* Hero / section heads */
+  .section { padding: 40px 0; }
+  .section__head { grid-template-columns: 1fr !important; gap: 12px; }
+  .org-hero__top, .hero__top { grid-template-columns: 1fr !important; padding: 32px 0; gap: 24px; }
+  .org-hero__h1, .hero__h1 { font-size: clamp(28px, 8vw, 44px); letter-spacing: -0.02em; }
+  .org-hero__visual, .hero__visual { border-left: none; border-top: 1px solid var(--border-soft, #e5e5e5); padding-top: 16px; }
+
+  /* Product page grid */
+  .pp__grid { grid-template-columns: 1fr !important; gap: 24px; padding: 32px 0; }
+  .pp__hero { padding: 40px 0 16px; }
+  .pp__form-grid { grid-template-columns: 1fr !important; }
+  .pp__scores { grid-template-columns: 1fr !important; }
+
+  /* Glosar */
+  .gl__hero { padding: 40px 0 24px; }
+  .gl__title { font-size: clamp(28px, 8vw, 44px); }
+  .gl__az { overflow-x: auto; gap: 4px; white-space: nowrap; padding: 10px 0; flex-wrap: nowrap; }
+  .gl__az a { min-width: 40px; padding: 8px 12px; flex-shrink: 0; text-align: center; }
+  .gl__pills { gap: 6px; }
+  .gl__pill { min-height: 36px; padding: 8px 12px; display: inline-flex; align-items: center; }
+  .gl__term summary { font-size: 16px; padding-right: 32px; }
+
+  /* Footer */
+  .footer__top { grid-template-columns: 1fr 1fr !important; gap: 24px; }
+  .footer__col { padding-bottom: 16px; }
+
+  /* Buttons — tap targets */
+  .btn { min-height: 44px; padding: 12px 18px; }
+  .btn--sm { min-height: 40px; padding: 10px 14px; }
+
+  /* Dashboard / app sidebar collapse */
+  .app { grid-template-columns: 1fr !important; }
+  .app__sidebar { display: none; } /* mobile users use top nav; sidebar hidden */
+
+  /* Generic image / iframe / table overflow guards */
+  img, iframe, video { max-width: 100%; height: auto; }
+  table { display: block; overflow-x: auto; max-width: 100%; }
+
+  /* Prevent horizontal scroll from any wide child */
+  html, body { overflow-x: hidden; }
+}
+
+/* =============================================================================
+ * ≤ 480px — portrait phones (final squeeze)
+ * ===========================================================================*/
+@media (max-width: 480px) {
+  .container { padding: 0 16px; }
+  .section { padding: 32px 0; }
+
+  /* All multi-col grids → single column */
+  .products, .docgen, .verticals, .deadlines, .partners,
+  .upload-cards, .tiles, .tiles.cols-4, .tiles.cols-2,
+  .footer__top {
+    grid-template-columns: 1fr !important;
+  }
+
+  .section__label { font-size: 10px; }
+  .section__title { font-size: clamp(22px, 6vw, 32px) !important; line-height: 1.15; }
+  .section__sub { font-size: 14px; }
+
+  .org-hero__h1, .hero__h1, .pp__title, .gl__title { font-size: clamp(26px, 8vw, 36px); }
+
+  /* Tighten card paddings on tiny screens */
+  .product, .partner, .deadline { padding: 18px !important; }
+  .pp__upload { padding: 18px; }
+  .gl__cta { padding: 32px 0; }
+  .gl__cta h2 { font-size: 22px; }
+
+  /* Smaller pp__drop */
+  .pp__drop { padding: 22px 16px; }
+
+  /* CTA button rows wrap nicely */
+  .gl__cta-btns, .pp__flow { gap: 8px; }
+  .gl__cta-btns .btn { flex: 1 1 100%; justify-content: center; }
+}
+
+/* =============================================================================
+ * Touch devices — ensure tap targets ≥ 44px regardless of width.
+ * Catches tablets in landscape (>768px) but still touch.
+ * ===========================================================================*/
+@media (hover: none) and (pointer: coarse) {
+  a, button, .btn, input[type="submit"], input[type="button"], .nav__item {
+    min-height: 44px;
+  }
+}

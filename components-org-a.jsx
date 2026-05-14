@@ -6,6 +6,7 @@ const { useState: useStateOrgA, useEffect: useEffectOrgA, useRef: useRefOrgA } =
    ============================================================ */
 function NavOrg({ lang, setLang }) {
   const [open, setOpen] = useStateOrgA(null);
+  const [mobileOpen, setMobileOpen] = useStateOrgA(false);
   const closeTimer = useRefOrgA(null);
   const openMenu = (k) => { clearTimeout(closeTimer.current); setOpen(k); };
   const scheduleClose = () => { closeTimer.current = setTimeout(() => setOpen(null), 150); };
@@ -28,6 +29,16 @@ function NavOrg({ lang, setLang }) {
             <div className="nav__tag">AI Readiness &amp;<br/>Funding Orchestrator</div>
           </div>
 
+          <button
+            className="nav__toggle"
+            aria-label="Menu"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? '✕' : '☰'}
+          </button>
+
+          <div className={`nav__panel ${mobileOpen ? 'is-open' : ''}`}>
           <div className="nav__links">
             <a className="nav__item" href="#catalog" onMouseEnter={() => openMenu(null)}>
               Catalog finanțări
@@ -88,6 +99,7 @@ function NavOrg({ lang, setLang }) {
             <a className="btn btn--ghost btn--sm" href="/login.html">Intră în cont</a>
             <a className="btn btn--ghost btn--sm" href="/search">Caută finanțare</a>
             <a className="btn btn--sm btn--accent" href="/upload-artefact">Analizează startupul</a>
+          </div>
           </div>
         </div>
       </div>

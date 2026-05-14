@@ -13,7 +13,8 @@
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="styles-v2.css" />
 <link rel="stylesheet" href="styles-org.css" />
-<script src="/lang.js?v=20260514d" defer></script>
+<link rel="stylesheet" href="/styles-mobile.css?v=20260514e" />
+<script src="/lang.js?v=20260514e" defer></script>
 </head>
 <body class="d-balanced">
 
@@ -32,12 +33,12 @@ let tweaks = { accent: 'navy', density: 'balanced', dark: false };
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-<script src="data.js?v=20260514d"></script>
-<script src="data-org.js?v=20260514d"></script>
-<script type="text/babel" src="thumbs.js?v=20260514d"></script>
-<script type="text/babel" src="components-org-a.jsx?v=20260514d"></script>
-<script type="text/babel" src="components-org-b.jsx?v=20260514d"></script>
-<script type="text/babel" src="components-org-c.jsx?v=20260514d"></script>
+<script src="data.js?v=20260514e"></script>
+<script src="data-org.js?v=20260514e"></script>
+<script type="text/babel" src="thumbs.js?v=20260514e"></script>
+<script type="text/babel" src="components-org-a.jsx?v=20260514e"></script>
+<script type="text/babel" src="components-org-b.jsx?v=20260514e"></script>
+<script type="text/babel" src="components-org-c.jsx?v=20260514e"></script>
 
 <script type="text/babel">
 const { useState: useStateStartups, useEffect: useEffectStartups } = React;
@@ -70,14 +71,14 @@ function StartupListPage() {
             const cls = s.cons === 'open' ? 'open' : s.cons === 'forming' ? 'forming' : 'closed';
             return (
               <a className="stab__row" key={i} href={`/search?q=${encodeURIComponent(s.name)}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <span className="stab__name">{s.flag} {s.name}</span>
-                <span>{s.vert}</span>
-                <span className="stab__cell-mono">{s.stage}</span>
-                <span className="stab__cell-mono">TRL {s.trl}</span>
-                <span>{s.looking}</span>
-                <span className="stab__cell-mono">{s.ask}</span>
-                <span><span className={`stab__pill ${cls}`}>{s.cons}</span></span>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '.08em' }}>Profil →</span>
+                <span className="stab__name" data-label="Startup">{s.flag} {s.name}</span>
+                <span data-label="Verticală">{s.vert}</span>
+                <span className="stab__cell-mono" data-label="Stadiu">{s.stage}</span>
+                <span className="stab__cell-mono" data-label="TRL">TRL {s.trl}</span>
+                <span data-label="Caută">{s.looking}</span>
+                <span className="stab__cell-mono" data-label="Sumă">{s.ask}</span>
+                <span data-label="Consorțiu"><span className={`stab__pill ${cls}`}>{s.cons}</span></span>
+                <span data-label="Acțiune" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '.08em' }}>Profil →</span>
               </a>
             );
           })}
