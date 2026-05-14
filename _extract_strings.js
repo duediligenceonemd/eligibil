@@ -11,6 +11,7 @@ const ALL_PAGES = [
   'index.html',
   'parteneri.html',
   'startupuri.html',
+  'produs.html',
 ];
 
 const HOMEPAGE_SCOPE = [

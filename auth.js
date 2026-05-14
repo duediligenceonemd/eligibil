@@ -15,9 +15,15 @@
   const PUBLIC_PAGES = ['/', '/index.html', '/login.html', '/register.html',
                         '/search', '/search.html',
                         '/evenimente', '/events', '/events.html',
-                        '/stiri', '/news', '/blog', '/en/blog'];
+                        '/stiri', '/news', '/blog', '/en/blog',
+                        '/parteneri', '/startupuri'];
   const PUBLIC_PREFIXES = ['/ro/granturi/', '/en/grants/', '/ro/granturi-', '/en/grants-',
-                           '/stiri/', '/news/', '/blog/', '/en/blog/'];
+                           '/stiri/', '/news/', '/blog/', '/en/blog/',
+                           '/produs/'];
+  // Pages where the upload flow is the primary action — anonymous users get
+  // bounced to /register.html (sign-up first) instead of /login.html.
+  const REGISTER_FIRST_PAGES = ['/upload-artefact'];
+  const REGISTER_FIRST_PREFIXES = ['/produs/'];
   const path = window.location.pathname;
   const isPublic =
     PUBLIC_PAGES.some(p => path === p || path.endsWith(p)) ||
@@ -30,8 +36,12 @@
     .then(r => r.json())
     .then(data => {
       if (!data.ok) {
-        // Not logged in → redirect to login
-        window.location.href = '/login.html?next=' + encodeURIComponent(window.location.pathname);
+        // Not logged in → register-first pages bounce to /register, others to /login.
+        const wantsRegister =
+          REGISTER_FIRST_PAGES.includes(path) ||
+          REGISTER_FIRST_PREFIXES.some(p => path.startsWith(p));
+        const target = wantsRegister ? '/register.html' : '/login.html';
+        window.location.href = target + '?next=' + encodeURIComponent(window.location.pathname);
         return;
       }
 

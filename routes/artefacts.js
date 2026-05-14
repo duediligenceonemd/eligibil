@@ -55,12 +55,27 @@ const upload = multer({
   }),
   limits: { fileSize: 25 * 1024 * 1024 },   // 25 MB
   fileFilter: (req, file, cb) => {
-    if (file.mimetype !== 'application/pdf') {
-      return cb(new Error('Doar PDF acceptat în această fază'));
+    // Accept PDF + Office docs for the per-product upload flow.
+    const ACCEPTED = new Set([
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',  // pptx
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',    // docx
+      'video/mp4', 'video/quicktime',
+    ]);
+    if (!ACCEPTED.has(file.mimetype)) {
+      return cb(new Error('Format neacceptat. Folosește PDF, PPTX, DOCX, MP4 sau MOV.'));
     }
     cb(null, true);
   },
 });
+
+// Map slug → artefact_type column value. Falls back to pitch_deck for unknown.
+const PRODUCT_TO_ARTEFACT_TYPE = {
+  pitch: 'pitch_deck',
+  video: 'video_pitch',
+  wp:    'whitepaper',
+  trl:   'trl_eval',
+};
 
 // ── Lazy SDK init (so /upload doesn't crash when ANTHROPIC_API_KEY is absent)
 let _anthropic = null;
@@ -104,17 +119,24 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       return res.json({ ok: true, artefact_id: existing.id, deduped: true, status: existing.status });
     }
 
-    // Mark previous current artefact as superseded
+    // Resolve product slug → artefact_type. Stays compatible with the
+    // pre-existing upload flow which doesn't pass ?product= at all.
+    const productSlug = String(req.query.product || '').toLowerCase();
+    const artefactType = PRODUCT_TO_ARTEFACT_TYPE[productSlug] || 'pitch_deck';
+    const productKind  = PRODUCT_TO_ARTEFACT_TYPE[productSlug] ? productSlug : null;
+
+    // Mark previous current artefact of THIS type as superseded
     await sb.from('artefacts')
       .update({ is_current: false })
       .eq('user_id', req.session.userId)
-      .eq('artefact_type', 'pitch_deck')
+      .eq('artefact_type', artefactType)
       .eq('is_current', true);
 
     const { data: artefact, error } = await sb.from('artefacts').insert({
       user_id:         req.session.userId,
       startup_id:      startup?.id || null,
-      artefact_type:   'pitch_deck',
+      artefact_type:   artefactType,
+      product_kind:    productKind,
       file_name:       req.file.originalname,
       file_size_bytes: req.file.size,
       file_path:       req.file.path,

@@ -152,6 +152,7 @@ app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'search.html'
 app.get('/upload-artefact', (req, res) => res.sendFile(path.join(__dirname, 'upload-artefact.html')));
 app.get('/parteneri',  (req, res) => res.sendFile(path.join(__dirname, 'parteneri.html')));
 app.get('/startupuri', (req, res) => res.sendFile(path.join(__dirname, 'startupuri.html')));
+app.get('/produs/:slug', (req, res) => res.sendFile(path.join(__dirname, 'produs.html')));
 
 // /evenimente (RO) + /events (EN) — public events listing page (Brief 04).
 // Both routes serve the same events.html shell; components-events.jsx

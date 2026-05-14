@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Produs · eligibil.org</title>
+<meta name="description" content="Descrierea produsului, avantaje, FAQ și încărcare document. Analiză AI pentru pitch deck, video pitch, whitepaper, evaluare TRL sau identificare consorțiu." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/styles-v2.css" />
+<link rel="stylesheet" href="/styles-org.css" />
+<script src="/lang.js?v=20260514c" defer></script>
+
+<style>
+  .pp__hero { padding: 64px 0 24px; border-bottom: 1px solid var(--border-soft); }
+  .pp__crumbs { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+  .pp__crumbs a { color: inherit; text-decoration: none; }
+  .pp__crumbs a:hover { color: var(--accent); }
+  .pp__code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); letter-spacing: .1em; margin-bottom: 8px; }
+  .pp__title { font-size: clamp(32px, 5vw, 52px); font-weight: 700; line-height: 1.05; margin: 0 0 8px; font-family: 'Space Grotesk', sans-serif; }
+  .pp__tag { font-size: 14px; color: var(--ink-2); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
+  .pp__fmt { display: inline-block; padding: 4px 10px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-top: 12px; }
+  .pp__desc { font-size: 17px; line-height: 1.55; color: var(--ink-1); max-width: 760px; margin: 24px 0 0; }
+  .pp__grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 48px; padding: 56px 0; }
+  @media (max-width: 900px) { .pp__grid { grid-template-columns: 1fr; gap: 32px; } }
+  .pp__deliver-h { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 12px; }
+  .pp__deliver li { padding: 10px 0; border-bottom: 1px solid var(--border-soft); font-size: 15px; color: var(--ink-1); list-style: none; display: flex; gap: 10px; }
+  .pp__deliver li::before { content: '✓'; color: var(--accent); font-weight: 600; }
+  .pp__upload { background: var(--bg-2); border: 1px solid var(--border-soft); padding: 28px; border-radius: 4px; }
+  .pp__drop { display: block; padding: 32px 20px; border: 2px dashed var(--border-soft); border-radius: 4px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
+  .pp__drop:hover, .pp__drop.is-hover { border-color: var(--accent); background: var(--bg-1); }
+  .pp__drop input { position: absolute; left: -9999px; }
+  .pp__drop strong { display: block; font-size: 16px; margin-bottom: 4px; }
+  .pp__drop small { color: var(--ink-2); font-size: 13px; }
+  .pp__flow { display: flex; gap: 8px; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-top: 14px; }
+  .pp__flow span { padding: 4px 8px; background: var(--bg-1); border: 1px solid var(--border-soft); border-radius: 3px; }
+  .pp__faq { padding: 48px 0; border-top: 1px solid var(--border-soft); }
+  .pp__faq h2 { font-size: 28px; margin-bottom: 24px; font-family: 'Space Grotesk', sans-serif; }
+  .pp__faq details { padding: 16px 0; border-bottom: 1px solid var(--border-soft); }
+  .pp__faq summary { cursor: pointer; font-weight: 600; font-size: 16px; padding-right: 28px; position: relative; }
+  .pp__faq summary::-webkit-details-marker { display: none; }
+  .pp__faq summary::after { content: '+'; position: absolute; right: 0; top: 0; font-size: 20px; color: var(--accent); }
+  .pp__faq details[open] summary::after { content: '−'; }
+  .pp__faq details p { margin: 12px 0 0; color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+  .pp__processing { padding: 28px; text-align: center; background: var(--bg-2); border: 1px solid var(--border-soft); }
+  .pp__results { padding: 32px 0; border-top: 1px solid var(--border-soft); }
+  .pp__scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0 32px; }
+  .pp__score { padding: 24px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 4px; text-align: center; }
+  .pp__score-v { font-size: 38px; font-weight: 700; color: var(--accent); }
+  .pp__score-v small { font-size: 14px; color: var(--ink-2); font-weight: 400; }
+  .pp__score-l { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-top: 4px; }
+  .pp__bullets h4 { font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); margin: 16px 0 8px; font-family: 'JetBrains Mono', monospace; }
+  .pp__bullets ul { padding-left: 20px; }
+  .pp__bullets li { padding: 4px 0; }
+  .pp__err { color: #c24a1e; padding: 16px; background: #fff5f0; border: 1px solid #fad4c0; border-radius: 4px; margin-top: 12px; }
+  .pp__form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .pp__form-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink-2); }
+  .pp__form-grid select, .pp__form-grid input { padding: 10px 12px; border: 1px solid var(--border-soft); background: var(--bg-1); border-radius: 4px; font-family: inherit; font-size: 14px; }
+</style>
+</head>
+<body class="d-balanced">
+
+<div id="root"><div style="padding:48px;text-align:center;color:#666">Se încarcă…</div></div>
+
+<script>
+const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
+let tweaks = { accent: 'navy', density: 'balanced', dark: false };
+(function () {
+  document.documentElement.style.setProperty('--accent', ACCENTS[tweaks.accent]);
+  document.body.classList.add('d-' + tweaks.density);
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script src="/data.js"></script>
+<script src="/data-org.js"></script>
+<script type="text/babel" src="/thumbs.js"></script>
+<script type="text/babel" src="/components-org-a.jsx"></script>
+<script type="text/babel" src="/components-org-b.jsx"></script>
+<script type="text/babel" src="/components-org-c.jsx"></script>
+
+<script type="text/babel">
+const { useState: useStateP, useEffect: useEffectP, useRef: useRefP } = React;
+
+function ProductPage() {
+  const slug = (location.pathname.match(/^\/produs\/([a-z]+)/) || [])[1];
+  const p = (window.ORG_PRODUCTS || []).find(x => x.id === slug);
+
+  const [state, setState] = useStateP('idle'); // idle | uploading | processing | results | error
+  const [errMsg, setErrMsg] = useStateP('');
+  const [result, setResult] = useStateP(null);
+  const fileInputRef = useRefP(null);
+
+  if (!p) {
+    return (
+      <section className="section">
+        <div className="container">
+          <div className="pp__crumbs"><a href="/">Acasă</a> › <a href="/#products">Produse</a></div>
+          <h1 className="pp__title">Produs negăsit</h1>
+          <p className="pp__desc">Slug-ul <code>/produs/{slug || '(gol)'}</code> nu corespunde niciunui produs activ. Vezi <a href="/#products">lista de produse</a>.</p>
+        </div>
+      </section>
+    );
+  }
+
+  async function handleFile(file) {
+    if (p.maxMb && file.size > p.maxMb * 1024 * 1024) {
+      setState('error');
+      setErrMsg('Fișierul depășește ' + p.maxMb + ' MB.');
+      return;
+    }
+    setState('uploading');
+    const fd = new FormData();
+    fd.append('file', file);
+
+    let resp, body;
+    try {
+      resp = await fetch('/api/artefacts/upload?product=' + encodeURIComponent(p.id), {
+        method: 'POST', body: fd, credentials: 'same-origin'
+      });
+    } catch (e) {
+      setState('error'); setErrMsg('Eroare de rețea: ' + e.message); return;
+    }
+    if (resp.status === 401) {
+      // Anonymous — push to register flow
+      location.href = '/register.html?next=' + encodeURIComponent('/produs/' + p.id);
+      return;
+    }
+    try { body = await resp.json(); } catch { body = {}; }
+    if (!resp.ok) {
+      setState('error');
+      setErrMsg(body?.error || ('Upload eșuat (' + resp.status + ')'));
+      return;
+    }
+
+    setState('processing');
+    const artefactId = body.artefact_id;
+    for (let tries = 0; tries < 40; tries++) {
+      await new Promise(r => setTimeout(r, 1500));
+      let st;
+      try {
+        const r = await fetch('/api/artefacts/' + artefactId, { credentials: 'same-origin' });
+        st = await r.json();
+      } catch { continue; }
+      if (st.artefact?.status === 'analyzed' || st.artefact?.status === 'awaiting_credits') {
+        setResult(st);
+        setState('results');
+        return;
+      }
+      if (st.artefact?.status === 'failed') {
+        setState('error');
+        setErrMsg(st.artefact.error_message || 'Analiza a eșuat.');
+        return;
+      }
+    }
+    setState('error');
+    setErrMsg('Timeout — analiza durează prea mult. Verifică în dashboard.');
+  }
+
+  function onDrop(e) {
+    e.preventDefault();
+    if (e.dataTransfer.files?.length) handleFile(e.dataTransfer.files[0]);
+  }
+  function onChange(e) {
+    if (e.target.files?.length) handleFile(e.target.files[0]);
+  }
+
+  return (
+    <>
+      <section className="pp__hero" data-screen-label={`Produs · ${p.code}`}>
+        <div className="container">
+          <div className="pp__crumbs">
+            <a href="/">Acasă</a> › <a href="/#products">Produse</a> › <span>{p.name}</span>
+          </div>
+          <div className="pp__code">{p.n} / 05 · {p.code}</div>
+          <h1 className="pp__title">{p.name}</h1>
+          <div className="pp__tag">{p.tag}</div>
+          <div className="pp__fmt">{p.formats}</div>
+          <p className="pp__desc">{p.descLong || p.desc}</p>
+        </div>
+      </section>
+
+      <section className="section" style={{ padding: 0 }}>
+        <div className="container pp__grid">
+          <div>
+            <div className="pp__deliver-h">Ce primești în raport</div>
+            <ul className="pp__deliver" style={{ padding: 0, margin: 0 }}>
+              {p.deliver.map(d => <li key={d}>{d}</li>)}
+            </ul>
+          </div>
+
+          <div className="pp__upload" id="upload">
+            <div className="pp__deliver-h" style={{ marginBottom: 16 }}>
+              {p.interactive ? 'Completează profilul' : 'Încarcă documentul'}
+            </div>
+
+            {p.interactive ? (
+              <ConsortiumForm />
+            ) : state === 'idle' ? (
+              <>
+                <label className="pp__drop" htmlFor="pp-file">
+                  <strong>Trage fișierul aici sau apasă pentru a selecta</strong>
+                  <small>{p.acceptHint}</small>
+                  <input id="pp-file" ref={fileInputRef} type="file" accept={p.acceptMime} onChange={onChange} />
+                </label>
+                <div className="pp__flow">
+                  <span>Upload</span>
+                  <span>→</span>
+                  <span>Register</span>
+                  <span>→</span>
+                  <span>Raport AI</span>
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--ink-2)', marginTop: 12 }}>
+                  Fără cont? Vei fi redirecționat la înregistrare după ce încarci fișierul.
+                  Fișierul tău rămâne privat, criptat și accesibil doar din contul tău.
+                </p>
+              </>
+            ) : state === 'uploading' ? (
+              <div className="pp__processing">
+                <strong>Se încarcă…</strong>
+                <div style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 4 }}>Te rugăm așteaptă</div>
+              </div>
+            ) : state === 'processing' ? (
+              <div className="pp__processing">
+                <strong>AI analizează documentul…</strong>
+                <div style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 4 }}>Estimat 30–60 secunde</div>
+              </div>
+            ) : state === 'error' ? (
+              <div className="pp__err">{errMsg}<br /><button className="btn btn--ghost btn--sm" style={{ marginTop: 8 }} onClick={() => setState('idle')}>Încearcă din nou</button></div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      {state === 'results' && result && <ResultsPanel result={result} />}
+
+      <section className="pp__faq" data-screen-label="FAQ produs">
+        <div className="container">
+          <h2>Întrebări frecvente</h2>
+          {(p.faq || []).map((f, i) => (
+            <details key={i}>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function ResultsPanel({ result }) {
+  const a = result.artefact || {};
+  const s = result.scores || {};
+  return (
+    <section className="section pp__results" data-screen-label="Rezultat analiză">
+      <div className="container">
+        <div className="section__label">REZULTAT · ANALIZĂ AI</div>
+        <h2 style={{ fontSize: 28, margin: '8px 0 8px' }}>Raportul tău</h2>
+        <p style={{ color: 'var(--ink-2)', fontSize: 14, marginBottom: 24 }}>
+          Generat în {a.analyzed_at ? new Date(a.analyzed_at).toLocaleString('ro-RO') : 'câteva secunde'}.
+          {a.status === 'awaiting_credits' && ' Notă: scoruri stub — analiza completă AI va relua când plătim creditele.'}
+        </p>
+        <div className="pp__scores">
+          <div className="pp__score">
+            <div className="pp__score-v">{s.readiness_score ?? '—'}<small>/100</small></div>
+            <div className="pp__score-l">Readiness</div>
+          </div>
+          <div className="pp__score">
+            <div className="pp__score-v">{s.completeness_score ?? '—'}<small>/100</small></div>
+            <div className="pp__score-l">Completeness</div>
+          </div>
+          <div className="pp__score">
+            <div className="pp__score-v">{s.fit_score ?? '—'}<small>/100</small></div>
+            <div className="pp__score-l">Fit</div>
+          </div>
+        </div>
+        <div className="pp__bullets">
+          <h4>Puncte tari</h4>
+          <ul>{(s.strengths || []).map((x, i) => <li key={i}>{x}</li>) }
+            {!s.strengths?.length && <li style={{ color: 'var(--ink-2)' }}>— niciunul detectat —</li>}</ul>
+          <h4>Lipsuri</h4>
+          <ul>{(s.gaps || []).map((x, i) => <li key={i}>{x}</li>) }
+            {!s.gaps?.length && <li style={{ color: 'var(--ink-2)' }}>— niciuna detectată —</li>}</ul>
+          {s.red_flags?.length > 0 && (<>
+            <h4 style={{ color: '#c24a1e' }}>Red flags</h4>
+            <ul>{s.red_flags.map((x, i) => <li key={i}>{x}</li>)}</ul>
+          </>)}
+        </div>
+        <div style={{ marginTop: 32, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <a className="btn btn--accent" href="/dashboard.html">Vezi în dashboard →</a>
+          <a className="btn btn--ghost" href="/search">Granturi recomandate</a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ConsortiumForm() {
+  const [sent, setSent] = useStateP(false);
+  const [data, setData] = useStateP({ sector: '', country: '', budget: '', trl: '', have: '' });
+  const onChange = (k) => (e) => setData({ ...data, [k]: e.target.value });
+  async function submit(e) {
+    e.preventDefault();
+    if (!window.__USER) {
+      location.href = '/register.html?next=' + encodeURIComponent('/produs/cons');
+      return;
+    }
+    setSent(true);
+    // Real call lands later; for now the registered profile is enough.
+  }
+  if (sent) {
+    return (
+      <div className="pp__processing">
+        <strong>Mulțumim — primim datele.</strong>
+        <div style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 4 }}>
+          Echipa eligibil.org va reveni cu recomandări de consorțiu în 1–2 zile lucrătoare.
+        </div>
+      </div>
+    );
+  }
+  return (
+    <form onSubmit={submit}>
+      <div className="pp__form-grid">
+        <label>Sector
+          <select required value={data.sector} onChange={onChange('sector')}>
+            <option value="">— alege —</option>
+            <option>AI / ML</option>
+            <option>Biotech / Health</option>
+            <option>Climate / Energy</option>
+            <option>Deep tech / Hardware</option>
+            <option>SaaS / Digital</option>
+            <option>AgriTech / FoodTech</option>
+          </select>
+        </label>
+        <label>Țară
+          <select required value={data.country} onChange={onChange('country')}>
+            <option value="">— alege —</option>
+            <option>Moldova</option>
+            <option>România</option>
+            <option>Ucraina</option>
+            <option>Alta UE</option>
+            <option>Alta</option>
+          </select>
+        </label>
+        <label>Buget total proiect
+          <select required value={data.budget} onChange={onChange('budget')}>
+            <option value="">— alege —</option>
+            <option>&lt; €500K</option>
+            <option>€500K – €2M</option>
+            <option>€2M – €5M</option>
+            <option>€5M+</option>
+          </select>
+        </label>
+        <label>TRL actual
+          <select required value={data.trl} onChange={onChange('trl')}>
+            <option value="">— alege —</option>
+            <option>TRL 1–2 (cercetare de bază)</option>
+            <option>TRL 3–4 (prototip)</option>
+            <option>TRL 5–6 (validare)</option>
+            <option>TRL 7–9 (producție)</option>
+          </select>
+        </label>
+        <label style={{ gridColumn: '1 / -1' }}>Ce parteneri ai deja
+          <input value={data.have} onChange={onChange('have')} placeholder="ex: Universitatea Tehnică din Moldova, fondatorul nostru tehnic, …" />
+        </label>
+      </div>
+      <button type="submit" className="btn btn--accent" style={{ marginTop: 16 }}>Cere recomandare consorțiu →</button>
+      <p style={{ fontSize: 12, color: 'var(--ink-2)', marginTop: 12 }}>
+        Recomandările sunt gratuite. Pentru introduceri facilitate, oferim un plan separat.
+      </p>
+    </form>
+  );
+}
+
+function App() {
+  const [lang, setLangState] = useStateP((window.getLanguage && window.getLanguage()) || 'RO');
+  const setLang = (l) => { setLangState(l); if (window.setLanguage) window.setLanguage(l); };
+  useEffectP(() => {
+    const onLang = (e) => setLangState(e.detail.lang);
+    window.addEventListener('languagechange', onLang);
+    return () => window.removeEventListener('languagechange', onLang);
+  }, []);
+  return (
+    <>
+      <NavOrg lang={lang} setLang={setLang} />
+      <ProductPage />
+      <FooterOrg lang={lang} setLang={setLang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>

@@ -412,7 +412,7 @@ function ProductsOrg() {
 
         <div className="products">
           {window.ORG_PRODUCTS.map((p, i) => (
-            <div className="product" key={p.id} id={`prod-${p.id}`}>
+            <a className="product" key={p.id} id={`prod-${p.id}`} href={`/produs/${p.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="product__head">
                 <span className="product__n">{p.n} / 05</span>
                 <span className="product__code">{p.code}</span>
@@ -438,7 +438,7 @@ function ProductsOrg() {
                 <span className="product__cta">{p.cta}</span>
                 <span style={{ color: 'var(--accent)' }}>→</span>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>
