@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Produse AI · eligibil.org</title>
+<meta name="description" content="Cele 5 produse AI eligibil.org pentru fondatori: analiză pitch deck, video pitch, whitepaper, evaluare TRL și identificare consorțiu. Încarcă document și primește raport AI." />
+<link rel="canonical" href="https://eligibil.org/produse" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/styles-v2.css" />
+<link rel="stylesheet" href="/styles-org.css" />
+<link rel="stylesheet" href="/styles-mobile.css?v=20260514f" />
+<script src="/lang.js?v=20260514f" defer></script>
+</head>
+<body class="d-balanced">
+
+<div id="root"><div style="padding:48px;text-align:center;color:#666">Se încarcă…</div></div>
+
+<script>
+const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
+let tweaks = { accent: 'navy', density: 'balanced', dark: false };
+(function () {
+  document.documentElement.style.setProperty('--accent', ACCENTS[tweaks.accent]);
+  document.body.classList.add('d-' + tweaks.density);
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script src="/data.js?v=20260514f"></script>
+<script src="/data-org.js?v=20260514f"></script>
+<script type="text/babel" src="/thumbs.js?v=20260514f"></script>
+<script type="text/babel" src="/components-org-a.jsx?v=20260514f"></script>
+<script type="text/babel" src="/components-org-b.jsx?v=20260514f"></script>
+<script type="text/babel" src="/components-org-c.jsx?v=20260514f"></script>
+
+<script type="text/babel">
+const { useState: useStateProduse, useEffect: useEffectProduse } = React;
+
+function ProductListPage() {
+  const products = window.ORG_PRODUCTS || [];
+  return (
+    <section className="section" data-screen-label="Toate produsele">
+      <div className="container">
+        <div className="section__label">PRODUSE · 5 INSTRUMENTE AI</div>
+        <div className="section__head">
+          <h1 className="section__title">Produse AI pentru fondatori care vor să devină eligibili mai repede.</h1>
+          <p className="section__sub">
+            Cele 5 instrumente eligibil.org care îți analizează pitch deck-ul, video pitch-ul, whitepaper-ul, estimează TRL-ul și identifică consorțiul potrivit. Fiecare produs are pagină dedicată cu descriere, FAQ și posibilitatea de a încărca documentul direct.
+          </p>
+        </div>
+
+        <div className="products" style={{ marginTop: 32 }}>
+          {products.map((p, i) => (
+            <a className="product" key={p.id} id={`prod-${p.id}`} href={`/produs/${p.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="product__head">
+                <span className="product__n">{p.n} / 05</span>
+                <span className="product__code">{p.code}</span>
+              </div>
+              <div className="product__thumb">
+                <Thumb kind={p.thumb} seed={i + 51} />
+              </div>
+              <div className="product__body">
+                <div>
+                  <div className="product__tag">{p.tag}</div>
+                  <h3 className="product__name">{p.name}</h3>
+                </div>
+                <div className="product__fmt">{p.formats}</div>
+                <p className="product__desc">{p.desc}</p>
+                <div className="product__deliver">
+                  <div className="product__deliver-h">Ce primești</div>
+                  {p.deliver.map(d => (
+                    <div className="product__deliver-item" key={d}>{d}</div>
+                  ))}
+                </div>
+              </div>
+              <div className="product__foot">
+                <span className="product__cta">{p.cta}</span>
+                <span style={{ color: 'var(--accent)' }}>→</span>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 48, padding: 28, background: 'var(--bg-2)', border: '1px solid var(--border-soft)' }}>
+          <h3 style={{ fontSize: 22, marginBottom: 8 }}>Nu știi care produs ți se potrivește?</h3>
+          <p style={{ color: 'var(--ink-2)', fontSize: 14, marginBottom: 16 }}>
+            Începe cu analiza pitch deck-ului — primești scor de pregătire, recomandări de granturi și sugestii de îmbunătățire în mai puțin de un minut.
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <a className="btn btn--accent" href="/produs/pitch">Analizează pitch deck →</a>
+            <a className="btn btn--ghost" href="/search">Vezi catalogul de granturi</a>
+            <a className="btn btn--ghost" href="/glosar">Glosar de termeni</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  const [lang, setLangState] = useStateProduse((window.getLanguage && window.getLanguage()) || 'RO');
+  const setLang = (l) => { setLangState(l); if (window.setLanguage) window.setLanguage(l); };
+  useEffectProduse(() => {
+    const onLang = (e) => setLangState(e.detail.lang);
+    window.addEventListener('languagechange', onLang);
+    return () => window.removeEventListener('languagechange', onLang);
+  }, []);
+  return (
+    <>
+      <NavOrg lang={lang} setLang={setLang} />
+      <ProductListPage />
+      <FooterOrg lang={lang} setLang={setLang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>

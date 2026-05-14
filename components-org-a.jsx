@@ -13,12 +13,22 @@ function NavOrg({ lang, setLang }) {
 
   const products = window.ORG_PRODUCTS;
   const resources = [
-    ['Blog', 'Ghiduri, analize și explicații despre finanțări.', '#blog'],
-    ['Știri', 'Programe noi, deadline-uri, politici și oportunități.', '#stiri'],
-    ['Parteneri', 'Acceleratoare, fonduri, instituții, universități.', '#parteneri'],
-    ['Lista startupuri', 'Catalog de startupuri cu profil, stadiu, nevoi.', '#startupuri'],
-    ['Onboarding', 'Ghid pentru fondatori, parteneri și programe.', '#onboard'],
+    ['Glosar', 'Termeni de finanțare explicați simplu — TRL, MVP, EIC, SBIR.', '/glosar'],
+    ['Blog', 'Ghiduri, analize și explicații despre finanțări.', '/blog'],
+    ['Știri', 'Programe noi, deadline-uri, politici și oportunități.', '/stiri'],
+    ['Parteneri', 'Acceleratoare, fonduri, instituții, universități.', '/parteneri'],
+    ['Lista startupuri', 'Catalog de startupuri cu profil, stadiu, nevoi.', '/startupuri'],
+    ['Onboarding', 'Ghid pentru fondatori, parteneri și programe.', '/register.html'],
   ];
+
+  // Close mobile panel when clicking a link inside it
+  useEffectOrgA(() => {
+    const onDocClick = (e) => {
+      if (mobileOpen && !e.target.closest('.nav__inner')) setMobileOpen(false);
+    };
+    document.addEventListener('click', onDocClick);
+    return () => document.removeEventListener('click', onDocClick);
+  }, [mobileOpen]);
 
   return (
     <nav className="nav" onMouseLeave={scheduleClose}>
@@ -48,13 +58,16 @@ function NavOrg({ lang, setLang }) {
               style={{ position: 'relative' }}
               onMouseEnter={() => openMenu('prod')}
             >
-              <button className={`nav__item ${open === 'prod' ? 'is-open' : ''}`}>
+              <button
+                className={`nav__item ${open === 'prod' ? 'is-open' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setOpen(open === 'prod' ? null : 'prod'); }}
+              >
                 Produse <span className="nav__caret">▾</span>
               </button>
               {open === 'prod' && (
                 <div className="nav__dropdown" onMouseEnter={() => openMenu('prod')} onMouseLeave={scheduleClose}>
                   {products.map(p => (
-                    <a className="nav__dropdown-item" href={`#prod-${p.id}`} key={p.id}>
+                    <a className="nav__dropdown-item" href={`/produs/${p.id}`} key={p.id}>
                       <div className="nav__dropdown-name">
                         <span className="nav__dropdown-num">{p.n}</span>
                         {p.name}
@@ -62,6 +75,10 @@ function NavOrg({ lang, setLang }) {
                       <div className="nav__dropdown-desc">{p.tag}</div>
                     </a>
                   ))}
+                  <a className="nav__dropdown-item" href="/produse" style={{ borderTop: '1px solid var(--border-soft)', fontWeight: 600 }}>
+                    <div className="nav__dropdown-name">Toate produsele →</div>
+                    <div className="nav__dropdown-desc">Vezi pagina dedicată cu toate cele 5 produse AI.</div>
+                  </a>
                 </div>
               )}
             </div>
@@ -70,7 +87,10 @@ function NavOrg({ lang, setLang }) {
               style={{ position: 'relative' }}
               onMouseEnter={() => openMenu('res')}
             >
-              <button className={`nav__item ${open === 'res' ? 'is-open' : ''}`}>
+              <button
+                className={`nav__item ${open === 'res' ? 'is-open' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setOpen(open === 'res' ? null : 'res'); }}
+              >
                 Resurse <span className="nav__caret">▾</span>
               </button>
               {open === 'res' && (

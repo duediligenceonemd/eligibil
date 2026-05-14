@@ -139,6 +139,52 @@
 
   /* Prevent horizontal scroll from any wide child */
   html, body { overflow-x: hidden; }
+
+  /* Dropdowns inside the mobile hamburger panel must render inline
+     (not as absolute popovers) so they stay inside the column flow. */
+  .nav__panel .nav__dropdown {
+    position: static !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 8px 0 8px 16px !important;
+    background: transparent !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .nav__panel .nav__dropdown-item {
+    padding: 10px 8px !important;
+    border-bottom: 1px dotted var(--border-soft, #eee);
+  }
+  .nav__panel button.nav__item {
+    width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+  .nav__panel .nav__item.is-open { color: var(--accent); }
+
+  /* Language switcher stays horizontal even when the panel is flex-column */
+  .nav__panel .langmini {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    flex-wrap: nowrap;
+  }
+  .nav__panel .langmini button { flex: 1; min-height: 40px; }
+
+  /* Blog / article body images — never overflow */
+  article img, .blog-post img, .news-body img,
+  .post-content img, .grant-detail img, main img,
+  .news-item img, .post img, [class*="hero"] img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 12px 0;
+  }
 }
 
 /* =============================================================================

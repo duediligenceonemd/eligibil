@@ -279,6 +279,7 @@ function FooterOrg({ lang, setLang }) {
           </div>
           <div className="footer__col">
             <h5>Resurse</h5>
+            <a href="/produse">Toate produsele</a>
             <a href="/blog">Blog</a>
             <a href="/stiri">Știri</a>
             <a href="/parteneri">Parteneri</a>
