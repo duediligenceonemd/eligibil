@@ -281,8 +281,8 @@ function FooterOrg({ lang, setLang }) {
             <h5>Resurse</h5>
             <a href="/blog">Blog</a>
             <a href="/stiri">Știri</a>
-            <a href="/search?tip=Accelerator">Parteneri</a>
-            <a href="/search">Lista startupuri</a>
+            <a href="/parteneri">Parteneri</a>
+            <a href="/startupuri">Lista startupuri</a>
             <a href="/blog?cat=reports">Rapoarte &amp; whitepapers</a>
             <a href="/blog?cat=glosar">Glosar de finanțare</a>
             <a href="/evenimente">Video &amp; webinarii</a>

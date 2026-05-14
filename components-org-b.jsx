@@ -490,7 +490,7 @@ function ResPartners() {
         ))}
       </div>
       <div style={{ marginTop: 28, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-        <a className="btn--link" href="/search?tip=Accelerator">Vezi partenerii →</a>
+        <a className="btn--link" href="/parteneri">Vezi partenerii →</a>
         <a className="btn--link" href="/register.html?type=partner">Listează organizația ta →</a>
       </div>
     </>
@@ -528,7 +528,7 @@ function ResStartups() {
         })}
       </div>
       <div style={{ marginTop: 28, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-        <a className="btn--link" href="/search">Explorează startupuri →</a>
+        <a className="btn--link" href="/startupuri">Explorează startupuri →</a>
         <a className="btn--link" href="/register.html">Listează startupul tău →</a>
       </div>
     </>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Startupuri înregistrate · eligibil.org</title>
+<meta name="description" content="Catalog public de startupuri înregistrate eligibil.org — verticale, stadiu, TRL, sumă căutată, deschidere pentru consorții colaborative." />
+<link rel="canonical" href="https://eligibil.org/startupuri" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="styles-v2.css" />
+<link rel="stylesheet" href="styles-org.css" />
+<script src="/lang.js?v=20260514a" defer></script>
+</head>
+<body class="d-balanced">
+
+<div id="root"></div>
+
+<script>
+const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
+let tweaks = { accent: 'navy', density: 'balanced', dark: false };
+(function () {
+  document.documentElement.style.setProperty('--accent', ACCENTS[tweaks.accent]);
+  document.body.classList.add('d-' + tweaks.density);
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="data.js"></script>
+<script src="data-org.js"></script>
+<script type="text/babel" src="thumbs.js"></script>
+<script type="text/babel" src="components-org-a.jsx"></script>
+<script type="text/babel" src="components-org-b.jsx"></script>
+<script type="text/babel" src="components-org-c.jsx"></script>
+
+<script type="text/babel">
+const { useState: useStateStartups, useEffect: useEffectStartups } = React;
+
+function StartupListPage() {
+  const rows = window.ORG_STARTUPS || [];
+  return (
+    <section className="section" data-screen-label="Lista startupuri">
+      <div className="container">
+        <div className="section__label">STARTUPURI · CATALOG PUBLIC</div>
+        <div className="section__head">
+          <h1 className="section__title">Startupuri înregistrate pe eligibil.org.</h1>
+          <p className="section__sub">
+            {rows.length} startupuri caută finanțare, parteneri pentru consorții sau acces la programe specifice. Vezi profilul fiecăruia, sumele căutate și stadiul de deschidere pentru consorțiu.
+          </p>
+        </div>
+
+        <div className="stab" style={{ marginTop: 32 }}>
+          <div className="stab__head">
+            <span>Startup</span>
+            <span>Verticală</span>
+            <span>Stadiu</span>
+            <span>TRL</span>
+            <span>Caută</span>
+            <span>Sumă</span>
+            <span>Consorțiu</span>
+            <span>Acțiune</span>
+          </div>
+          {rows.map((s, i) => {
+            const cls = s.cons === 'open' ? 'open' : s.cons === 'forming' ? 'forming' : 'closed';
+            return (
+              <a className="stab__row" key={i} href={`/search?q=${encodeURIComponent(s.name)}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <span className="stab__name">{s.flag} {s.name}</span>
+                <span>{s.vert}</span>
+                <span className="stab__cell-mono">{s.stage}</span>
+                <span className="stab__cell-mono">TRL {s.trl}</span>
+                <span>{s.looking}</span>
+                <span className="stab__cell-mono">{s.ask}</span>
+                <span><span className={`stab__pill ${cls}`}>{s.cons}</span></span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '.08em' }}>Profil →</span>
+              </a>
+            );
+          })}
+        </div>
+
+        <div style={{ marginTop: 48, padding: 28, background: 'var(--bg-2)', border: '1px solid var(--border-soft)' }}>
+          <h3 style={{ fontSize: 22, marginBottom: 8 }}>Ești startup în căutare de finanțare?</h3>
+          <p style={{ color: 'var(--ink-2)', fontSize: 14, marginBottom: 16 }}>
+            Listează-te în catalog, primește scoruri AI pe pitch deck-ul tău și acces la consorții care caută parteneri ca tine.
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <a className="btn btn--accent" href="/register.html">Listează startupul →</a>
+            <a className="btn btn--ghost" href="/upload-artefact">Analizează pitch deck</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  const [lang, setLangState] = useStateStartups((window.getLanguage && window.getLanguage()) || 'RO');
+  const setLang = (l) => { setLangState(l); if (window.setLanguage) window.setLanguage(l); };
+  useEffectStartups(() => {
+    const onLang = (e) => setLangState(e.detail.lang);
+    window.addEventListener('languagechange', onLang);
+    return () => window.removeEventListener('languagechange', onLang);
+  }, []);
+  return (
+    <>
+      <NavOrg lang={lang} setLang={setLang} />
+      <StartupListPage />
+      <FooterOrg lang={lang} setLang={setLang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>

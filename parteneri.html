@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Parteneri verificați · eligibil.org</title>
+<meta name="description" content="Lista partenerilor verificați eligibil.org — acceleratoare, fonduri, programe donor și instituții care construiesc ecosistemul de finanțare în Moldova, România și Europa de Est." />
+<link rel="canonical" href="https://eligibil.org/parteneri" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="styles-v2.css" />
+<link rel="stylesheet" href="styles-org.css" />
+<script src="/lang.js?v=20260514a" defer></script>
+</head>
+<body class="d-balanced">
+
+<div id="root"></div>
+
+<script>
+const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
+let tweaks = { accent: 'navy', density: 'balanced', dark: false };
+(function () {
+  document.documentElement.style.setProperty('--accent', ACCENTS[tweaks.accent]);
+  document.body.classList.add('d-' + tweaks.density);
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="data.js"></script>
+<script src="data-org.js"></script>
+<script type="text/babel" src="thumbs.js"></script>
+<script type="text/babel" src="components-org-a.jsx"></script>
+<script type="text/babel" src="components-org-b.jsx"></script>
+<script type="text/babel" src="components-org-c.jsx"></script>
+
+<script type="text/babel">
+const { useState: useStatePartners, useEffect: useEffectPartners } = React;
+
+function PartnersListPage() {
+  return (
+    <section className="section" data-screen-label="Lista parteneri">
+      <div className="container">
+        <div className="section__label">PARTENERI · VERIFICAȚI</div>
+        <div className="section__head">
+          <h1 className="section__title">Acceleratoare, fonduri și organizații care construiesc ecosistemul.</h1>
+          <p className="section__sub">
+            {window.ORG_PARTNERS?.length || 0} parteneri verificați — programe publice, fonduri private, acceleratoare și instituții care își mențin activ profilul. Toți sunt eligibili să primească aplicații pre-calificate prin eligibil.org.
+          </p>
+        </div>
+
+        <div className="partners" style={{ marginTop: 32 }}>
+          {(window.ORG_PARTNERS || []).map((p, i) => (
+            <a className="partner" key={i} href={`/search?q=${encodeURIComponent(p.name)}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="partner__logo"><Thumb kind={p.thumb} seed={i + 161} /></div>
+              <div>
+                <div className="partner__head">
+                  {p.verified && <span className="partner__verified">✓ Verified</span>}
+                  <span className="partner__country">{p.flag} {p.region}</span>
+                </div>
+                <h3 className="partner__name">{p.name}</h3>
+                <div className="partner__sub">{p.type}</div>
+                <p className="partner__desc">{p.desc}</p>
+                <div className="partner__tags">
+                  {p.tags?.map(t => <span className="program__tag" key={t}>{t}</span>)}
+                </div>
+                <div className="partner__cta">
+                  <span>Vezi profil</span>
+                  <span>→</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 48, padding: 28, background: 'var(--bg-2)', border: '1px solid var(--border-soft)' }}>
+          <h3 style={{ fontSize: 22, marginBottom: 8 }}>Ești accelerator, fond sau program?</h3>
+          <p style={{ color: 'var(--ink-2)', fontSize: 14, marginBottom: 16 }}>
+            Listează-te gratuit în catalog, primește badge "Verified" după confirmare, și ajunge la aplicanți pre-calificați.
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <a className="btn btn--accent" href="/register.html?type=partner">Listează organizația →</a>
+            <a className="btn btn--ghost" href="/register.html?claim=1">Revendică profil existent</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  const [lang, setLangState] = useStatePartners((window.getLanguage && window.getLanguage()) || 'RO');
+  const setLang = (l) => { setLangState(l); if (window.setLanguage) window.setLanguage(l); };
+  useEffectPartners(() => {
+    const onLang = (e) => setLangState(e.detail.lang);
+    window.addEventListener('languagechange', onLang);
+    return () => window.removeEventListener('languagechange', onLang);
+  }, []);
+  return (
+    <>
+      <NavOrg lang={lang} setLang={setLang} />
+      <PartnersListPage />
+      <FooterOrg lang={lang} setLang={setLang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>
