@@ -284,7 +284,7 @@ function FooterOrg({ lang, setLang }) {
             <a href="/parteneri">Parteneri</a>
             <a href="/startupuri">Lista startupuri</a>
             <a href="/blog?cat=reports">Rapoarte &amp; whitepapers</a>
-            <a href="/blog?cat=glosar">Glosar de finanțare</a>
+            <a href="/glosar">Glosar de finanțare</a>
             <a href="/evenimente">Video &amp; webinarii</a>
           </div>
           <div className="footer__col">

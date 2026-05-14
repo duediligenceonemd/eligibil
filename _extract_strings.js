@@ -12,6 +12,8 @@ const ALL_PAGES = [
   'parteneri.html',
   'startupuri.html',
   'produs.html',
+  'glosar.html',
+  'data-glosar.js',
 ];
 
 const HOMEPAGE_SCOPE = [

@@ -16,7 +16,7 @@
                         '/search', '/search.html',
                         '/evenimente', '/events', '/events.html',
                         '/stiri', '/news', '/blog', '/en/blog',
-                        '/parteneri', '/startupuri'];
+                        '/parteneri', '/startupuri', '/glosar'];
   const PUBLIC_PREFIXES = ['/ro/granturi/', '/en/grants/', '/ro/granturi-', '/en/grants-',
                            '/stiri/', '/news/', '/blog/', '/en/blog/',
                            '/produs/'];
