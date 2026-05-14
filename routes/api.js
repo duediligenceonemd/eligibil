@@ -95,6 +95,7 @@ const GRANT_SELECT_PAS1 = [
   'amount_min_eur', 'amount_max_eur',
   'sectors_en', 'application_url', 'is_equity_free',
   'funder_id', 'enriched_at',
+  'application_languages', 'eligibility_rules',
 ];
 const GRANT_SELECT      = GRANT_SELECT_BASE.join(', ');
 const GRANT_SELECT_FULL = GRANT_SELECT_BASE.concat(GRANT_SELECT_PAS1).join(', ');
