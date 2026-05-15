@@ -718,7 +718,7 @@ function AdminApp() {
     <div className="ap">
       <div className="ap__shell">
         <aside className="ap__side">
-          <div className="ap__brand">eligibil<span>.org</span> · admin</div>
+          <a href="/" className="ap__brand" style={{ textDecoration: 'none', color: 'inherit' }}>eligibil<span>.org</span> · admin</a>
           <nav className="ap__nav">
             {tabs.map(t => (
               <button key={t.id} className={tab === t.id ? 'is-active' : ''} onClick={() => setTab(t.id)}>

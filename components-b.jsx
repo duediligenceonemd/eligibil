@@ -384,7 +384,7 @@ function Footer({ lang, setLang }) {
       <div className="container">
         <div className="footer__top">
           <div>
-            <div className="footer__brand">eligibil<span style={{ color: 'var(--accent)' }}>.org</span></div>
+            <a href="/" className="footer__brand" style={{ textDecoration: 'none', color: 'inherit' }}>eligibil<span style={{ color: 'var(--accent)' }}>.org</span></a>
             <div className="footer__tag">AI Readiness &amp; Funding Orchestrator</div>
             <p style={{ fontSize: 13.5, color: 'var(--ink-2)', marginTop: 16, maxWidth: 300 }}>
               Agregatorul #1 de granturi, competiții și capital non-dilutiv pentru Moldova, România și Europa de Est.

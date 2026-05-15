@@ -101,10 +101,10 @@ function Nav({ lang, setLang }) {
     <nav className="nav" onMouseLeave={scheduleClose}>
       <div className="container">
         <div className="nav__inner">
-          <div className="nav__brand">
+          <a href="/" className="nav__brand" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="nav__logo">eligibil<span className="nav__logo-dot">.org</span></div>
             <div className="nav__tag">AI Readiness &amp;<br/>Funding Orchestrator</div>
-          </div>
+          </a>
           <div className="nav__links">
             <NavItem label="Surse de finanțare" k="finantari" open={open} openMenu={openMenu} />
             <NavItem label="Programe active" k="programe" open={open} openMenu={openMenu} />

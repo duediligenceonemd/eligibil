@@ -33,14 +33,24 @@ function escapeXml(s) {
 // /pricing /about /parteneri are placeholders in the brief but no routes
 // exist yet — including them now would feed Google 404s.
 const STATIC_PAGES = [
-  { path: '/',           changefreq: 'daily'  },
-  { path: '/search',     changefreq: 'daily'  },
-  { path: '/evenimente', changefreq: 'daily'  },
-  { path: '/events',     changefreq: 'daily'  },
-  { path: '/stiri',      changefreq: 'daily'  },
-  { path: '/news',       changefreq: 'daily'  },
-  { path: '/blog',       changefreq: 'weekly' },
-  { path: '/en/blog',    changefreq: 'weekly' },
+  { path: '/',            changefreq: 'daily'  },
+  { path: '/search',      changefreq: 'daily'  },
+  { path: '/evenimente',  changefreq: 'daily'  },
+  { path: '/events',      changefreq: 'daily'  },
+  { path: '/stiri',       changefreq: 'daily'  },
+  { path: '/news',        changefreq: 'daily'  },
+  { path: '/blog',        changefreq: 'weekly' },
+  { path: '/en/blog',     changefreq: 'weekly' },
+  { path: '/produse',     changefreq: 'weekly' },
+  { path: '/produs/pitch',   changefreq: 'weekly' },
+  { path: '/produs/video',   changefreq: 'weekly' },
+  { path: '/produs/wp',      changefreq: 'weekly' },
+  { path: '/produs/trl',     changefreq: 'weekly' },
+  { path: '/produs/cons',    changefreq: 'weekly' },
+  { path: '/parteneri',   changefreq: 'weekly' },
+  { path: '/startupuri',  changefreq: 'weekly' },
+  { path: '/glosar',      changefreq: 'monthly'},
+  { path: '/about',       changefreq: 'monthly'},
 ];
 
 // ── Programmatic SEO listings — keep in sync with SEO_SECTORS / SEO_COUNTRIES
