@@ -272,6 +272,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/artefacts', require('./routes/artefacts'));
 app.use('/api/newsletter', require('./routes/newsletter'));
+app.use('/api/events', require('./routes/events'));
 app.use('/api', require('./routes/api'));
 
 // Catch-all: serve index.html for non-API routes

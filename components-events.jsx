@@ -4,6 +4,79 @@ const { useState, useMemo, useEffect } = React;
 // ========== DATA ==========
 const EVENTS = [];  // initial empty — populated via /api/events fetch in EventsApp
 
+const MONTHS_RO = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+const MONTHS_RO_SHORT = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec'];
+
+// Map server response {events:[], grant_deadlines:[]} → unified array
+// with the shape expected by the legacy EventsApp UI.
+function normalizeApi(data) {
+  const out = [];
+
+  // Conferences / workshops / webinars / etc from `events` table
+  (data.events || []).forEach((e, i) => {
+    const d = new Date(e.start_date);
+    out.push({
+      id: e.id || `ev_${i}`,
+      slug: e.slug_ro || e.slug_en,
+      title: e.title,
+      desc: e.short_summary_ro || e.short_summary_en || '',
+      type: e.event_type,
+      country: e.country || 'EU',
+      countryCode: e.country?.slice(0, 2).toUpperCase(),
+      city: e.city || (e.is_online ? 'Online' : ''),
+      format: e.is_online ? 'online' : 'offline',
+      featured: !!e.is_featured,
+      topics: e.topics || [],
+      audience: e.audience || [],
+      organizer: e.organizer_name,
+      organizerUrl: e.organizer_url,
+      url: e.registration_url || e.source_url,
+      date: d,
+      dateText: d.toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }),
+      day: d.getDate(),
+      month: MONTHS_RO_SHORT[d.getMonth()],
+      monthFull: `${MONTHS_RO[d.getMonth()]} ${d.getFullYear()}`,
+      priceLabel: e.is_free ? 'Gratuit' : (e.price_eur ? `€${e.price_eur}` : '—'),
+      isFree: !!e.is_free,
+      venue: e.venue,
+    });
+  });
+
+  // Grant deadlines as virtual events
+  (data.grant_deadlines || []).forEach((g, i) => {
+    const d = new Date(g.start_date);
+    out.push({
+      id: g.id,
+      slug: g.slug,
+      title: g.title,
+      desc: g.summary || '',
+      type: 'grant_deadline',
+      country: g.country || 'EU',
+      city: '',
+      format: 'offline',
+      featured: false,
+      topics: g.sector ? String(g.sector).split(/[\/,]/).map(s => s.trim()).filter(Boolean) : [],
+      audience: ['founders'],
+      organizer: g.organizer_name,
+      url: g.url,
+      externalUrl: g.external_url,
+      date: d,
+      dateText: d.toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }),
+      day: d.getDate(),
+      month: MONTHS_RO_SHORT[d.getMonth()],
+      monthFull: `${MONTHS_RO[d.getMonth()]} ${d.getFullYear()}`,
+      maxAmount: g.max_amount,
+      priceLabel: g.max_amount ? `până la €${(g.max_amount / 1000).toFixed(0)}K` : '',
+      isFree: false,
+      evidence: g.evidence_status,
+    });
+  });
+
+  // Sort chronologically, then featured-first within same month
+  out.sort((a, b) => (a.date - b.date) || (b.featured - a.featured));
+  return out;
+}
+
 const TYPES = [
   { id: 'all', name: 'Toate' },
   { id: 'grant_deadline', name: 'Deadline-uri granturi' },
