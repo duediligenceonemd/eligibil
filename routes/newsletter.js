@@ -6,18 +6,12 @@
 
 const express = require('express');
 const { getSupabase } = require('../db/supabase');
+const { validate, newsletterSchema } = require('../lib/schemas');
 
 const router = express.Router();
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-router.post('/subscribe', async (req, res) => {
-  const email = String(req.body?.email || '').trim().toLowerCase();
-  const context = String(req.body?.context || 'page').slice(0, 32);
-
-  if (!EMAIL_RE.test(email) || email.length > 254) {
-    return res.status(400).json({ error: 'Adresă de email invalidă' });
-  }
+router.post('/subscribe', validate(newsletterSchema), async (req, res) => {
+  const { email, context } = req.body;
 
   const sb = getSupabase();
   if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });

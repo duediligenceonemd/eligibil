@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Politica de Confidențialitate · eligibil.org</title>
+<meta name="description" content="Politica de confidențialitate și protecția datelor personale pentru eligibil.org — platforma AI de granturi." />
+<link rel="canonical" href="https://eligibil.org/privacy" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/styles-v2.css" />
+<link rel="stylesheet" href="/styles-mobile.css?v=20260514h" />
+
+<style>
+  .priv__hero { padding: 80px 0 32px; border-bottom: 1px solid var(--border-soft); }
+  .priv__crumbs { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+  .priv__crumbs a { color: inherit; text-decoration: none; }
+  .priv__title { font-size: clamp(28px, 4vw, 48px); font-weight: 700; line-height: 1.1; margin: 0 0 12px; font-family: 'Space Grotesk', sans-serif; }
+  .priv__updated { font-size: 13px; color: var(--ink-2); font-family: 'JetBrains Mono', monospace; }
+  .priv__body { max-width: 780px; padding: 48px 0 80px; }
+  .priv__body h2 { font-size: 22px; margin: 40px 0 12px; font-family: 'Space Grotesk', sans-serif; }
+  .priv__body h3 { font-size: 17px; margin: 28px 0 8px; font-family: 'Space Grotesk', sans-serif; }
+  .priv__body p, .priv__body li { font-size: 15px; line-height: 1.65; color: var(--ink-1); margin: 0 0 12px; }
+  .priv__body ul { padding-left: 24px; }
+  .priv__lang { display: flex; gap: 16px; margin-top: 16px; }
+  .priv__lang a { font-size: 13px; color: var(--accent); text-decoration: underline; }
+</style>
+</head>
+<body class="d-balanced">
+
+<div class="wrap">
+
+<section class="priv__hero">
+  <div class="priv__crumbs"><a href="/">eligibil.org</a> / Confidențialitate</div>
+  <h1 class="priv__title" id="priv-title">Politica de Confidențialitate</h1>
+  <p class="priv__updated">Ultima actualizare: 16 mai 2026</p>
+  <div class="priv__lang">
+    <a href="#" onclick="setLang('ro')">Română</a>
+    <a href="#" onclick="setLang('en')">English</a>
+  </div>
+</section>
+
+<div class="priv__body" id="priv-content">
+</div>
+
+</div>
+
+<script>
+const CONTENT = {
+  ro: `
+<h2>1. Cine suntem</h2>
+<p><strong>eligibil.org</strong> este o platformă AI care ajută startupuri și IMM-uri să găsească și să aplice la granturi și finanțări nerambursabile. Operatorul datelor este SC Eligibil SRL, Republica Moldova.</p>
+
+<h2>2. Ce date colectăm</h2>
+<ul>
+  <li><strong>Date de cont:</strong> email, nume, prenume, parolă (stocată criptat cu bcrypt)</li>
+  <li><strong>Profil startup:</strong> nume companie, sector, stadiu, țară, mărime echipă, pitch, obiective</li>
+  <li><strong>Documente încărcate:</strong> pitch deck-uri și alte artefacte (stocate criptat)</li>
+  <li><strong>Date tehnice:</strong> adresă IP (la abonare newsletter), user agent</li>
+  <li><strong>Cookie-uri:</strong> un singur cookie de sesiune (funcțional, nu tracking)</li>
+</ul>
+
+<h2>3. Cum folosim datele</h2>
+<ul>
+  <li>Autentificarea și securitatea contului</li>
+  <li>Matching AI între profilul startup-ului și granturi disponibile</li>
+  <li>Calculul scorului de eligibilitate</li>
+  <li>Trimiterea newsletter-ului (doar cu consimțământ explicit)</li>
+</ul>
+<p>Nu vindem și nu partajăm datele personale cu terți. Nu folosim datele pentru antrenarea modelelor AI fără consimțământ explicit.</p>
+
+<h2>4. Baza legală (GDPR)</h2>
+<ul>
+  <li><strong>Consimțământ</strong> — la crearea contului și abonarea la newsletter</li>
+  <li><strong>Executarea contractului</strong> — furnizarea serviciului de matching</li>
+  <li><strong>Interes legitim</strong> — securitatea platformei și prevenirea abuzului</li>
+</ul>
+
+<h2>5. Cât timp păstrăm datele</h2>
+<ul>
+  <li>Datele de cont: atât timp cât contul este activ</li>
+  <li>După ștergerea contului: datele sunt eliminate în max. 30 de zile</li>
+  <li>Log-uri de securitate: 90 de zile</li>
+  <li>Date de facturare (când va fi cazul): 5 ani conform legislației fiscale</li>
+</ul>
+
+<h2>6. Drepturile tale</h2>
+<p>Conform GDPR, ai dreptul la:</p>
+<ul>
+  <li><strong>Acces</strong> — poți vedea toate datele tale din pagina de profil</li>
+  <li><strong>Rectificare</strong> — poți edita profilul oricând</li>
+  <li><strong>Ștergere</strong> — poți șterge contul complet din setări</li>
+  <li><strong>Portabilitate</strong> — poți exporta datele în format JSON</li>
+  <li><strong>Retragere consimțământ</strong> — oricând, fără efect retroactiv</li>
+</ul>
+<p>Pentru exercitarea drepturilor, contactează-ne la: <strong>privacy@eligibil.org</strong></p>
+
+<h2>7. Cookie-uri</h2>
+<p>Folosim un singur cookie tehnic de sesiune (<code>connect.sid</code>) necesar pentru autentificare. Nu folosim cookie-uri de tracking, analitics sau marketing. Acest cookie se șterge automat la închiderea browserului sau după 7 zile.</p>
+
+<h2>8. Securitate</h2>
+<ul>
+  <li>Parole criptate cu bcrypt (12 runde)</li>
+  <li>Conexiuni HTTPS obligatorii</li>
+  <li>Rate limiting pe endpoint-uri sensibile</li>
+  <li>Security headers (CSP, HSTS, X-Frame-Options)</li>
+</ul>
+
+<h2>9. Transferuri internaționale</h2>
+<p>Datele sunt stocate pe servere Supabase (UE). Nu transferăm date în afara Spațiului Economic European fără garanții adecvate.</p>
+
+<h2>10. Contact</h2>
+<p>Pentru orice întrebări legate de protecția datelor:<br>
+<strong>Email:</strong> privacy@eligibil.org<br>
+<strong>Adresă:</strong> SC Eligibil SRL, Chișinău, Republica Moldova</p>
+`,
+
+  en: `
+<h2>1. Who we are</h2>
+<p><strong>eligibil.org</strong> is an AI platform that helps startups and SMEs find and apply for grants and non-dilutive funding. The data controller is SC Eligibil SRL, Republic of Moldova.</p>
+
+<h2>2. What data we collect</h2>
+<ul>
+  <li><strong>Account data:</strong> email, first name, last name, password (stored encrypted with bcrypt)</li>
+  <li><strong>Startup profile:</strong> company name, sector, stage, country, team size, pitch, goals</li>
+  <li><strong>Uploaded documents:</strong> pitch decks and other artefacts (stored encrypted)</li>
+  <li><strong>Technical data:</strong> IP address (on newsletter signup), user agent</li>
+  <li><strong>Cookies:</strong> a single session cookie (functional, not tracking)</li>
+</ul>
+
+<h2>3. How we use your data</h2>
+<ul>
+  <li>Account authentication and security</li>
+  <li>AI matching between your startup profile and available grants</li>
+  <li>Eligibility score computation</li>
+  <li>Newsletter delivery (only with explicit consent)</li>
+</ul>
+<p>We do not sell or share personal data with third parties. We do not use your data to train AI models without explicit consent.</p>
+
+<h2>4. Legal basis (GDPR)</h2>
+<ul>
+  <li><strong>Consent</strong> — when creating an account and subscribing to the newsletter</li>
+  <li><strong>Contract performance</strong> — providing the matching service</li>
+  <li><strong>Legitimate interest</strong> — platform security and abuse prevention</li>
+</ul>
+
+<h2>5. Data retention</h2>
+<ul>
+  <li>Account data: as long as the account is active</li>
+  <li>After account deletion: data is removed within 30 days</li>
+  <li>Security logs: 90 days</li>
+  <li>Billing data (when applicable): 5 years per fiscal law</li>
+</ul>
+
+<h2>6. Your rights</h2>
+<p>Under GDPR, you have the right to:</p>
+<ul>
+  <li><strong>Access</strong> — view all your data from the profile page</li>
+  <li><strong>Rectification</strong> — edit your profile at any time</li>
+  <li><strong>Erasure</strong> — delete your account completely from settings</li>
+  <li><strong>Portability</strong> — export your data in JSON format</li>
+  <li><strong>Withdraw consent</strong> — at any time, without retroactive effect</li>
+</ul>
+<p>To exercise your rights, contact us at: <strong>privacy@eligibil.org</strong></p>
+
+<h2>7. Cookies</h2>
+<p>We use a single technical session cookie (<code>connect.sid</code>) required for authentication. We do not use tracking, analytics, or marketing cookies. This cookie is automatically deleted when closing the browser or after 7 days.</p>
+
+<h2>8. Security</h2>
+<ul>
+  <li>Passwords encrypted with bcrypt (12 rounds)</li>
+  <li>Mandatory HTTPS connections</li>
+  <li>Rate limiting on sensitive endpoints</li>
+  <li>Security headers (CSP, HSTS, X-Frame-Options)</li>
+</ul>
+
+<h2>9. International transfers</h2>
+<p>Data is stored on Supabase servers (EU). We do not transfer data outside the European Economic Area without adequate safeguards.</p>
+
+<h2>10. Contact</h2>
+<p>For any questions about data protection:<br>
+<strong>Email:</strong> privacy@eligibil.org<br>
+<strong>Address:</strong> SC Eligibil SRL, Chisinau, Republic of Moldova</p>
+`
+};
+
+const TITLES = { ro: 'Politica de Confidențialitate', en: 'Privacy Policy' };
+
+function setLang(lang) {
+  document.getElementById('priv-content').innerHTML = CONTENT[lang] || CONTENT.ro;
+  document.getElementById('priv-title').textContent = TITLES[lang] || TITLES.ro;
+}
+setLang('ro');
+</script>
+
+<script src="/cookie-consent.js"></script>
+</body>
+</html>

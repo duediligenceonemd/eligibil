@@ -3,6 +3,7 @@
 const express         = require('express');
 const db              = require('../db/users-supabase');
 const { getSupabase } = require('../db/supabase');
+const { validate, commentSchema, reactionToggleSchema, profileUpdateSchema, pipelineSchema } = require('../lib/schemas');
 
 const router = express.Router();
 
@@ -484,20 +485,17 @@ router.get('/comments', async (req, res) => {
 });
 
 // POST /api/comments — auth required
-router.post('/comments', requireAuth, async (req, res) => {
+router.post('/comments', requireAuth, validate(commentSchema), async (req, res) => {
   const sb = tryGetSupabase();
   if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });
-  const t = _validateTarget(req, res);
-  if (!t) return;
-  const body = String(req.body?.body || '').trim();
-  if (body.length < 1 || body.length > 5000) return res.status(400).json({ error: 'body must be 1..5000 chars' });
+  const { content_type, content_id, body } = req.body;
   // Look up user for denormalised email/name
   const user = await db.findOne('users', { id: req.session.userId });
   const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(' ') : '';
   try {
     const { data, error } = await sb.from('comments').insert({
-      content_type: t.content_type,
-      content_id:   t.content_id,
+      content_type,
+      content_id,
       user_id:      req.session.userId,
       user_email:   user?.email || null,
       user_name:    userName || user?.email || 'Utilizator',
@@ -534,16 +532,15 @@ router.delete('/comments/:id', requireAuth, async (req, res) => {
 });
 
 // POST /api/reactions/toggle — auth required, idempotent like-toggle
-router.post('/reactions/toggle', requireAuth, async (req, res) => {
+router.post('/reactions/toggle', requireAuth, validate(reactionToggleSchema), async (req, res) => {
   const sb = tryGetSupabase();
   if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });
-  const t = _validateTarget(req, res);
-  if (!t) return;
+  const { content_type, content_id } = req.body;
   try {
     const { data: existing } = await sb.from('reactions')
       .select('id')
-      .eq('content_type', t.content_type)
-      .eq('content_id', t.content_id)
+      .eq('content_type', content_type)
+      .eq('content_id', content_id)
       .eq('user_id', req.session.userId)
       .eq('kind', 'like')
       .maybeSingle();
@@ -552,8 +549,8 @@ router.post('/reactions/toggle', requireAuth, async (req, res) => {
       res.json({ ok: true, reacted: false });
     } else {
       await sb.from('reactions').insert({
-        content_type: t.content_type,
-        content_id:   t.content_id,
+        content_type,
+        content_id,
         user_id:      req.session.userId,
         kind:         'like',
       });
@@ -601,7 +598,7 @@ router.get('/profile', requireAuth, async (req, res) => {
 // =============================================================================
 // PUT /api/profile
 // =============================================================================
-router.put('/profile', requireAuth, async (req, res) => {
+router.put('/profile', requireAuth, validate(profileUpdateSchema), async (req, res) => {
   const {
     startupName, website, pitch, sector, stage, trl, country,
     teamSize, github, goals, amountIdx, horizon, priority,
@@ -642,6 +639,36 @@ router.put('/profile', requireAuth, async (req, res) => {
   } catch (_) { /* non-fatal */ }
 
   res.json({ ok: true, startup });
+});
+
+// =============================================================================
+// DELETE /api/profile — GDPR right to erasure
+// Cascaded deletion of all user data, then session destruction.
+// =============================================================================
+router.delete('/profile', requireAuth, async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });
+
+  const userId = req.session.userId;
+  try {
+    // Order matters: children before parents
+    await sb.from('pipeline_items').delete().eq('user_id', userId);
+    await sb.from('reactions').delete().eq('user_id', userId);
+    await sb.from('comments').update({ user_name: 'Utilizator sters', user_email: null, user_id: null }).eq('user_id', userId);
+    await sb.from('saved_grants').delete().eq('user_id', userId);
+    await sb.from('user_grant_scores').delete().eq('user_id', userId);
+    await sb.from('user_profiles').delete().eq('user_id', userId);
+    await sb.from('startups').delete().eq('user_id', userId);
+    await sb.from('profiles').delete().eq('id', userId);
+
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid');
+      res.json({ ok: true, message: 'Toate datele au fost sterse' });
+    });
+  } catch (err) {
+    console.error('DELETE /api/profile error:', err);
+    res.status(500).json({ error: 'Eroare la stergerea datelor' });
+  }
 });
 
 // =============================================================================
@@ -731,7 +758,7 @@ router.get('/pipeline', requireAuth, async (req, res) => {
 // =============================================================================
 // POST /api/pipeline
 // =============================================================================
-router.post('/pipeline', requireAuth, async (req, res) => {
+router.post('/pipeline', requireAuth, validate(pipelineSchema), async (req, res) => {
   const { grantId, grantName, stage, notes, deadline } = req.body;
   const item = await db.insert('pipeline_items', {
     user_id:    req.session.userId,

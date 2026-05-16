@@ -3,33 +3,28 @@
 const express = require('express');
 const bcrypt  = require('bcryptjs');
 const db      = require('../db/users-supabase');
+const { validate, loginSchema, registerSchema } = require('../lib/schemas');
 
 const router = express.Router();
 
 // POST /api/auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', validate(registerSchema), async (req, res) => {
   const {
     email, password, firstName, lastName, role,
     startupName, website, pitch, sector, stage, trl, country,
     teamSize, github, goals, amountIdx, horizon, priority,
   } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email și parola sunt obligatorii' });
-  }
-
-  const normalEmail = email.toLowerCase().trim();
-
   try {
-    // Duplicate check
-    if (await db.findOne('users', { email: normalEmail })) {
+    // Duplicate check (email already normalized by Zod)
+    if (await db.findOne('users', { email })) {
       return res.status(409).json({ error: 'Email deja înregistrat' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await db.insert('users', {
-      email: normalEmail,
+      email,
       password_hash: passwordHash,
       first_name: firstName || null,
       last_name:  lastName  || null,
@@ -68,15 +63,11 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', validate(loginSchema), async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email și parola sunt obligatorii' });
-  }
-
   try {
-    const user = await db.findOne('users', { email: email.toLowerCase().trim() });
+    const user = await db.findOne('users', { email });
     if (!user) {
       return res.status(401).json({ error: 'Email sau parolă incorectă' });
     }

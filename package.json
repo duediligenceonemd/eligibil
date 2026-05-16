@@ -33,7 +33,8 @@
     "stats:refresh": "node scripts/compute-user-stats.js",
     "stats:rescore": "node scripts/compute-user-stats.js --sync-json --rescore",
     "grants:enrich": "node scripts/enrich-grants-claude.js",
-    "grants:enrich:dry": "node scripts/enrich-grants-claude.js --dry-run"
+    "grants:enrich:dry": "node scripts/enrich-grants-claude.js --dry-run",
+    "security:audit": "npm audit --audit-level=moderate"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",
@@ -42,7 +43,9 @@
     "cheerio": "^1.2.0",
     "dotenv": "^16.5.0",
     "express": "^4.22.1",
+    "express-rate-limit": "^8.5.2",
     "express-session": "^1.19.0",
+    "helmet": "^8.1.0",
     "imapflow": "^1.3.2",
     "mailparser": "^3.9.8",
     "multer": "^2.1.1",
@@ -50,6 +53,7 @@
     "pdf-parse": "^2.4.5",
     "pg": "^8.13.3",
     "rss-parser": "^3.13.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^3.25.76"
   }
 }

@@ -16,6 +16,7 @@
  */
 
 const express = require('express');
+const crypto  = require('crypto');
 const router  = express.Router();
 
 const { getSupabase } = require('../db/supabase');
@@ -50,7 +51,11 @@ function isAdminUser(user) {
 
 async function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
-  if (process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN) return next();
+  if (process.env.ADMIN_TOKEN && token) {
+    const a = Buffer.from(String(token));
+    const b = Buffer.from(String(process.env.ADMIN_TOKEN));
+    if (a.length === b.length && crypto.timingSafeEqual(a, b)) return next();
+  }
   if (!req.session?.userId) {
     return res.status(401).json({ error: 'Authentication required' });
   }

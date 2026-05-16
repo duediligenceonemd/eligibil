@@ -1,24 +1,70 @@
 'use strict';
 require('dotenv').config();
+require('./lib/validate-env');
 
-const express = require('express');
-const session = require('express-session');
-const path    = require('path');
+const express     = require('express');
+const session     = require('express-session');
+const helmet      = require('helmet');
+const rateLimit   = require('express-rate-limit');
+const path        = require('path');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// Cloud Run terminates TLS at the load balancer — trust X-Forwarded-* headers
+app.set('trust proxy', 1);
+
+// Security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc:  ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+      styleSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc:    ["'self'", "https://fonts.gstatic.com"],
+      imgSrc:     ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
 
 // Body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Rate limiting
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Prea multe încercări. Reîncercați în 15 minute.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const newsletterLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  message: { error: 'Prea multe cereri. Reîncercați mai târziu.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: 'Prea multe cereri. Reîncercați în 15 minute.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Session middleware (MemoryStore — fine for dev/prototype)
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'eligibil-dev-secret-2026',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   },
 }));
@@ -157,6 +203,8 @@ app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'about.html'))
 app.get('/produs/:slug', (req, res) => res.sendFile(path.join(__dirname, 'produs.html')));
 app.get('/glosar', (req, res) => res.sendFile(path.join(__dirname, 'glosar.html')));
 app.get('/produse', (req, res) => res.sendFile(path.join(__dirname, 'produse.html')));
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
+app.get('/politica-confidentialitate', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
 
 // /evenimente (RO) + /events (EN) — public events listing page (Brief 04).
 // Both routes serve the same events.html shell; components-events.jsx
@@ -267,13 +315,15 @@ app.get('/grant.html', async (req, res, next) => {
 // Static files served from project root
 app.use(express.static(__dirname));
 
-// API routes
+// API routes (with rate limiting)
+app.use('/api/auth/login',    authLimiter);
+app.use('/api/auth/register', authLimiter);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/artefacts', require('./routes/artefacts'));
-app.use('/api/newsletter', require('./routes/newsletter'));
+app.use('/api/newsletter', newsletterLimiter, require('./routes/newsletter'));
 app.use('/api/events', require('./routes/events'));
-app.use('/api', require('./routes/api'));
+app.use('/api', apiLimiter, require('./routes/api'));
 
 // Catch-all: serve index.html for non-API routes
 app.get('*', (req, res, next) => {
