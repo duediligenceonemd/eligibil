@@ -19,11 +19,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+      scriptSrc:  ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://www.clarity.ms"],
       styleSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:    ["'self'", "https://fonts.gstatic.com"],
       imgSrc:     ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "https://www.clarity.ms"],
     },
   },
   crossOriginEmbedderPolicy: false,
@@ -325,12 +325,23 @@ app.use('/api/newsletter', newsletterLimiter, require('./routes/newsletter'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api', apiLimiter, require('./routes/api'));
 
-// Catch-all: serve index.html for non-API routes
-app.get('*', (req, res, next) => {
+// API 404 — unknown API endpoints
+app.all('/api/*', (req, res) => {
+  res.status(404).json({ error: 'Endpoint inexistent' });
+});
+
+// Page 404 — unknown pages get the 404 page, not index.html
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, '404.html'));
+});
+
+// Global error handler — catches unhandled throws in route handlers
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
   if (req.path.startsWith('/api')) {
-    return next();
+    return res.status(500).json({ error: 'Eroare internă de server' });
   }
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.status(500).sendFile(path.join(__dirname, '404.html'));
 });
 
 // Initialise DB and start server
