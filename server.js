@@ -330,6 +330,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/artefacts', require('./routes/artefacts'));
 app.use('/api/newsletter', newsletterLimiter, require('./routes/newsletter'));
 app.use('/api/waitlist', waitlistLimiter, require('./routes/waitlist'));
+app.use('/api/unsubscribe', require('./routes/unsubscribe'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api', apiLimiter, require('./routes/api'));
 

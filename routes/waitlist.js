@@ -4,6 +4,8 @@ const express = require('express');
 const crypto = require('crypto');
 const { getSupabase } = require('../db/supabase');
 const { validate, waitlistSchema } = require('../lib/schemas');
+const { sendEmail, unsubscribeUrl } = require('../lib/email/resend');
+const { waitlistConfirm, T } = require('../lib/email/templates');
 
 const router = express.Router();
 
@@ -65,6 +67,14 @@ router.post('/', validate(waitlistSchema), async (req, res) => {
       httpOnly: false,
       sameSite: 'lax',
     });
+
+    sendEmail({
+      to: email,
+      subject: (T.waitlistConfirm.subject[locale] || T.waitlistConfirm.subject.ro),
+      html: waitlistConfirm({ language: locale, unsubscribeUrl: unsubscribeUrl(email, 'waitlist') }),
+      type: 'waitlist_confirm',
+      language: locale,
+    }).catch(() => {});
 
     res.json({ ok: true, id: data.id });
   } catch (err) {

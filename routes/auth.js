@@ -4,6 +4,8 @@ const express = require('express');
 const bcrypt  = require('bcryptjs');
 const db      = require('../db/users-supabase');
 const { validate, loginSchema, registerSchema } = require('../lib/schemas');
+const { sendEmail, queueEmail, unsubscribeUrl } = require('../lib/email/resend');
+const { welcome, T } = require('../lib/email/templates');
 
 const router = express.Router();
 
@@ -51,6 +53,18 @@ router.post('/register', validate(registerSchema), async (req, res) => {
     }
 
     req.session.userId = user.id;
+
+    var lang = 'ro';
+    sendEmail({
+      to: email,
+      subject: (T.welcome.subject[lang] || T.welcome.subject.ro),
+      html: welcome({ language: lang, name: firstName, unsubscribeUrl: unsubscribeUrl(email, 'all') }),
+      type: 'welcome',
+      language: lang,
+    }).catch(() => {});
+
+    queueEmail({ userId: user.id, recipient: email, type: 'onboarding_day3', language: lang, scheduledFor: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) }).catch(() => {});
+    queueEmail({ userId: user.id, recipient: email, type: 'onboarding_day7', language: lang, scheduledFor: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }).catch(() => {});
 
     return res.json({
       ok: true,
