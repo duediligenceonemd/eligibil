@@ -56,4 +56,15 @@ CREATE TRIGGER funding_resources_updated_at_trigger
   BEFORE UPDATE ON funding_resources
   FOR EACH ROW EXECUTE FUNCTION funding_resources_touch_updated_at();
 
-GRANT ALL ON TABLE funding_resources TO anon, authenticated;
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+REVOKE ALL ON TABLE funding_resources FROM anon, authenticated;
+GRANT SELECT ON TABLE funding_resources TO anon, authenticated;
+
+ALTER TABLE funding_resources ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS funding_resources_public_read ON funding_resources;
+CREATE POLICY funding_resources_public_read
+  ON funding_resources
+  FOR SELECT
+  TO anon, authenticated
+  USING (true);

@@ -3,8 +3,10 @@ const { Sentry, sentryEnabled, reportError } = require('./instrument');
 require('./lib/env-validation');
 
 const express = require('express');
+const helmet = require('helmet');
 const session = require('express-session');
 const path    = require('path');
+const { SupabaseSessionStore } = require('./lib/supabase-session-store');
 const {
   apiLimiter,
   authLoginLimiter,
@@ -22,6 +24,7 @@ const {
 const app  = express();
 const PORT = process.env.PORT || 3000;
 const IS_PROD = process.env.NODE_ENV === 'production';
+const SESSION_MAX_AGE_MS = Number(process.env.SESSION_MAX_AGE_MS || 24 * 60 * 60 * 1000);
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
@@ -58,39 +61,21 @@ app.use(helmet({
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
-// Rate limiting
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { error: 'Prea multe încercări. Reîncercați în 15 minute.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-const newsletterLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 3,
-  message: { error: 'Prea multe cereri. Reîncercați mai târziu.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-const waitlistLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 3,
-  message: { error: 'Prea multe cereri. Reîncercați într-un minut.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { error: 'Prea multe cereri. Reîncercați în 15 minute.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+function createSessionStore() {
+  if (String(process.env.SESSION_STORE || '').toLowerCase() !== 'supabase') {
+    return undefined;
+  }
 
-// Session middleware (MemoryStore — fine for dev/prototype)
+  return new SupabaseSessionStore({
+    table: process.env.SESSION_TABLE || 'app_sessions',
+    ttlMs: SESSION_MAX_AGE_MS,
+  });
+}
+
+// Session middleware. Use SESSION_STORE=supabase in production for persistence.
 app.use(session({
   name: 'elig.sid',
+  store: createSessionStore(),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -101,7 +86,7 @@ app.use(session({
     httpOnly: true,
     sameSite: 'lax',
     secure: IS_PROD,
-    maxAge: 24 * 60 * 60 * 1000,
+    maxAge: SESSION_MAX_AGE_MS,
   },
 }));
 app.use('/api', sameOriginGuard);
@@ -318,6 +303,10 @@ app.get('/glosar', (req, res) => res.sendFile(path.join(__dirname, 'glosar.html'
 app.get('/produse', (req, res) => res.sendFile(path.join(__dirname, 'produse.html')));
 app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
 app.get('/politica-confidentialitate', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
+app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'terms.html')));
+app.get('/termeni-si-conditii', (req, res) => res.sendFile(path.join(__dirname, 'terms.html')));
+app.get('/forgot-password', (req, res) => res.sendFile(path.join(__dirname, 'reset-password.html')));
+app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'reset-password.html')));
 
 // /evenimente (RO) + /events (EN) — public events listing page (Brief 04).
 // Both routes serve the same events.html shell; components-events.jsx
@@ -330,6 +319,7 @@ app.get('/events',     (req, res) => res.sendFile(path.join(__dirname, 'events.h
 // every API call enforces requireAdmin server-side.
 app.get('/legal/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
 app.get('/legal/cookie', (req, res) => res.sendFile(path.join(__dirname, 'cookies.html')));
+app.get('/legal/terms', (req, res) => res.sendFile(path.join(__dirname, 'terms.html')));
 
 app.get(['/dashboard', '/dashboard.html'], requirePageSession, (req, res) =>
   res.sendFile(path.join(__dirname, 'dashboard.html'))
@@ -449,6 +439,8 @@ app.use(express.static(__dirname));
 // API routes
 app.use('/api/auth/login', authLoginLimiter);
 app.use('/api/auth/register', authRegisterLimiter);
+app.use('/api/auth/forgot-password', authRegisterLimiter);
+app.use('/api/auth/reset-password', authLoginLimiter);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/artefacts', uploadLimiter, require('./routes/artefacts'));

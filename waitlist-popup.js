@@ -76,7 +76,8 @@
     if (path === excluded[i] || path.indexOf('/admin') === 0) return;
   }
 
-  if (window.innerWidth < 360) return;
+  if (window.innerWidth < 320) return;
+  var isMobile = window.innerWidth < 768;
 
   // Debug: ?popup=test forces instant show
   if (/[?&]popup=test/.test(location.search)) {
@@ -201,14 +202,22 @@
     var previousFocus = document.activeElement;
 
     // Overlay
-    var overlay = el('div', 'position:fixed;inset:0;z-index:10000;background:rgba(14,22,32,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s ease;padding:16px;', {
+    var overlayStyle = 'position:fixed;inset:0;z-index:10000;background:rgba(14,22,32,0.6);backdrop-filter:blur(4px);display:flex;opacity:0;transition:opacity .2s ease;';
+    if (isMobile) {
+      overlayStyle += 'align-items:flex-end;justify-content:center;padding:0;';
+    } else {
+      overlayStyle += 'align-items:center;justify-content:center;padding:16px;';
+    }
+    var overlay = el('div', overlayStyle, {
       role: 'dialog',
       'aria-modal': 'true',
       'aria-labelledby': 'wl-title',
     });
 
     // Modal
-    var modal = el('div', 'position:relative;max-width:480px;width:100%;background:var(--surface,#fffefb);border:1px solid var(--border-soft,#d9d3c5);padding:32px;box-shadow:0 24px 48px rgba(0,0,0,0.15);');
+    var modalPad = isMobile ? '24px 20px' : '32px';
+    var modalRadius = isMobile ? 'border-radius:16px 16px 0 0;' : '';
+    var modal = el('div', 'position:relative;max-width:480px;width:100%;background:var(--surface,#fffefb);border:1px solid var(--border-soft,#d9d3c5);padding:' + modalPad + ';box-shadow:0 24px 48px rgba(0,0,0,0.15);max-height:' + (isMobile ? '90vh' : 'none') + ';overflow-y:auto;-webkit-overflow-scrolling:touch;' + modalRadius);
 
     // Close button
     var closeBtn = el('button', 'position:absolute;top:12px;right:12px;width:32px;height:32px;border:none;background:none;cursor:pointer;color:var(--muted,#6a7381);font-size:20px;display:flex;align-items:center;justify-content:center;', { 'aria-label': 'Close', tabindex: '0' });
@@ -217,11 +226,13 @@
     closeBtn.onmouseout = function () { closeBtn.style.color = 'var(--muted,#6a7381)'; };
 
     // Title
-    var title = el('h2', "font-family:'Space Grotesk',system-ui,sans-serif;font-size:24px;font-weight:600;color:var(--ink,#0e1620);margin:0 0 12px;line-height:1.2;padding-right:32px;", { id: 'wl-title' });
+    var titleSize = isMobile ? '20px' : '24px';
+    var title = el('h2', "font-family:'Space Grotesk',system-ui,sans-serif;font-size:" + titleSize + ";font-weight:600;color:var(--ink,#0e1620);margin:0 0 12px;line-height:1.2;padding-right:32px;", { id: 'wl-title' });
     title.textContent = txt(v.title, lang);
 
     // Subtitle
-    var sub = el('p', "font-family:'Inter',system-ui,sans-serif;font-size:15px;color:var(--muted,#6a7381);line-height:1.55;margin:0 0 20px;");
+    var subSize = isMobile ? '14px' : '15px';
+    var sub = el('p', "font-family:'Inter',system-ui,sans-serif;font-size:" + subSize + ";color:var(--muted,#6a7381);line-height:1.55;margin:0 0 16px;");
     sub.textContent = txt(v.sub, lang);
 
     modal.appendChild(closeBtn);
@@ -244,7 +255,8 @@
     var form = el('div', 'margin:0 0 12px;');
 
     // Input
-    var input = el('input', "width:100%;padding:12px;border:1px solid var(--border-soft,#d9d3c5);background:var(--bg,#f7f5f0);color:var(--ink,#0e1620);font-family:'Inter',system-ui,sans-serif;font-size:14px;box-sizing:border-box;outline:none;margin-bottom:12px;", {
+    var inputFontSize = isMobile ? '16px' : '14px';
+    var input = el('input', "width:100%;padding:12px;border:1px solid var(--border-soft,#d9d3c5);background:var(--bg,#f7f5f0);color:var(--ink,#0e1620);font-family:'Inter',system-ui,sans-serif;font-size:" + inputFontSize + ";box-sizing:border-box;outline:none;margin-bottom:12px;min-height:48px;", {
       type: 'email',
       placeholder: txt(T.input, lang),
       autocomplete: 'email',
@@ -258,7 +270,7 @@
     var errMsg = el('p', "font-family:'Inter',system-ui,sans-serif;font-size:13px;color:var(--hot,#c24a1e);margin:0 0 8px;display:none;");
 
     // Submit button
-    var ctaBtn = el('button', "width:100%;padding:14px;background:var(--ink,#0e1620);color:var(--bg,#f7f5f0);border:1px solid var(--ink,#0e1620);font-family:'Inter',system-ui,sans-serif;font-weight:500;font-size:14px;cursor:pointer;transition:transform .08s ease,background .15s;", { tabindex: '0' });
+    var ctaBtn = el('button', "width:100%;padding:14px;background:var(--ink,#0e1620);color:var(--bg,#f7f5f0);border:1px solid var(--ink,#0e1620);font-family:'Inter',system-ui,sans-serif;font-weight:500;font-size:14px;cursor:pointer;transition:transform .08s ease,background .15s;min-height:48px;", { tabindex: '0' });
     ctaBtn.textContent = txt(v.cta, lang);
     ctaBtn.onmouseover = function () { ctaBtn.style.transform = 'translate(-2px,-2px)'; ctaBtn.style.boxShadow = '4px 4px 0 0 var(--accent,#1f3a5f)'; };
     ctaBtn.onmouseout = function () { ctaBtn.style.transform = 'none'; ctaBtn.style.boxShadow = 'none'; };
@@ -269,7 +281,8 @@
     modal.appendChild(form);
 
     // Dismiss link
-    var dismissLink = el('button', "display:block;width:100%;text-align:center;background:none;border:none;font-family:'Inter',system-ui,sans-serif;font-size:13px;color:var(--muted,#6a7381);cursor:pointer;padding:8px 0;", { tabindex: '0' });
+    var dismissPad = isMobile ? '12px 0' : '8px 0';
+    var dismissLink = el('button', "display:block;width:100%;text-align:center;background:none;border:none;font-family:'Inter',system-ui,sans-serif;font-size:13px;color:var(--muted,#6a7381);cursor:pointer;padding:" + dismissPad + ";min-height:44px;", { tabindex: '0' });
     dismissLink.textContent = txt(v.dismiss, lang);
     dismissLink.onmouseover = function () { dismissLink.style.color = 'var(--accent,#1f3a5f)'; };
     dismissLink.onmouseout = function () { dismissLink.style.color = 'var(--muted,#6a7381)'; };
@@ -288,8 +301,10 @@
       requestAnimationFrame(function () { overlay.style.opacity = '1'; });
     });
 
-    // Focus input after animation
-    setTimeout(function () { input.focus(); }, 300);
+    // Focus input after animation (skip on mobile to avoid keyboard popup)
+    if (!isMobile) {
+      setTimeout(function () { input.focus(); }, 300);
+    }
 
     // ── Close logic ──────────────────────────────────────────────────────────
     function closePopup() {

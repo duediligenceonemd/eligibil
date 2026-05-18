@@ -160,6 +160,147 @@ The app now exposes:
 - `response_time_ms`
 - Supabase connectivity status
 
+## Legal Pages
+
+The app now includes public legal pages:
+
+- `/privacy`
+- `/legal/privacy`
+- `/legal/cookie`
+- `/terms`
+- `/legal/terms`
+
+These are static HTML documents and should still be reviewed by legal counsel before final sign-off.
+
+## Password Reset
+
+Transactional password reset is now implemented with token-based verification.
+
+Endpoints:
+
+- `POST /api/auth/forgot-password`
+- `GET /api/auth/reset-password/verify?token=...`
+- `POST /api/auth/reset-password`
+
+Public page:
+
+- `/forgot-password`
+- `/reset-password`
+
+Required Supabase schema:
+
+- run `scripts/supabase-password-reset-schema.sql`
+
+Optional env:
+
+```env
+PASSWORD_RESET_TTL_MINUTES=30
+```
+
+## Persistent Sessions
+
+By default, local development can continue using the Express memory session store.
+
+For production persistence across restarts and multiple instances:
+
+1. Run `scripts/supabase-sessions-schema.sql` in Supabase.
+2. Set:
+
+```env
+SESSION_STORE=supabase
+SESSION_TABLE=app_sessions
+SESSION_MAX_AGE_MS=86400000
+```
+
+The `app_sessions` table is private:
+
+- `RLS ON`
+- no `anon` / `authenticated` grants
+- no public policies
+- server-side access only through the Supabase service role
+
+## Deadline Alerts
+
+The email queue already supports `deadline_alert`. A producer script is now included to enqueue alerts for saved grants that are approaching their deadline.
+
+Command:
+
+```bash
+npm run emails:deadline-alerts
+```
+
+Behavior:
+
+- checks `saved_grants`
+- joins to `profiles.email`
+- looks for active grants whose deadline is in `14,7,3` days by default
+- deduplicates against queued alerts and sent email logs
+- enqueues `deadline_alert` emails into `email_queue`
+
+Configuration:
+
+```env
+DEADLINE_ALERT_DAYS=14,7,3
+```
+
+Recommended schedule:
+
+- run `npm run emails:deadline-alerts` daily
+- run `node scripts/process-email-queue.js` shortly after
+
+## GitHub Actions
+
+Workflows currently included:
+
+- `build.yml`
+- `audits.yml`
+- `smoke-pages.yml`
+- `security.yml`
+- `diagnostics.yml`
+
+`diagnostics.yml` is intended for fast CI environment debugging:
+
+- confirms runner/runtime versions
+- checks key project files
+- installs dependencies
+- runs the build in isolation
+
+## Resources Table Security
+
+`funding_resources` is intended to be:
+
+- publicly readable
+- writable only from trusted server-side code using the Supabase service role
+
+The schema now includes RLS hardening:
+
+- `anon` and `authenticated` get `SELECT` only
+- no public `INSERT`, `UPDATE`, or `DELETE`
+- RLS policy allows public reads only
+
+For existing databases, run:
+
+- `scripts/supabase-resources-rls.sql`
+
+## Private Operational Tables
+
+The following tables should not be publicly accessible through Supabase client roles:
+
+- `newsletter_subscribers`
+- `waitlist`
+- `email_logs`
+- `email_queue`
+
+The application already uses server-side service-role access for these flows, so the safe posture is:
+
+- enable RLS
+- revoke `anon` and `authenticated`
+- do not create public policies
+
+Prepared migration:
+
+- `scripts/supabase-private-tables-rls.sql`
+
 ## Cookie Consent & Analytics
 
 Frontend consent and analytics primitives are included:
@@ -250,6 +391,38 @@ Beyond the base grants schema, the repo now includes additional SQL files for op
 | `GET/POST` | `/api/pipeline` | Application pipeline |
 | `POST` | `/api/auth/register` | Register |
 | `POST` | `/api/auth/login` | Login |
+
+---
+
+## Production Verification
+
+After a deploy, run:
+
+```bash
+npm run verify:prod
+```
+
+Optional:
+
+```bash
+PROD_BASE_URL=https://eligibil.org npm run verify:prod
+```
+
+The script checks:
+
+- homepage
+- search
+- resources pages
+- `/api/health`
+- `/api/resources/overview`
+- sitemap
+- `llms.txt`
+
+It also prints a small health summary for:
+
+- Supabase
+- Analytics
+- Sentry
 
 ---
 

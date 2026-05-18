@@ -1,6 +1,6 @@
 # Security Audit — eligibil.org
 
-**Data:** 16 mai 2026
+**Data:** 18 mai 2026
 **Auditor:** Claude Code (automated)
 **Stack:** Node.js + Express 4.22 + Supabase PostgreSQL + React CDN
 
@@ -32,9 +32,9 @@
 | # | Finding | Status |
 |---|---------|--------|
 | 10 | Zero GDPR compliance (privacy policy, cookie consent, data deletion) | REMEDIAT — privacy.html, cookie-consent.js, DELETE /api/profile |
-| 11 | MemoryStore pentru sesiuni (pierde sesiuni la restart) | ACCEPTAT — OK pentru MVP <100 users |
+| 11 | MemoryStore pentru sesiuni (pierde sesiuni la restart) | PREGĂTIT — Supabase session store disponibil cu `SESSION_STORE=supabase` |
 | 12 | CSP cu unsafe-inline (inline scripts în HTML static) | ACCEPTAT — necesar deoarece frontend nu are build step |
-| 13 | RLS dezactivat pe Supabase | ACCEPTAT — service key doar server-side |
+| 13 | RLS dezactivat pe Supabase | REMEDIAT — RLS activ pe funding_resources, newsletter_subscribers, waitlist, email_logs, email_queue |
 | 14 | Zero CI/CD security scanning | REMEDIAT — GitHub Actions npm audit + Dependabot |
 | 15 | Zero teste automate | NEABORDAT — separat de security hardening |
 
@@ -69,9 +69,9 @@ Când se va integra procesarea de plăți:
 
 | Risc | Justificare | Condiție de revizuire |
 |------|-------------|----------------------|
-| MemoryStore | MVP cu <100 users | Migrează la connect-pg-simple când >100 users concurenți |
+| MemoryStore implicit | Dezvoltare locală simplă | Activează `SESSION_STORE=supabase` în producție după schema `app_sessions` |
 | CSP unsafe-inline | Frontend static fără build step | Migrează la nonces cu templating engine |
-| RLS dezactivat | Service key server-only | Activează RLS dacă se adaugă client-side queries |
+| RLS fără policy pe tabele private | Intenționat: blocare completă pentru anon/authenticated | Revizuiește doar dacă apar use-case-uri client-side legitime |
 | CSRF tokens | JSON content-type + SameSite=lax | Adaugă csurf dacă se adaugă form-based mutations |
 
 ---
@@ -81,3 +81,33 @@ Când se va integra procesarea de plăți:
 1. https://securityheaders.com — Headers HTTP (target: A+)
 2. https://observatory.mozilla.org — Audit complet Mozilla
 3. https://www.ssllabs.com/ssltest/ — SSL/TLS (target: A+)
+
+---
+
+## Update 18 mai 2026
+
+După auditul inițial, au fost aplicate remedieri suplimentare direct în Supabase:
+
+- `public.funding_resources`
+  - `RLS = ON`
+  - policy publică doar pentru `SELECT`
+  - `anon/authenticated` au doar `SELECT`
+- `public.newsletter_subscribers`
+  - `RLS = ON`
+  - fără grants pentru `anon/authenticated`
+- `public.waitlist`
+  - `RLS = ON`
+  - fără grants pentru `anon/authenticated`
+- `public.email_logs`
+  - `RLS = ON`
+  - fără grants pentru `anon/authenticated`
+- `public.email_queue`
+  - `RLS = ON`
+  - fără grants pentru `anon/authenticated`
+
+Observații rămase din Supabase Advisor:
+
+- `INFO`: `RLS enabled, no policy` pe tabelele private de mai sus
+  - acesta este comportamentul intenționat, pentru că ele nu trebuie expuse public prin PostgREST
+- `WARN`: extensiile `vector` și `citext` sunt instalate în schema `public`
+  - recomandare structurală, nu risc critic imediat

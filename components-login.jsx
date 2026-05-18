@@ -133,6 +133,11 @@ function LoginApp() {
                 onChange={e => setPassword(e.target.value)}
                 required
               />
+              <div style={{ marginTop: 10, textAlign: 'right' }}>
+                <a href="/forgot-password" style={{ color: 'var(--accent)', textDecoration: 'underline', fontFamily: 'JetBrains Mono, monospace', fontSize: 11 }}>
+                  Ai uitat parola?
+                </a>
+              </div>
             </div>
 
             {error && (

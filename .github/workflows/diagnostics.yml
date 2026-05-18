@@ -1,19 +1,19 @@
-name: Build
+name: Diagnostics
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
+  push:
+    branches: [master]
 
 permissions:
   contents: read
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: diagnostics-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  environment:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -29,13 +29,25 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Show runtime versions
+      - name: Show runtime and environment
         run: |
+          echo "runner.os=${{ runner.os }}"
+          echo "runner.arch=${{ runner.arch }}"
           node -v
           npm -v
+
+      - name: Verify key project files
+        run: |
+          test -f package.json
+          test -f package-lock.json
+          test -f server.js
+          test -d .github/workflows
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Run build validation
+      - name: Show top-level dependency health
+        run: npm ls --depth=0
+
+      - name: Build
         run: npm run build

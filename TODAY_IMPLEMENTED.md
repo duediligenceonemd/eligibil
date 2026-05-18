@@ -29,6 +29,19 @@ Data: 17 mai 2026
   - `GET /api/admin/feedback/:id`
   - `PUT /api/admin/feedback/:id`
   - `DELETE /api/admin/feedback/:id`
+- `terms.html` + rute legale publice
+- flow de resetare parolă:
+  - `POST /api/auth/forgot-password`
+  - `GET /api/auth/reset-password/verify`
+  - `POST /api/auth/reset-password`
+- script producer pentru alerte de deadline:
+  - `npm run emails:deadline-alerts`
+- hardening RLS pentru `funding_resources`:
+  - `scripts/supabase-resources-rls.sql`
+  - `anon/authenticated` au doar `SELECT`
+- session store persistent pregătit:
+  - `SESSION_STORE=supabase`
+  - `scripts/supabase-sessions-schema.sql`
 
 ### Cleanup tehnic închis
 
