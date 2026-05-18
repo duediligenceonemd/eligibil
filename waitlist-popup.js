@@ -78,6 +78,11 @@
 
   if (window.innerWidth < 360) return;
 
+  // Debug: ?popup=test forces instant show
+  if (/[?&]popup=test/.test(location.search)) {
+    setTimeout(function () { showPopup(false); }, 300);
+  }
+
   // ── Tracking state ──────────────────────────────────────────────────────────
   var state = {
     startTime: Date.now(),
