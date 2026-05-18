@@ -48,6 +48,13 @@ const newsletterLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+const waitlistLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 3,
+  message: { error: 'Prea multe cereri. Reîncercați într-un minut.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -322,6 +329,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/artefacts', require('./routes/artefacts'));
 app.use('/api/newsletter', newsletterLimiter, require('./routes/newsletter'));
+app.use('/api/waitlist', waitlistLimiter, require('./routes/waitlist'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api', apiLimiter, require('./routes/api'));
 
