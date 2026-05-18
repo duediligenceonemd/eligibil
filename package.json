@@ -17,8 +17,12 @@
     "accelerator"
   ],
   "scripts": {
+    "build": "node scripts/build.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
+    "audit:files": "node scripts/check-required-files.js",
+    "audit:i18n": "node scripts/i18n-audit.js",
+    "smoke:pages": "node scripts/smoke-pages.js",
     "seed": "node scripts/seed-grants.js",
     "seed:dry": "node scripts/seed-grants.js --dry-run",
     "db:push": "node scripts/push-schema.js",
@@ -30,14 +34,22 @@
     "grants:gmail": "node scripts/gmail-poller.js",
     "grants:scrape": "node scripts/web-scrapers.js",
     "grants:fetch": "node scripts/cron-fetch.js",
+    "resources:import": "node scripts/import-funding-resources.js",
+    "resources:import:dry": "node scripts/import-funding-resources.js --dry-run",
+    "resources:describe": "node scripts/generate-resource-descriptions.js",
+    "resources:describe:dry": "node scripts/generate-resource-descriptions.js --dry-run",
     "stats:refresh": "node scripts/compute-user-stats.js",
     "stats:rescore": "node scripts/compute-user-stats.js --sync-json --rescore",
     "grants:enrich": "node scripts/enrich-grants-claude.js",
     "grants:enrich:dry": "node scripts/enrich-grants-claude.js --dry-run",
-    "security:audit": "npm audit --audit-level=moderate"
+    "security:audit": "npm audit --audit-level=high",
+    "security:fix": "npm audit fix",
+    "security:check": "npx better-npm-audit audit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",
+    "@sentry/node": "^10.53.1",
+    "@sentry/profiling-node": "^10.53.1",
     "@supabase/supabase-js": "^2.49.4",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.2.0",

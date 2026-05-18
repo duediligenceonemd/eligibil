@@ -1,6 +1,11 @@
 // Profile components — app.eligibil.org
 const { useState, useEffect, useRef, useCallback } = React;
 
+function trackProfileAnalytics(eventName, payload) {
+  if (!window.eligibilAnalytics || typeof window.eligibilAnalytics.track !== 'function') return;
+  window.eligibilAnalytics.track(eventName, payload || {});
+}
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 const SECTORS = [
   'AI & ML', 'Biotech & Health', 'Climate Tech', 'Fintech', 'EdTech',
@@ -528,7 +533,7 @@ function TabConfidence({ form }) {
 }
 
 // ── Save bar ──────────────────────────────────────────────────────────────────
-function SaveBar({ saveStatus, onSaveNow }) {
+function SaveBar({ saveStatus, onSaveNow, onDeleteAccount }) {
   const statusText = {
     '':       '',
     saving:   'Se salvează…',
@@ -541,6 +546,9 @@ function SaveBar({ saveStatus, onSaveNow }) {
       <span className={`profile__save-status${saveStatus ? ' ' + saveStatus : ''}`}>
         {statusText}
       </span>
+      <button className="btn btn--ghost btn--sm" onClick={onDeleteAccount} style={{ marginRight: 8, borderColor: '#c24a1e', color: '#c24a1e' }}>
+        Șterge contul
+      </button>
       <button className="btn btn--accent btn--sm" onClick={onSaveNow}>
         Salvează acum
       </button>
@@ -555,6 +563,7 @@ function ProfileApp() {
   const [saveStatus, setSaveStatus] = useState('');
   const [loading, setLoading] = useState(true);
   const debounceRef = useRef(null);
+  const profileCompletedRef = useRef(false);
 
   // ── Fetch profile on mount ──────────────────────────────────────────────────
   useEffect(() => {
@@ -615,6 +624,17 @@ function ProfileApp() {
         .then(r => {
           if (r.ok) {
             setSaveStatus('saved');
+            const confidence = computeConfidence(currentForm);
+            if (confidence >= 70 && !profileCompletedRef.current) {
+              profileCompletedRef.current = true;
+              trackProfileAnalytics('profile_completed', {
+                confidence_score: confidence,
+                goals_count: Array.isArray(currentForm.goals) ? currentForm.goals.length : 0,
+                team_count: Array.isArray(currentForm.team) ? currentForm.team.filter(m => m.name).length : 0,
+                has_website: !!currentForm.website,
+                has_pitch: !!currentForm.pitch,
+              });
+            }
             setTimeout(() => setSaveStatus(''), 3000);
           } else {
             setSaveStatus('error');
@@ -635,6 +655,17 @@ function ProfileApp() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     performSave();
   }, [performSave]);
+
+  const handleDeleteAccount = useCallback(() => {
+    if (!window.confirm('Sigur vrei să ștergi contul? Acțiunea este ireversibilă.')) return;
+    fetch('/api/profile', { method: 'DELETE' })
+      .then(r => r.json().then(body => ({ ok: r.ok, body })).catch(() => ({ ok: r.ok, body: {} })))
+      .then(({ ok, body }) => {
+        if (!ok) throw new Error(body.error || 'Nu am putut șterge contul');
+        window.location.href = '/';
+      })
+      .catch(() => setSaveStatus('error'));
+  }, []);
 
   // ── Confidence pct for tab badge ────────────────────────────────────────────
   const pct = computeConfidence(form);
@@ -720,7 +751,7 @@ function ProfileApp() {
         </div>
 
         {/* Save bar */}
-        <SaveBar saveStatus={saveStatus} onSaveNow={handleSaveNow} />
+        <SaveBar saveStatus={saveStatus} onSaveNow={handleSaveNow} onDeleteAccount={handleDeleteAccount} />
 
       </div>
     </div>

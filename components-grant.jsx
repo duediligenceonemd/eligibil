@@ -5,6 +5,15 @@
 // for fields not yet carried by the schema (objectives, timeline, etc).
 const { useState, useEffect, useRef } = React;
 
+function trackGrantAnalytics(eventName, payload) {
+  if (!window.eligibilAnalytics || typeof window.eligibilAnalytics.track !== 'function') return;
+  window.eligibilAnalytics.track(eventName, payload || {});
+}
+
+function primaryGrantUrl(grant) {
+  return grant.application_url || grant.website || grant.source_url || null;
+}
+
 // ============== DATA ==============
 const GRANTS = {
   eic: {
@@ -435,7 +444,17 @@ function Hero({ g, mode }) {
               Înregistrează-te în 5 min ca să afli scorul tău personal de match cu acest grant și ce să îmbunătățești.
             </p>
             <div className="match-card__cta">
-              <button className="btn btn--accent">Calculează scorul meu →</button>
+              <button
+                className="btn btn--accent"
+                onClick={() => trackGrantAnalytics('eligibility_check_started', {
+                  grant_id: g.id,
+                  grant_type: g.type,
+                  region: g.region,
+                  source_context: 'grant_public_match_card',
+                })}
+              >
+                Calculează scorul meu →
+              </button>
               <button className="btn btn--ghost btn--sm">Vezi exemplu profil</button>
             </div>
           </div>
@@ -506,6 +525,21 @@ function FAQ({ items }) {
 }
 
 function Aside({ g, mode }) {
+  const applyUrl = primaryGrantUrl(g);
+
+  function handleApplyClick(sourceContext) {
+    trackGrantAnalytics('funding_apply_clicked', {
+      grant_id: g.id,
+      grant_type: g.type,
+      region: g.region,
+      has_application_url: !!g.application_url,
+      source_context: sourceContext,
+    });
+    if (applyUrl) {
+      window.open(applyUrl, '_blank', 'noopener');
+    }
+  }
+
   return (
     <aside className="aside">
       <div className="aside__card">
@@ -519,7 +553,12 @@ function Aside({ g, mode }) {
         <div className="aside__card">
           <div className="aside__card-h"><span>ACȚIUNI</span></div>
           <div className="aside__actions">
-            <button className="aside__action primary"><span className="aside__action-icon">▶</span> Începe aplicarea</button>
+            <button
+              className="aside__action primary"
+              onClick={() => handleApplyClick('grant_app_aside_primary')}
+            >
+              <span className="aside__action-icon">▶</span> Începe aplicarea
+            </button>
             <button className="aside__action"><span className="aside__action-icon">+</span> Salvează în watchlist</button>
             <button className="aside__action"><span className="aside__action-icon">▥</span> Adaugă în pipeline</button>
             <button className="aside__action"><span className="aside__action-icon">◐</span> Generează docs cu AI</button>
@@ -555,7 +594,18 @@ function Aside({ g, mode }) {
           <div className="aside__card-h" style={{ color: 'rgba(255,255,255,.7)' }}><span>FREE TRIAL</span></div>
           <div style={{ fontFamily: 'Space Grotesk', fontSize: 18, fontWeight: 600, marginBottom: 6 }}>Calculează match-ul tău</div>
           <div style={{ fontSize: 13, opacity: .85, marginBottom: 14 }}>5 min · fără card · 735+ granturi</div>
-          <button className="btn" style={{ background: '#fff', color: 'var(--accent)', borderColor: '#fff', width: '100%', justifyContent: 'center' }}>Începe gratuit →</button>
+          <button
+            className="btn"
+            style={{ background: '#fff', color: 'var(--accent)', borderColor: '#fff', width: '100%', justifyContent: 'center' }}
+            onClick={() => trackGrantAnalytics('eligibility_check_started', {
+              grant_id: g.id,
+              grant_type: g.type,
+              region: g.region,
+              source_context: 'grant_public_aside_cta',
+            })}
+          >
+            Începe gratuit →
+          </button>
         </div>
       )}
     </aside>
@@ -813,7 +863,17 @@ function GrantApp() {
                 <p style={{ color: 'var(--ink-2)', maxWidth: 480, margin: '0 auto 20px', fontSize: 14 }}>
                   AI-ul nostru analizează profilul tău și îți dă lista exactă de îmbunătățiri pentru acest grant. Fără cont, nu putem personaliza.
                 </p>
-                <button className="btn btn--accent">Înregistrează-te gratuit →</button>
+                <button
+                  className="btn btn--accent"
+                  onClick={() => trackGrantAnalytics('eligibility_check_started', {
+                    grant_id: g.id,
+                    grant_type: g.type,
+                    region: g.region,
+                    source_context: 'grant_public_insights_cta',
+                  })}
+                >
+                  Înregistrează-te gratuit →
+                </button>
               </div>
             </ContentSection>
           )}

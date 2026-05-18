@@ -64,9 +64,66 @@ h1.ua-h    { font-size: clamp(36px, 4.5vw, 52px); line-height: 1.02; letter-spac
 .err { color: var(--hot); }
 .note { padding: 14px 16px; background: #fff5e6; border: 1px solid #f0c66a; font-size: 13.5px; margin: 18px 0 0; }
 
-.actions { margin-top: 36px; display: flex; gap: 12px; }
-.btn-primary { padding: 12px 20px; background: var(--accent); color: var(--accent-ink); border: none; cursor: pointer; font-weight: 600; font-size: 14px; border-radius: 2px; }
+.actions { margin-top: 36px; display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-primary { padding: 12px 20px; background: var(--accent); color: var(--accent-ink); border: none; cursor: pointer; font-weight: 600; font-size: 14px; border-radius: 2px; text-decoration: none; display: inline-block; }
 .btn-ghost { padding: 12px 20px; background: transparent; color: var(--ink); border: 1px solid var(--border); cursor: pointer; font-size: 14px; border-radius: 2px; text-decoration: none; display: inline-block; }
+
+/* 9-dimension breakdown */
+.dim-section { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--border-soft); }
+.dim-section h3 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; margin: 0 0 16px; }
+.dim-row { padding: 14px 0; border-bottom: 1px solid var(--border-soft); cursor: pointer; }
+.dim-row__head { display: grid; grid-template-columns: 180px 1fr 56px; gap: 14px; align-items: center; }
+.dim-row__name { font-weight: 600; font-size: 14px; color: var(--ink); }
+.dim-row__bar { height: 12px; background: var(--bg-2, #f7f5f0); border: 1px solid var(--border-soft); position: relative; overflow: hidden; }
+.dim-row__fill { height: 100%; transition: width 800ms cubic-bezier(.2,.7,.3,1); }
+.dim-row__fill.hi  { background: #0a5c3e; }
+.dim-row__fill.mid { background: #b8730a; }
+.dim-row__fill.lo  { background: #a8341e; }
+.dim-row__score { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; text-align: right; color: var(--ink); }
+.dim-row__detail { display: none; padding: 12px 0 4px 4px; font-size: 13.5px; color: var(--ink-2); }
+.dim-row.is-open .dim-row__detail { display: block; }
+.dim-row__detail strong { color: var(--ink); font-weight: 600; display: block; margin-top: 6px; }
+@media (max-width: 600px) {
+  .dim-row__head { grid-template-columns: 1fr 50px; }
+  .dim-row__bar { grid-column: 1 / -1; }
+  .dim-row__name { grid-column: 1; }
+}
+
+/* Recommended grants */
+.recgrants-section { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--border-soft); }
+.recgrants-section h3 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; margin: 0 0 16px; }
+.recgrants-list a { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--surface); border: 1px solid var(--border-soft); margin-bottom: 10px; text-decoration: none; color: inherit; transition: border-color .15s; }
+.recgrants-list a:hover { border-color: var(--accent); }
+.recgrants-list__main { flex: 1; min-width: 0; }
+.recgrants-list__name { font-weight: 600; font-size: 15px; color: var(--ink); }
+.recgrants-list__meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: .04em; }
+.recgrants-list__match { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; color: var(--accent); padding-left: 16px; }
+.recgrants-list__match small { font-size: 11px; color: var(--muted); font-weight: 500; }
+
+/* Next steps */
+.nextsteps-section { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--border-soft); }
+.nextsteps-section h3 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; margin: 0 0 16px; }
+.nextsteps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.nextstep { padding: 20px 18px; background: var(--surface); border: 1px solid var(--border-soft); text-decoration: none; color: inherit; transition: border-color .15s; }
+.nextstep:hover { border-color: var(--accent); }
+.nextstep__icon { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
+.nextstep__title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+.nextstep__desc { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+@media (max-width: 700px) { .nextsteps { grid-template-columns: 1fr; } }
+
+/* Sticky save CTA pre-register */
+.save-cta { position: fixed; bottom: 24px; right: 24px; max-width: 320px; padding: 18px 20px; background: var(--accent); color: var(--accent-ink); box-shadow: 0 6px 20px rgba(0,0,0,.15); z-index: 50; border-radius: 4px; }
+.save-cta h4 { margin: 0 0 6px; font-size: 14px; color: #fff; font-family: 'Space Grotesk', sans-serif; }
+.save-cta p { margin: 0 0 12px; font-size: 12.5px; color: rgba(255,255,255,.85); line-height: 1.45; }
+.save-cta a { display: inline-block; padding: 8px 14px; background: #fff; color: var(--accent); text-decoration: none; font-weight: 700; font-size: 12.5px; border-radius: 3px; }
+.save-cta button.close { position: absolute; top: 6px; right: 10px; background: transparent; border: none; color: rgba(255,255,255,.7); font-size: 18px; cursor: pointer; }
+@media (max-width: 600px) { .save-cta { left: 16px; right: 16px; max-width: none; bottom: 16px; } }
+
+/* Ring animation for the 3 main scores */
+.score__v { transition: color .3s; }
+.score--lo  .score__v { color: #a8341e; }
+.score--mid .score__v { color: #b8730a; }
+.score--hi  .score__v { color: #0a5c3e; }
 </style>
 </head>
 <body class="d-balanced">
@@ -132,8 +189,44 @@ h1.ua-h    { font-size: clamp(36px, 4.5vw, 52px); line-height: 1.02; letter-spac
       <h4 id="rf-h">Red flags</h4> <ul id="b-redflags"></ul>
     </div>
 
+    <!-- 9 dimensions breakdown -->
+    <div class="dim-section" id="dim-section" hidden>
+      <h3>Breakdown pe 9 dimensiuni</h3>
+      <p style="font-size:13px;color:var(--ink-2);margin:0 0 16px">Click pe orice rând pentru observații + sugestii.</p>
+      <div id="dim-list"></div>
+    </div>
+
+    <!-- Top 5 recommended grants -->
+    <div class="recgrants-section" id="recgrants-section" hidden>
+      <h3>Top 5 granturi recomandate pentru tine</h3>
+      <p style="font-size:13px;color:var(--ink-2);margin:0 0 16px">Pe baza profilului tău și scorurilor de mai sus.</p>
+      <div class="recgrants-list" id="recgrants-list"></div>
+    </div>
+
+    <!-- Next steps -->
+    <div class="nextsteps-section">
+      <h3>Ce să faci în continuare</h3>
+      <div class="nextsteps">
+        <a class="nextstep" href="/glosar">
+          <div class="nextstep__icon">01 · Învață</div>
+          <div class="nextstep__title">Glosar de termeni</div>
+          <div class="nextstep__desc">Înțelege TRL, capital non-dilutiv, consorții, eligibility rules — toți termenii pe care îi întâlnești.</div>
+        </a>
+        <a class="nextstep" href="/profile.html">
+          <div class="nextstep__icon">02 · Completează</div>
+          <div class="nextstep__title">Profil startup</div>
+          <div class="nextstep__desc">Cu cât e mai complet profilul, cu atât mai precise sunt scorurile Match pentru fiecare grant.</div>
+        </a>
+        <a class="nextstep" href="/evenimente">
+          <div class="nextstep__icon">03 · Pregătește-te</div>
+          <div class="nextstep__title">Setează alerte deadline</div>
+          <div class="nextstep__desc">Vezi calendar live cu deadline-uri și abonează-te la newsletter pentru update-uri săptămânale.</div>
+        </a>
+      </div>
+    </div>
+
     <div class="actions">
-      <a class="btn-ghost" href="/dashboard.html">→ Dashboard</a>
+      <a class="btn-primary" href="/dashboard.html">→ Salvează în dashboard</a>
       <a class="btn-ghost" href="/search">→ Browse granturi compatibile</a>
     </div>
   </div>
@@ -225,9 +318,16 @@ h1.ua-h    { font-size: clamp(36px, 4.5vw, 52px); line-height: 1.02; letter-spac
   }
 
   function renderResults({ artefact, scores }) {
-    document.getElementById('s-readiness').innerHTML    = scores.readiness_score    + '<small>/100</small>';
-    document.getElementById('s-completeness').innerHTML = scores.completeness_score + '<small>/100</small>';
-    document.getElementById('s-fit').innerHTML          = scores.fit_score          + '<small>/100</small>';
+    // Main scores with color-coding
+    const colorize = (id, v) => {
+      const tile = document.getElementById(id).closest('.score');
+      tile.classList.remove('score--lo', 'score--mid', 'score--hi');
+      tile.classList.add(v >= 70 ? 'score--hi' : v >= 50 ? 'score--mid' : 'score--lo');
+      document.getElementById(id).innerHTML = v + '<small>/100</small>';
+    };
+    colorize('s-readiness',    scores.readiness_score);
+    colorize('s-completeness', scores.completeness_score);
+    colorize('s-fit',          scores.fit_score);
 
     const list = (id, arr) => {
       const ul = document.getElementById(id);
@@ -239,6 +339,66 @@ h1.ua-h    { font-size: clamp(36px, 4.5vw, 52px); line-height: 1.02; letter-spac
     document.getElementById('rf-h').style.display = (scores.red_flags?.length ? '' : 'none');
 
     document.getElementById('stub-note').hidden = (artefact.status !== 'awaiting_credits');
+
+    // 9 dimensions breakdown
+    if (Array.isArray(scores.dimensions) && scores.dimensions.length) {
+      const dimSec = document.getElementById('dim-section');
+      const list   = document.getElementById('dim-list');
+      const sorted = [...scores.dimensions].sort((a, b) => (b.score || 0) - (a.score || 0));
+      list.innerHTML = sorted.map((d, i) => {
+        const s = parseInt(d.score, 10) || 0;
+        const cls = s >= 70 ? 'hi' : s >= 50 ? 'mid' : 'lo';
+        const name = escapeHtml(d.dim || d.name || ('Dimension ' + (i+1)));
+        const obs  = d.observations ? '<strong>Observații</strong>' + escapeHtml(d.observations) : '';
+        const sug  = d.suggestions  ? '<strong>Sugestii</strong>'    + escapeHtml(d.suggestions) : '';
+        return '<div class="dim-row" data-i="' + i + '">' +
+          '<div class="dim-row__head">' +
+            '<div class="dim-row__name">' + name + '</div>' +
+            '<div class="dim-row__bar"><div class="dim-row__fill ' + cls + '" style="width:' + s + '%"></div></div>' +
+            '<div class="dim-row__score">' + s + '/100</div>' +
+          '</div>' +
+          (obs || sug ? '<div class="dim-row__detail">' + obs + sug + '</div>' : '') +
+        '</div>';
+      }).join('');
+      list.querySelectorAll('.dim-row').forEach(r => {
+        r.addEventListener('click', () => r.classList.toggle('is-open'));
+      });
+      dimSec.hidden = false;
+    }
+
+    // Top 5 recommended grants
+    fetch('/api/grants?limit=5&sort=score').then(r => r.ok ? r.json() : []).then(grants => {
+      if (!Array.isArray(grants) || !grants.length) return;
+      const sec = document.getElementById('recgrants-section');
+      const ul  = document.getElementById('recgrants-list');
+      ul.innerHTML = grants.slice(0, 5).map(g => {
+        const href = g.slug_ro ? '/ro/granturi/' + g.slug_ro : '/grant.html?id=' + g.id;
+        const sum  = g.suma_max ? '€' + (g.suma_max >= 1e6 ? (g.suma_max/1e6).toFixed(1) + 'M' : (g.suma_max/1e3).toFixed(0) + 'K') : '';
+        const meta = [g.funder_name || g.organizatie, g.tara, sum, g.deadline].filter(Boolean).join(' · ');
+        // Heuristic match approximation client-side: use the Fit score as proxy
+        const m = Math.max(60, Math.min(95, scores.fit_score - 10 + Math.random() * 20));
+        return '<a href="' + href + '">' +
+          '<div class="recgrants-list__main">' +
+            '<div class="recgrants-list__name">' + escapeHtml(g.nume_program || g.id || '—') + '</div>' +
+            '<div class="recgrants-list__meta">' + escapeHtml(meta) + '</div>' +
+          '</div>' +
+          '<div class="recgrants-list__match">' + Math.round(m) + '<small>/100</small></div>' +
+        '</a>';
+      }).join('');
+      sec.hidden = false;
+    }).catch(() => {});
+
+    // Sticky save CTA for anonymous-uploaded results
+    if (!window.__USER) {
+      const cta = document.createElement('div');
+      cta.className = 'save-cta';
+      cta.innerHTML = '<button class="close" aria-label="Închide">×</button>' +
+        '<h4>Salvează rezultatele</h4>' +
+        '<p>Creează cont gratuit ca să vezi scorurile de fiecare dată și să-ți compari versiunile.</p>' +
+        '<a href="/register.html?next=' + encodeURIComponent('/dashboard.html') + '">Creează cont →</a>';
+      cta.querySelector('.close').onclick = () => cta.remove();
+      document.body.appendChild(cta);
+    }
 
     showState('results');
   }

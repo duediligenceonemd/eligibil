@@ -1,15 +1,40 @@
 'use strict';
-require('dotenv').config();
-require('./lib/validate-env');
+const { Sentry, sentryEnabled, reportError } = require('./instrument');
+require('./lib/env-validation');
 
-const express     = require('express');
-const session     = require('express-session');
-const helmet      = require('helmet');
-const rateLimit   = require('express-rate-limit');
-const path        = require('path');
+const express = require('express');
+const session = require('express-session');
+const path    = require('path');
+const {
+  apiLimiter,
+  authLoginLimiter,
+  authRegisterLimiter,
+  newsletterLimiter,
+  uploadLimiter,
+} = require('./lib/rate-limit');
+const {
+  requireAdminPage,
+  requirePageSession,
+  sameOriginGuard,
+  securityHeaders,
+} = require('./lib/request-security');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+const IS_PROD = process.env.NODE_ENV === 'production';
+
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+app.use(securityHeaders);
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self), payment=(self)');
+  res.setHeader('X-DNS-Prefetch-Control', 'on');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  if (IS_PROD) {
+    res.setHeader('Strict-Transport-Security', 'max-age=15552000; includeSubDomains');
+  }
+  next();
+});
 
 // Cloud Run terminates TLS at the load balancer — trust X-Forwarded-* headers
 app.set('trust proxy', 1);
@@ -30,8 +55,8 @@ app.use(helmet({
 }));
 
 // Body parsing
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
 // Rate limiting
 const authLimiter = rateLimit({
@@ -65,16 +90,21 @@ const apiLimiter = rateLimit({
 
 // Session middleware (MemoryStore — fine for dev/prototype)
 app.use(session({
+  name: 'elig.sid',
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  rolling: true,
+  unset: 'destroy',
+  proxy: IS_PROD,
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure: IS_PROD,
+    maxAge: 24 * 60 * 60 * 1000,
   },
 }));
+app.use('/api', sameOriginGuard);
 
 // Bilingual grant detail routes — must come BEFORE express.static so that
 // /grant.html (legacy) hits our redirect handler instead of being served as
@@ -85,6 +115,65 @@ function tryGetSupabase() {
   try { return require('./db/supabase').getSupabase(); } catch { return null; }
 }
 const GRANT_SELECT_FULL = '*';
+
+app.get('/app-config.js', (req, res) => {
+  res.type('application/javascript').send(
+    [
+      '(function () {',
+      '  window.__APP_CONFIG__ = {',
+      `    gaMeasurementId: ${JSON.stringify(process.env.GA_MEASUREMENT_ID || '')},`,
+      `    environment: ${JSON.stringify(process.env.NODE_ENV || 'development')},`,
+      `    siteUrl: ${JSON.stringify(process.env.SITE_URL || 'https://eligibil.org')}`,
+      '  };',
+      '})();',
+    ].join('\n')
+  );
+});
+
+app.get('/api/health', async (req, res) => {
+  const startedAt = Date.now();
+  const supabase = tryGetSupabase();
+  let supabaseOk = false;
+  let supabaseError = null;
+  const analyticsConfigured = !!String(process.env.GA_MEASUREMENT_ID || '').trim();
+  const sentryConfigured = !!String(process.env.SENTRY_DSN || '').trim();
+
+  if (supabase) {
+    try {
+      const { error } = await supabase.from('grants').select('id').limit(1);
+      if (error) throw error;
+      supabaseOk = true;
+    } catch (err) {
+      supabaseError = err.message;
+    }
+  } else {
+    supabaseError = 'Supabase not configured';
+  }
+
+  const payload = {
+    status: supabaseOk ? 'ok' : 'degraded',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    response_time_ms: Date.now() - startedAt,
+    services: {
+      supabase: {
+        ok: supabaseOk,
+      },
+      analytics: {
+        ok: analyticsConfigured,
+      },
+      sentry: {
+        ok: sentryConfigured,
+      },
+    },
+  };
+
+  if (!supabaseOk && supabaseError) {
+    payload.services.supabase.error = supabaseError;
+  }
+
+  res.status(supabaseOk ? 200 : 503).json(payload);
+});
 
 async function serveGrantPage(req, res, lang, slugColumn) {
   const sb = tryGetSupabase();
@@ -98,6 +187,20 @@ async function serveGrantPage(req, res, lang, slugColumn) {
       .maybeSingle();
     if (error) throw error;
     if (!data) return res.status(404).sendFile(path.join(__dirname, '404.html'));
+
+    // Funder Intelligence — fetch up to 4 other grants from same funder
+    let related = [];
+    if (data.funder_name) {
+      const { data: rel } = await sb
+        .from('grants')
+        .select('id, slug_ro, slug_en, nume_program, nume_program_en, short_summary_ro, short_summary_en, suma_max, deadline, status')
+        .eq('funder_name', data.funder_name)
+        .neq('id', data.id)
+        .eq('status', 'Activ')
+        .limit(4);
+      related = rel || [];
+    }
+    data.related_grants = related;
 
     const html = renderGrantPage(data, lang);
     res.type('html').send(html);
@@ -202,11 +305,14 @@ app.get(/^\/(ro|en)\/(granturi|grants)-(.+)$/, async (req, res, next) => {
 // /search — public catalog page. Static file served via the catch-all that
 // follows; we just need an explicit route ahead of the index.html fallback.
 app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'search.html')));
-app.get('/upload-artefact', (req, res) => res.sendFile(path.join(__dirname, 'upload-artefact.html')));
+app.get('/resurse', (req, res) => res.sendFile(path.join(__dirname, 'resources.html')));
+app.get('/en/resources', (req, res) => res.sendFile(path.join(__dirname, 'resources-en.html')));
 app.get('/parteneri',  (req, res) => res.sendFile(path.join(__dirname, 'parteneri.html')));
 app.get('/parteneri/:slug', (req, res) => res.sendFile(path.join(__dirname, 'partener.html')));
 app.get('/startupuri', (req, res) => res.sendFile(path.join(__dirname, 'startupuri.html')));
 app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'about.html')));
+app.get('/evenimente/:slug', (req, res) => res.sendFile(path.join(__dirname, 'eveniment.html')));
+app.get('/events/:slug',     (req, res) => res.sendFile(path.join(__dirname, 'eveniment.html')));
 app.get('/produs/:slug', (req, res) => res.sendFile(path.join(__dirname, 'produs.html')));
 app.get('/glosar', (req, res) => res.sendFile(path.join(__dirname, 'glosar.html')));
 app.get('/produse', (req, res) => res.sendFile(path.join(__dirname, 'produse.html')));
@@ -222,7 +328,25 @@ app.get('/events',     (req, res) => res.sendFile(path.join(__dirname, 'events.h
 // /admin — protected admin panel (CRUD over grants + events). The page
 // loads auth.js which redirects anonymous visitors to /login.html, and
 // every API call enforces requireAdmin server-side.
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
+app.get('/legal/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
+app.get('/legal/cookie', (req, res) => res.sendFile(path.join(__dirname, 'cookies.html')));
+
+app.get(['/dashboard', '/dashboard.html'], requirePageSession, (req, res) =>
+  res.sendFile(path.join(__dirname, 'dashboard.html'))
+);
+app.get(['/profile', '/profile.html'], requirePageSession, (req, res) =>
+  res.sendFile(path.join(__dirname, 'profile.html'))
+);
+app.get(['/consortium', '/consortium.html'], requirePageSession, (req, res) =>
+  res.sendFile(path.join(__dirname, 'consortium.html'))
+);
+app.get(['/upload-artefact', '/upload-artefact.html'], requirePageSession, (req, res) =>
+  res.sendFile(path.join(__dirname, 'upload-artefact.html'))
+);
+app.get(['/admin', '/admin.html', '/admin-queue.html'], requireAdminPage, (req, res) => {
+  const fileName = req.path.endsWith('admin-queue.html') ? 'admin-queue.html' : 'admin.html';
+  res.sendFile(path.join(__dirname, fileName));
+});
 
 // /stiri (RO) + /news (EN) listing + detail. /blog detail+listing same lang
 // in both URLs (brand convention). All public; auth.js whitelists below.
@@ -322,17 +446,32 @@ app.get('/grant.html', async (req, res, next) => {
 // Static files served from project root
 app.use(express.static(__dirname));
 
-// API routes (with rate limiting)
-app.use('/api/auth/login',    authLimiter);
-app.use('/api/auth/register', authLimiter);
+// API routes
+app.use('/api/auth/login', authLoginLimiter);
+app.use('/api/auth/register', authRegisterLimiter);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
-app.use('/api/artefacts', require('./routes/artefacts'));
+app.use('/api/artefacts', uploadLimiter, require('./routes/artefacts'));
+app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/newsletter', newsletterLimiter, require('./routes/newsletter'));
-app.use('/api/waitlist', waitlistLimiter, require('./routes/waitlist'));
+app.use('/api/waitlist', require('./routes/waitlist'));
 app.use('/api/unsubscribe', require('./routes/unsubscribe'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api', apiLimiter, require('./routes/api'));
+
+if (!IS_PROD || process.env.ENABLE_SENTRY_DEBUG_ROUTE === 'true') {
+  app.get('/debug-sentry', (req, res) => {
+    Sentry.logger.info('User triggered test error', {
+      action: 'test_error_endpoint',
+      path: req.path,
+    });
+    Sentry.metrics.count('debug_sentry_requests', 1);
+    Sentry.startSpan({ name: 'debug-sentry-route' }, () => {
+      throw new Error('My first Sentry error!');
+    });
+    res.status(204).end();
+  });
+}
 
 // API 404 — unknown API endpoints
 app.all('/api/*', (req, res) => {
@@ -353,10 +492,31 @@ app.use((err, req, res, next) => {
   res.status(500).sendFile(path.join(__dirname, '404.html'));
 });
 
+Sentry.setupExpressErrorHandler(app);
+
+app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+  console.error('Unhandled application error:', err.message);
+  reportError(err, {
+    tags: { area: 'server', route: 'unhandled_error' },
+    extra: { path: req.path, method: req.method },
+  });
+  res.status(500).json({
+    error: 'Internal server error',
+    sentry_id: res.sentry || null,
+  });
+});
+
 // Initialise DB and start server
 require('./db/users-supabase').init();
 
 // Bind to 0.0.0.0 for Cloud Run / Docker (default localhost-only would not accept external requests)
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
+  if (sentryEnabled) {
+    Sentry.logger.info('Sentry initialized for eligibil.org', {
+      environment: process.env.NODE_ENV || 'development',
+      port: PORT,
+    });
+  }
 });

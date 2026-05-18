@@ -124,6 +124,118 @@ npm run dev      # development (auto-reload)
 
 Open `http://localhost:3000`
 
+## Runtime Configuration
+
+Environment variables used by the current app layer:
+
+```env
+SESSION_SECRET=replace-with-a-long-random-secret
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_KEY=your-supabase-service-role-key
+GA_MEASUREMENT_ID=
+SITE_URL=https://eligibil.org
+```
+
+Notes:
+
+- `GA_MEASUREMENT_ID` is optional and only used after cookie analytics consent.
+- `SITE_URL` is used for SEO routes such as `sitemap.xml` and `llms.txt`.
+
+## Health & SEO Endpoints
+
+The app now exposes:
+
+| Endpoint | Purpose |
+|---|---|
+| `/api/health` | Health check for uptime monitoring |
+| `/sitemap.xml` | Search engine sitemap |
+| `/robots.txt` | Crawl rules |
+| `/llms.txt` | AI/search discovery guidance |
+
+`/api/health` returns:
+
+- `status`
+- `timestamp`
+- `environment`
+- `response_time_ms`
+- Supabase connectivity status
+
+## Cookie Consent & Analytics
+
+Frontend consent and analytics primitives are included:
+
+- `cookie-consent.js`
+- `analytics.js`
+- `analytics-events.md`
+- `/app-config.js`
+
+Behavior:
+
+- analytics are disabled until the user grants consent
+- analytics payloads intentionally exclude personal data
+- consent preferences are persisted client-side
+
+## Sentry Monitoring
+
+The Express runtime is prepared for Sentry with early bootstrap in:
+
+- `instrument.js`
+
+Configuration is read from environment variables:
+
+- `SENTRY_DSN`
+- `SENTRY_ENABLE_LOGS`
+- `SENTRY_TRACES_SAMPLE_RATE`
+- `SENTRY_PROFILE_SESSION_SAMPLE_RATE`
+- `SENTRY_PROFILE_LIFECYCLE`
+- `SENTRY_SEND_DEFAULT_PII`
+- `ENABLE_SENTRY_DEBUG_ROUTE`
+
+Behavior:
+
+- Sentry initializes as early as possible
+- Express errors are forwarded through the Sentry error handler
+- sensitive request fields are redacted before sending
+- `/debug-sentry` is enabled only outside production unless explicitly turned on
+
+## Feedback Widget
+
+A native feedback widget is now available on public pages.
+
+It submits to:
+
+- `POST /api/feedback`
+
+Expected Supabase schema:
+
+- run `scripts/supabase-feedback-schema.sql`
+
+Stored fields:
+
+- `rating`
+- `funding_type_interest`
+- `message`
+- `page`
+- `user_agent`
+- `language`
+- `created_at`
+
+Admin review is also available via:
+
+- `GET /api/admin/feedback`
+- `GET /api/admin/feedback/:id`
+- `PUT /api/admin/feedback/:id`
+- `DELETE /api/admin/feedback/:id`
+- `/admin` → tab `Feedback`
+
+## Additional Supabase Schemas
+
+Beyond the base grants schema, the repo now includes additional SQL files for operational features. Apply only the ones you need:
+
+- `scripts/supabase-resources-schema.sql`
+- `scripts/supabase-resources-descriptions-schema.sql`
+- `scripts/supabase-feedback-schema.sql`
+
 ---
 
 ## API Endpoints

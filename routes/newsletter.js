@@ -3,15 +3,20 @@
 const express = require('express');
 const crypto = require('crypto');
 const { getSupabase } = require('../db/supabase');
-const { validate, newsletterSchema } = require('../lib/schemas');
+const { reportError } = require('../instrument');
+const { newsletterSchema, parseBody } = require('../lib/validation');
 const { sendEmail, unsubscribeUrl } = require('../lib/email/resend');
 const { newsletterConfirm, T } = require('../lib/email/templates');
 
 const router = express.Router();
 
-router.post('/subscribe', validate(newsletterSchema), async (req, res) => {
-  const { email, context } = req.body;
+router.post('/subscribe', async (req, res) => {
+  const parsed = parseBody(newsletterSchema, req.body || {});
+  if (!parsed.ok) {
+    return res.status(400).json({ error: 'Adresă de email invalidă', fields: parsed.error.fieldErrors });
+  }
 
+  const { email, context } = parsed.data;
   const sb = getSupabase();
   if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });
 
@@ -54,7 +59,11 @@ router.post('/subscribe', validate(newsletterSchema), async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error('POST /api/newsletter/subscribe error:', err.message);
-    res.status(500).json({ error: err.message });
+    reportError(err, {
+      tags: { area: 'newsletter', action: 'subscribe' },
+      extra: { context },
+    });
+    res.status(500).json({ error: 'Eroare internă de server' });
   }
 });
 

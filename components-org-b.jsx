@@ -28,8 +28,14 @@ function ProgramsOrg() {
       <div className="container">
         <div className="section__label">07 — Programe deschise</div>
         <div className="section__head">
+          <div style={{ marginTop: 16 }}>
+            <a className="btn btn--accent btn--sm" href="/resurse">Deschide catalogul de resurse →</a>
+          </div>
           <h2 className="section__title">Programe deschise pentru aplicare.</h2>
           <p className="section__sub">Cele mai recente programe verificate în baza eligibil.org. Actualizate periodic și disponibile cu analiză AI de pregătire.</p>
+          <div style={{ marginTop: 16 }}>
+            <a className="btn btn--accent btn--sm" href="/resurse">Deschide catalogul de resurse →</a>
+          </div>
         </div>
 
         <div className="tabs">

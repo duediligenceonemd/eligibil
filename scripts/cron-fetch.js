@@ -20,8 +20,8 @@
  *     /tr "node C:\Users\Zinaida\ELIGIBIL\scripts\cron-fetch.js" \
  *     /sc hourly /mo 6
  *
- * Or with cron (Linux/macOS):
- *   0 */6 * * * cd /path/to/eligibil && node scripts/cron-fetch.js >> logs/cron.log 2>&1
+ * Or with cron (Linux/macOS), every 6 hours:
+ *   0 at every sixth hour: cd /path/to/eligibil && node scripts/cron-fetch.js >> logs/cron.log 2>&1
  */
 
 require('dotenv').config();

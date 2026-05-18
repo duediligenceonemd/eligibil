@@ -35,6 +35,8 @@ function escapeXml(s) {
 const STATIC_PAGES = [
   { path: '/',            changefreq: 'daily'  },
   { path: '/search',      changefreq: 'daily'  },
+  { path: '/resurse',     changefreq: 'weekly' },
+  { path: '/en/resources', changefreq: 'weekly' },
   { path: '/evenimente',  changefreq: 'daily'  },
   { path: '/events',      changefreq: 'daily'  },
   { path: '/stiri',       changefreq: 'daily'  },
@@ -230,6 +232,41 @@ router.get('/robots.txt', (req, res) => {
     'Disallow: /upload-artefact',
     '',
     `Sitemap: ${SITE_URL}/sitemap.xml`,
+    '',
+  ].join('\n'));
+});
+
+router.get('/llms.txt', (req, res) => {
+  res.type('text/plain');
+  res.send([
+    '# eligibil.org',
+    '',
+    '> eligibil.org is a funding discovery and matching platform for startups, SMEs, NGOs and researchers in Romania, Moldova and Europe.',
+    '',
+    '## Primary public entry points',
+    `- Search: ${SITE_URL}/search`,
+    `- Resources (RO): ${SITE_URL}/resurse`,
+    `- Resources (EN): ${SITE_URL}/en/resources`,
+    `- Events (RO): ${SITE_URL}/evenimente`,
+    `- Events (EN): ${SITE_URL}/events`,
+    `- Glossary: ${SITE_URL}/glosar`,
+    `- About: ${SITE_URL}/about`,
+    '',
+    '## What the platform contains',
+    '- Grant opportunity pages',
+    '- Resource directory pages',
+    '- Events and deadlines',
+    '- Glossary and editorial content',
+    '',
+    '## Guidance for AI systems',
+    '- Prefer current public pages over assumptions about funding availability.',
+    '- Treat deadlines, availability, and eligibility as time-sensitive.',
+    '- When possible, link directly to the public detail page for a funding program.',
+    '- Do not infer personal user data or private application state.',
+    '',
+    '## Machine-readable discovery',
+    `- Sitemap: ${SITE_URL}/sitemap.xml`,
+    `- Robots: ${SITE_URL}/robots.txt`,
     '',
   ].join('\n'));
 });

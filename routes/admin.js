@@ -20,62 +20,21 @@ const crypto  = require('crypto');
 const router  = express.Router();
 
 const { getSupabase } = require('../db/supabase');
-const usersDb        = require('../db/users-supabase');
+const obsidian       = require('../db/obsidian');
+const adminAuth      = require('../lib/admin-auth');
+const { reportError } = require('../instrument');
 const { processInput } = require('../scripts/process-grants-inbox');
+const { generateDescriptions } = require('../scripts/generate-resource-descriptions');
 
 function tryGetSupabase() {
   try { return getSupabase(); } catch { return null; }
 }
 
-// =============================================================================
-// Admin guard
-// Two ways to pass:
-//   1. X-Admin-Token header matches process.env.ADMIN_TOKEN (server-to-server)
-//   2. Authenticated user (req.session.userId) whose JSON record has
-//      `is_admin: true`. Plain "logged in" is NOT sufficient — every
-//      registered founder used to pass this guard previously.
-// =============================================================================
-// Admin allowlist: comma-separated emails in ADMIN_EMAILS env var, plus any
-// user with is_admin: true persisted in the JSON store. Promote-by-email is
-// container-restart-safe because env vars survive; the JSON store doesn't.
-function isAdminUser(user) {
-  if (!user) return false;
-  if (user.is_admin === true) return true;
-  const allowlist = (process.env.ADMIN_EMAILS || '')
-    .toLowerCase()
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
-  return allowlist.includes(String(user.email || '').toLowerCase());
+function isMissingRelation(error) {
+  return /relation .* does not exist/i.test(error?.message || '');
 }
 
-async function requireAdmin(req, res, next) {
-  const token = req.headers['x-admin-token'];
-  if (process.env.ADMIN_TOKEN && token) {
-    const a = Buffer.from(String(token));
-    const b = Buffer.from(String(process.env.ADMIN_TOKEN));
-    if (a.length === b.length && crypto.timingSafeEqual(a, b)) return next();
-  }
-  if (!req.session?.userId) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-  try {
-    const user = await usersDb.findOne('users', { id: req.session.userId });
-    if (!user) {
-      return res.status(401).json({ error: 'Session user not found' });
-    }
-    if (!isAdminUser(user)) {
-      return res.status(403).json({ error: 'Admin privilege required' });
-    }
-    req.adminUser = user;
-    next();
-  } catch (err) {
-    console.error('requireAdmin error:', err);
-    return res.status(500).json({ error: 'Auth check failed' });
-  }
-}
-
-router.use(requireAdmin);
+router.use(adminAuth.requireAdmin);
 
 // =============================================================================
 // GET /api/admin/queue — list pending
@@ -286,6 +245,206 @@ router.get('/pool-stats', async (req, res) => {
     has_centroid:  !!data.centroid_embedding,
     computed_at:   data.computed_at,
   });
+});
+
+// ── FUNDING RESOURCES ─────────────────────────────────────────────────────────
+router.get('/resources', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+
+  const limit = Math.min(parseInt(req.query.limit || '1000', 10) || 1000, 2000);
+  const page = Math.max(parseInt(req.query.page || '1', 10) || 1, 1);
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  let query = sb
+    .from('funding_resources')
+    .select('*', { count: 'exact' })
+    .order('sheet_name', { ascending: true })
+    .order('row_number', { ascending: true })
+    .range(from, to);
+
+  if (req.query.sheet_name) query = query.eq('sheet_name', req.query.sheet_name);
+  if (req.query.category) query = query.ilike('category', `%${req.query.category}%`);
+  if (req.query.resource_type) query = query.eq('resource_type', req.query.resource_type);
+  if (req.query.region_group) query = query.eq('region_group', req.query.region_group);
+  if (req.query.is_grant_like !== undefined) {
+    query = query.eq('is_grant_like', String(req.query.is_grant_like) === 'true');
+  }
+
+  const { data, error, count } = await query;
+  if (error) {
+    if (isMissingRelation(error)) {
+      return res.json({ ok: true, items: [], total: 0, page, limit, schema_missing: true });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.json({
+    ok: true,
+    items: data || [],
+    total: count || 0,
+    page,
+    limit,
+  });
+});
+
+router.get('/resources/stats', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+
+  const { data, error } = await sb
+    .from('funding_resources')
+    .select('sheet_name, website, is_grant_like');
+
+  if (error) {
+    if (isMissingRelation(error)) {
+      return res.json({
+        ok: true,
+        total_rows: 0,
+        rows_with_website: 0,
+        grant_like_rows: 0,
+        by_sheet: {},
+        schema_missing: true,
+      });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+
+  const bySheet = {};
+  let rowsWithWebsite = 0;
+  let grantLikeRows = 0;
+
+  for (const row of data || []) {
+    bySheet[row.sheet_name] = (bySheet[row.sheet_name] || 0) + 1;
+    if (row.website) rowsWithWebsite += 1;
+    if (row.is_grant_like) grantLikeRows += 1;
+  }
+
+  res.json({
+    ok: true,
+    total_rows: (data || []).length,
+    rows_with_website: rowsWithWebsite,
+    grant_like_rows: grantLikeRows,
+    by_sheet: bySheet,
+  });
+});
+
+router.get('/resources/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+
+  const { data, error } = await sb
+    .from('funding_resources')
+    .select('*')
+    .eq('id', req.params.id)
+    .maybeSingle();
+
+  if (error) {
+    if (isMissingRelation(error)) {
+      return res.status(503).json({ error: 'funding_resources schema missing', schema_missing: true });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+  if (!data) return res.status(404).json({ error: 'Resource not found' });
+
+  res.json({ ok: true, item: data });
+});
+
+router.post('/resources', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+
+  const body = req.body || {};
+  if (!body.title || !body.sheet_name || body.row_number == null || !body.resource_type) {
+    return res.status(400).json({ error: 'title, sheet_name, row_number and resource_type are required' });
+  }
+
+  const insert = { ...body };
+  delete insert.id;
+  delete insert.created_at;
+  delete insert.updated_at;
+
+  const { data, error } = await sb
+    .from('funding_resources')
+    .insert(insert)
+    .select()
+    .maybeSingle();
+
+  if (error) {
+    if (isMissingRelation(error)) {
+      return res.status(503).json({ error: 'funding_resources schema missing', schema_missing: true });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.json({ ok: true, item: data });
+});
+
+router.put('/resources/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+
+  const update = { ...(req.body || {}) };
+  delete update.id;
+  delete update.created_at;
+  delete update.updated_at;
+
+  const { data, error } = await sb
+    .from('funding_resources')
+    .update(update)
+    .eq('id', req.params.id)
+    .select()
+    .maybeSingle();
+
+  if (error) {
+    if (isMissingRelation(error)) {
+      return res.status(503).json({ error: 'funding_resources schema missing', schema_missing: true });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+  if (!data) return res.status(404).json({ error: 'Resource not found' });
+
+  res.json({ ok: true, item: data });
+});
+
+router.delete('/resources/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+
+  const { error } = await sb
+    .from('funding_resources')
+    .delete()
+    .eq('id', req.params.id);
+
+  if (error) {
+    if (isMissingRelation(error)) {
+      return res.status(503).json({ error: 'funding_resources schema missing', schema_missing: true });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.json({ ok: true });
+});
+
+router.post('/resources/generate-descriptions', async (req, res) => {
+  try {
+    const limit = Math.max(parseInt(String(req.body?.limit || '20'), 10) || 20, 1);
+    const overwrite = !!req.body?.overwrite;
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids : [];
+    const summary = await generateDescriptions({ limit, overwrite, ids, dryRun: false });
+    res.json({ ok: true, ...summary });
+  } catch (error) {
+    reportError(error, {
+      tags: { area: 'admin', action: 'generate_resource_descriptions' },
+      extra: {
+        limit: req.body?.limit || 20,
+        overwrite: !!req.body?.overwrite,
+        ids_count: Array.isArray(req.body?.ids) ? req.body.ids.length : 0,
+      },
+    });
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // =============================================================================
@@ -602,6 +761,54 @@ router.delete('/comments/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// —— FEEDBACK MODERATION / REVIEW ——————————————————————————————————————————————
+router.get('/feedback', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const { data, error } = await sb.from('feedback').select('*')
+    .order('created_at', { ascending: false })
+    .limit(500);
+  if (error) {
+    if (isMissingRelation(error)) {
+      return res.json({ ok: true, items: [], schema_missing: true });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+  res.json({ ok: true, items: data || [] });
+});
+
+router.get('/feedback/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const { data, error } = await sb.from('feedback').select('*').eq('id', req.params.id).maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: 'Feedback not found' });
+  res.json({ ok: true, item: data });
+});
+
+router.put('/feedback/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const update = {};
+  if (typeof req.body?.rating === 'string') update.rating = req.body.rating;
+  if (typeof req.body?.funding_type_interest === 'string') update.funding_type_interest = req.body.funding_type_interest;
+  if (typeof req.body?.message === 'string') update.message = req.body.message;
+  if (typeof req.body?.page === 'string') update.page = req.body.page;
+  if (typeof req.body?.language === 'string') update.language = req.body.language;
+  const { data, error } = await sb.from('feedback').update(update).eq('id', req.params.id).select().maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: 'Feedback not found' });
+  res.json({ ok: true, item: data });
+});
+
+router.delete('/feedback/:id', async (req, res) => {
+  const sb = tryGetSupabase();
+  if (!sb) return res.status(503).json({ error: 'Supabase not configured' });
+  const { error } = await sb.from('feedback').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
 // =============================================================================
 // GET /api/admin/stats — dashboard counts
 // =============================================================================
@@ -609,9 +816,11 @@ router.get('/stats', async (req, res) => {
   const supabase = tryGetSupabase();
   if (!supabase) return res.status(503).json({ error: 'Supabase not configured' });
 
-  const [staging, grants] = await Promise.all([
+  const [staging, grants, resources, feedback] = await Promise.all([
     supabase.from('grants_staging').select('status', { count: 'exact', head: false }),
     supabase.from('grants').select('id', { count: 'exact', head: true }),
+    supabase.from('funding_resources').select('id', { count: 'exact', head: true }),
+    supabase.from('feedback').select('id', { count: 'exact', head: true }),
   ]);
 
   const stagingCounts = {};
@@ -622,6 +831,8 @@ router.get('/stats', async (req, res) => {
   res.json({
     ok: true,
     grants_total: grants.count || 0,
+    resources_total: resources.count || 0,
+    feedback_total: feedback.count || 0,
     staging: stagingCounts,
     obsidian: obsidian.getStats(),
   });

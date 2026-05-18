@@ -15,15 +15,32 @@ function LoginApp() {
       .catch(() => {});
   }, []);
 
+  function safeNextPath(raw) {
+    const value = String(raw || '');
+    if (!value.startsWith('/')) return '/dashboard.html';
+    if (value.startsWith('//')) return '/dashboard.html';
+    return value;
+  }
+
   const next = (() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('next') || '/dashboard.html';
+    return safeNextPath(params.get('next') || '/dashboard.html');
   })();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setError('Introdu un email valid.');
+      setLoading(false);
+      return;
+    }
+    if (password.length < 8) {
+      setError('Parola trebuie să aibă minimum 8 caractere.');
+      setLoading(false);
+      return;
+    }
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',

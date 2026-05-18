@@ -1,6 +1,12 @@
 // eligibil.org — Part A: Nav, Hero, Filters, Deadlines, Positioning, Products
 const { useState: useStateOrgA, useEffect: useEffectOrgA, useRef: useRefOrgA } = React;
 
+function trackAnalyticsOrg(eventName, payload) {
+  if (window.eligibilAnalytics && typeof window.eligibilAnalytics.track === 'function') {
+    window.eligibilAnalytics.track(eventName, payload);
+  }
+}
+
 /* ============================================================
    Nav with .org menu (Catalog · Produse · Resurse · About)
    ============================================================ */
@@ -12,7 +18,9 @@ function NavOrg({ lang, setLang }) {
   const scheduleClose = () => { closeTimer.current = setTimeout(() => setOpen(null), 150); };
 
   const products = window.ORG_PRODUCTS;
+  const resourcesCatalogHref = lang === 'EN' ? '/en/resources' : '/resurse';
   const resources = [
+    ['Catalog resurse', 'Directoare, suport tehnic, capital și oportunități utile pentru startupuri.', resourcesCatalogHref],
     ['Glosar', 'Termeni de finanțare explicați simplu — TRL, MVP, EIC, SBIR.', '/glosar'],
     ['Blog', 'Ghiduri, analize și explicații despre finanțări.', '/blog'],
     ['Știri', 'Programe noi, deadline-uri, politici și oportunități.', '/stiri'],
@@ -113,7 +121,16 @@ function NavOrg({ lang, setLang }) {
           <div className="nav__right">
             <div className="langmini">
               {['RO','EN','RU','UA'].map(l => (
-                <button key={l} className={lang === l ? 'is-active' : ''} onClick={() => setLang(l)}>{l}</button>
+                <button
+                  key={l}
+                  className={lang === l ? 'is-active' : ''}
+                  onClick={() => {
+                    trackAnalyticsOrg('language_changed', { from_lang: String(lang || '').toLowerCase(), to_lang: l.toLowerCase() });
+                    setLang(l);
+                  }}
+                >
+                  {l}
+                </button>
               ))}
             </div>
             <a className="btn btn--ghost btn--sm" href="/login.html">Intră în cont</a>
@@ -130,8 +147,9 @@ function NavOrg({ lang, setLang }) {
 /* ============================================================
    Hero (section 2) + trust strip
    ============================================================ */
-function HeroOrg() {
+function HeroOrg({ lang }) {
   const [activeChip, setActiveChip] = useStateOrgA(null);
+  const resourcesHref = lang === 'EN' ? '/en/resources' : '/resurse';
   const popular = [
     'Granturi AI Moldova',
     'SBIR Phase I',
@@ -193,6 +211,7 @@ function HeroOrg() {
               </div>
 
               <div className="org-hero__ctas" style={{ marginTop: 24 }}>
+                <a className="btn btn--accent btn--sm" href={resourcesHref}>Explorează resursele →</a>
                 <a className="btn btn--ghost btn--sm" href="#analiza">Analizează startupul meu ↓</a>
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.08em', alignSelf: 'center' }}>
                   Sau încarcă deck-ul direct mai jos

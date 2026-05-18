@@ -23,6 +23,12 @@ const DEFAULT_FILTERS = {
   sort: 'difficulty',
 };
 
+function trackAnalytics(eventName, payload) {
+  if (window.eligibilAnalytics && typeof window.eligibilAnalytics.track === 'function') {
+    window.eligibilAnalytics.track(eventName, payload);
+  }
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function formatAmount(min, max) {
   const fmt = (n) => n >= 1_000_000 ? `€${(n / 1_000_000).toFixed(1).replace('.0', '')}M`
@@ -99,13 +105,17 @@ function writeUrlFilters(filters) {
 
 // ── Components ────────────────────────────────────────────────────────────────
 function Topbar() {
+  const lang = (typeof window !== 'undefined' && window.__LANG__) || 'ro';
+  const resourcesHref = lang === 'en' ? '/en/resources' : '/resurse';
+  const eventsHref = lang === 'en' ? '/events' : '/evenimente';
   return (
     <header className="sb__top">
       <a className="sb__brand" href="/">eligibil<span>.org</span></a>
       <nav className="sb__nav">
         <a href="/">Acasă</a>
         <a href="/search">Caută</a>
-        <a href="/evenimente">Evenimente</a>
+        <a href={resourcesHref}>{lang === 'en' ? 'Resources' : 'Resurse'}</a>
+        <a href={eventsHref}>{lang === 'en' ? 'Events' : 'Evenimente'}</a>
         <a className="sb__cta" href="/register.html">Începe gratuit →</a>
       </nav>
     </header>
@@ -197,7 +207,12 @@ function ResultCard({ g }) {
   const ev      = evidenceLabel(g.evidence_status);
 
   return (
-    <a className="sb__card" href={detailUrl(g)}>
+    <a className="sb__card" href={detailUrl(g)} onClick={() => trackAnalytics('funding_viewed', {
+      funding_id: g.id,
+      funding_type: g.tip || '',
+      country: g.tara || '',
+      has_deadline: !!g.deadline,
+    })}>
       <div className="sb__card-row1">
         <div className="sb__card-name">{name}</div>
         <div className="sb__card-amount">{formatAmount(g.suma_min, g.suma_max)}</div>
@@ -223,6 +238,7 @@ function SearchApp() {
   const [results, setResults] = useState(null);   // null = initial loading
   const [error, setError]     = useState(null);
   const debounceRef = useRef(null);
+  const firstRunRef = useRef(true);
 
   const set = (patch) => setFilters((f) => ({ ...f, ...patch }));
   const reset = () => setFilters({ ...DEFAULT_FILTERS });
@@ -244,6 +260,17 @@ function SearchApp() {
         if (!r.ok) throw new Error(`API ${r.status}`);
         const data = await r.json();
         setResults(Array.isArray(data) ? data : []);
+        if (!firstRunRef.current) {
+          trackAnalytics(filters.q ? 'search_performed' : 'filter_used', {
+            query_length: (filters.q || '').trim().length,
+            has_sector: !!filters.sector,
+            has_country: !!filters.tara,
+            has_stage: !!filters.stadiu,
+            has_type: !!filters.tip,
+            result_count: Array.isArray(data) ? data.length : 0,
+            result_context: 'grants',
+          });
+        }
       } catch (err) {
         setError(err.message || 'Eroare necunoscută');
         setResults([]);
@@ -251,6 +278,10 @@ function SearchApp() {
     }, 300);
     return () => clearTimeout(debounceRef.current);
   }, [filters]);
+
+  useEffect(() => {
+    firstRunRef.current = false;
+  }, []);
 
   const count = results == null ? null : results.length;
 

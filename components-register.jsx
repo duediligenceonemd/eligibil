@@ -1,5 +1,10 @@
 // Registration / Onboarding — app.eligibil.org/register
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
+
+function trackRegisterAnalytics(eventName, payload) {
+  if (!window.eligibilAnalytics || typeof window.eligibilAnalytics.track !== 'function') return;
+  window.eligibilAnalytics.track(eventName, payload || {});
+}
 
 const REG_SECTORS = [
   { id: 'ai', name: 'AI & ML', n: 142 },
@@ -648,6 +653,7 @@ function RegisterApp() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const signupStartedRef = useRef(false);
 
   useEffect(() => {
     try { localStorage.setItem('reg-state', JSON.stringify(state)); } catch (e) {}
@@ -671,11 +677,36 @@ function RegisterApp() {
 
   const set = (k, v) => setState(s => ({ ...s, [k]: v }));
 
-  const next = () => setStep(s => Math.min(s + 1, STEPS.length - 1));
+  const next = () => {
+    if (!signupStartedRef.current) {
+      signupStartedRef.current = true;
+      trackRegisterAnalytics('signup_started', {
+        entry_step: step + 1,
+        result_context: 'register_onboarding',
+      });
+    }
+    setStep(s => Math.min(s + 1, STEPS.length - 1));
+  };
   const prev = () => setStep(s => Math.max(s - 1, 0));
+
+  function validateBeforeSubmit() {
+    if (!/^\S+@\S+\.\S+$/.test(state.email || '')) return 'Introdu un email valid.';
+    if ((state.firstName || '').trim().length < 2) return 'Numele trebuie să aibă minimum 2 caractere.';
+    if ((state.lastName || '').trim().length < 2) return 'Prenumele trebuie să aibă minimum 2 caractere.';
+    if ((state.password || '').length < 10) return 'Parola trebuie să aibă minimum 10 caractere.';
+    if (!/[A-Z]/.test(state.password || '') || !/[a-z]/.test(state.password || '') || !/[0-9]/.test(state.password || '')) {
+      return 'Parola trebuie să conțină literă mare, literă mică și cifră.';
+    }
+    return '';
+  }
 
   async function handleFinish() {
     if (!state.consent || submitting) return;
+    const validationError = validateBeforeSubmit();
+    if (validationError) {
+      setSubmitError(validationError);
+      return;
+    }
     setSubmitting(true);
     setSubmitError('');
     try {
@@ -710,6 +741,14 @@ function RegisterApp() {
         setSubmitting(false);
         return;
       }
+      trackRegisterAnalytics('signup_completed', {
+        result_context: 'register_onboarding',
+        has_startup_name: !!state.startupName,
+        has_pitch: !!state.pitch,
+        has_goals: Array.isArray(state.goals) && state.goals.length > 0,
+        selected_sector: !!state.sector,
+        selected_country: !!state.country,
+      });
       // Clear saved draft
       try { localStorage.removeItem('reg-state'); localStorage.removeItem('reg-step'); } catch (e) {}
       window.location.href = '/dashboard.html';

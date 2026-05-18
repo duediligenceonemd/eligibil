@@ -33,14 +33,15 @@ Write-Host "Service: $Service"
 Write-Host ""
 
 # -----------------------------------------------------------------------------
-# Read .env and build --set-env-vars argument
+# Read .env and build a temporary YAML env-vars file
+# Avoid PowerShell escaping issues with --set-env-vars delimiters.
 # -----------------------------------------------------------------------------
 if (-not (Test-Path ".env")) {
     Write-Error ".env file not found. Copy .env.example to .env first."
     exit 1
 }
 
-$envVars = @()
+$envVars = @{}
 Get-Content ".env" | ForEach-Object {
     $line = $_.Trim()
     if ($line -and -not $line.StartsWith("#") -and $line.Contains("=")) {
@@ -51,14 +52,28 @@ Get-Content ".env" | ForEach-Object {
         $val = $val -replace '^["'']|["'']$', ''
         # Skip empty values
         if ($val) {
-            $envVars += "${key}=${val}"
+            if ($key -notin @('PORT', 'K_SERVICE', 'K_REVISION', 'K_CONFIGURATION')) {
+                $envVars[$key] = $val
+            }
         }
     }
 }
 
-# Build comma-separated list (escape commas in values)
-$envVarsArg = ($envVars -join "^|^") -replace ",", "\,"
-# Use ^|^ as delimiter to avoid issues with comma in values
+if ($envVars.ContainsKey('SUPABASE_SERVICE_KEY')) {
+    $key = [string]$envVars['SUPABASE_SERVICE_KEY']
+    if ($key.StartsWith('sb_publishable_') -or $key.StartsWith('sb_anon_')) {
+        Write-Error "SUPABASE_SERVICE_KEY din .env este o cheie publishable/anon, nu service role. Oprește deploy-ul și înlocuiește cheia."
+        exit 1
+    }
+}
+
+$tempEnvFile = Join-Path $env:TEMP "eligibil-cloudrun-env.yaml"
+$yamlLines = @()
+foreach ($key in $envVars.Keys) {
+    $escaped = $envVars[$key].Replace("'", "''")
+    $yamlLines += "${key}: '${escaped}'"
+}
+Set-Content -Path $tempEnvFile -Value ($yamlLines -join [Environment]::NewLine) -Encoding UTF8
 
 Write-Host "Loaded $($envVars.Count) environment variables from .env"
 Write-Host ""
@@ -82,7 +97,7 @@ gcloud run deploy $Service `
     --max-instances 10 `
     --concurrency 80 `
     --timeout 300 `
-    --set-env-vars "^|^$envVarsArg"
+    --env-vars-file $tempEnvFile
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Deploy failed"
@@ -103,3 +118,5 @@ Write-Host "Next:"
 Write-Host "  - Test: $url/api/grants"
 Write-Host "  - Map custom domain (eligibil.org) when DNS is ready:"
 Write-Host "      gcloud run domain-mappings create --service=$Service --domain=eligibil.org --region=$Region"
+
+Remove-Item -LiteralPath $tempEnvFile -ErrorAction SilentlyContinue

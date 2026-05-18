@@ -3,7 +3,15 @@
 const express         = require('express');
 const db              = require('../db/users-supabase');
 const { getSupabase } = require('../db/supabase');
-const { validate, commentSchema, reactionToggleSchema, profileUpdateSchema, pipelineSchema } = require('../lib/schemas');
+const { isAdminRequest } = require('../lib/admin-auth');
+const { reportError } = require('../instrument');
+const {
+  commentSchema,
+  parseBody,
+  pipelineSchema,
+  profileSchema,
+  reactionSchema,
+} = require('../lib/validation');
 
 const router = express.Router();
 
@@ -21,6 +29,17 @@ function requireAuth(req, res, next) {
 function tryGetSupabase() {
   try { return getSupabase(); } catch { return null; }
 }
+
+function isMissingRelation(error) {
+  return /relation .* does not exist|Could not find the table .* in the schema cache/i.test(error?.message || '');
+}
+
+const RESOURCE_TYPE_ALIASES = {
+  grant_program: 'grant_database',
+  capital_provider: 'capital_resource',
+  support_program: 'funding_resource',
+  technical_support: 'technical_resource',
+};
 
 // ── OpenAI embedding helper ───────────────────────────────────────────────────
 // Returns null if OPENAI_API_KEY not set (triggers FTS fallback).
@@ -174,7 +193,149 @@ router.get('/grants', async (req, res) => {
     res.json(data || []);
   } catch (err) {
     console.error('GET /api/grants error:', err.message);
+    reportError(err, {
+      tags: { area: 'api', route: 'grants_list' },
+      extra: { query: req.query },
+    });
     res.status(500).json({ error: 'Eroare la încărcarea granturilor' });
+  }
+});
+
+// =============================================================================
+// GET /api/resources — PUBLIC catalog for support resources / directories
+// Query params:
+//   ?q=              free text over title/category/description
+//   ?region_group=
+//   ?resource_type=
+//   ?category=
+//   ?is_grant_like=  true|false
+//   ?limit=          default 120, max 300
+// =============================================================================
+router.get('/resources', async (req, res) => {
+  const supabase = tryGetSupabase();
+  if (!supabase) return res.status(503).json({ error: 'Supabase neconfigurat. Adaugă credențialele în .env' });
+
+  try {
+    const { q, region_group, resource_type, category, is_grant_like } = req.query;
+    const limit = Math.min(Number(req.query.limit) || 120, 300);
+
+    let query = supabase
+      .from('funding_resources')
+      .select('id, title, amount_raw, category, description, website, region_group, resource_type, is_grant_like, sheet_name, row_number')
+      .order('sheet_name', { ascending: true })
+      .order('row_number', { ascending: true })
+      .limit(limit);
+
+    if (region_group) query = query.eq('region_group', region_group);
+    if (resource_type) {
+      const normalizedResourceType = RESOURCE_TYPE_ALIASES[resource_type] || resource_type;
+      query = query.eq('resource_type', normalizedResourceType);
+    }
+    if (category) query = query.ilike('category', `%${category}%`);
+    if (is_grant_like !== undefined && is_grant_like !== '') {
+      query = query.eq('is_grant_like', String(is_grant_like) === 'true');
+    }
+    if (q) {
+      const term = `%${q}%`;
+      query = query.or(`title.ilike.${term},category.ilike.${term},description.ilike.${term}`);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      if (isMissingRelation(error)) return res.json([]);
+      return res.status(500).json({ error: error.message });
+    }
+    res.json(data || []);
+  } catch (err) {
+    reportError(err, {
+      tags: { area: 'api', route: 'resources_list' },
+      extra: { query: req.query },
+    });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/resources/overview', async (req, res) => {
+  const supabase = tryGetSupabase();
+  if (!supabase) {
+    return res.status(503).json({
+      error: 'Supabase neconfigurat. Adaugă credențialele în .env',
+      total: 0,
+      rows_with_website: 0,
+      grant_like_rows: 0,
+      by_region: {},
+      by_type: {},
+    });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('funding_resources')
+      .select('region_group, resource_type, website, is_grant_like');
+
+    if (error) {
+      if (isMissingRelation(error)) {
+        return res.json({
+          total: 0,
+          rows_with_website: 0,
+          grant_like_rows: 0,
+          by_region: {},
+          by_type: {},
+        });
+      }
+      return res.status(500).json({ error: error.message });
+    }
+
+    const summary = {
+      total: 0,
+      rows_with_website: 0,
+      grant_like_rows: 0,
+      by_region: {},
+      by_type: {},
+    };
+
+    for (const row of data || []) {
+      summary.total += 1;
+      if (row.website) summary.rows_with_website += 1;
+      if (row.is_grant_like) summary.grant_like_rows += 1;
+      const region = row.region_group || 'Unknown';
+      const type = row.resource_type || 'unknown';
+      summary.by_region[region] = (summary.by_region[region] || 0) + 1;
+      summary.by_type[type] = (summary.by_type[type] || 0) + 1;
+    }
+
+    res.json(summary);
+  } catch (err) {
+    reportError(err, {
+      tags: { area: 'api', route: 'resources_overview' },
+    });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/resources/:id', async (req, res) => {
+  const supabase = tryGetSupabase();
+  if (!supabase) return res.status(503).json({ error: 'Supabase neconfigurat. Adaugă credențialele în .env' });
+
+  try {
+    const { data, error } = await supabase
+      .from('funding_resources')
+      .select('id, title, amount_raw, category, description, website, region_group, resource_type, is_grant_like, sheet_name, row_number')
+      .eq('id', req.params.id)
+      .maybeSingle();
+
+    if (error) {
+      if (isMissingRelation(error)) return res.status(404).json({ error: 'Resource not found' });
+      return res.status(500).json({ error: error.message });
+    }
+    if (!data) return res.status(404).json({ error: 'Resource not found' });
+    res.json(data);
+  } catch (err) {
+    reportError(err, {
+      tags: { area: 'api', route: 'resource_detail' },
+      extra: { id: req.params.id },
+    });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -200,6 +361,9 @@ router.get('/grants/stats', async (req, res) => {
     res.json({ total: total || 0, verified });
   } catch (err) {
     console.error('GET /api/grants/stats error:', err.message);
+    reportError(err, {
+      tags: { area: 'api', route: 'grants_stats' },
+    });
     res.json({ total: 0, verified: 0 });
   }
 });
@@ -276,6 +440,10 @@ router.get('/grants/match', requireAuth, async (req, res) => {
     res.json({ ok: true, results, source, total: results.length });
   } catch (err) {
     console.error('GET /api/grants/match error:', err.message);
+    reportError(err, {
+      tags: { area: 'api', route: 'grants_match' },
+      extra: { user_id: req.session?.userId || null },
+    });
     res.status(500).json({ error: 'Eroare la calculul matchingului' });
   }
 });
@@ -311,6 +479,10 @@ router.get('/grants/:id', async (req, res) => {
     res.json({ ...data, user_scores });
   } catch (err) {
     console.error('GET /api/grants/:id error:', err.message);
+    reportError(err, {
+      tags: { area: 'api', route: 'grant_detail' },
+      extra: { id: req.params.id },
+    });
     res.status(500).json({ error: 'Eroare internă' });
   }
 });
@@ -435,11 +607,22 @@ router.get('/events', async (req, res) => {
 // =============================================================================
 const VALID_CONTENT_TYPES = ['grant', 'blog_post', 'news_article'];
 function _validateTarget(req, res) {
-  const t = String(req.query.content_type || req.body?.content_type || '');
-  const id = String(req.query.content_id || req.body?.content_id || '');
-  if (!VALID_CONTENT_TYPES.includes(t)) { res.status(400).json({ error: 'invalid content_type' }); return null; }
-  if (!id) { res.status(400).json({ error: 'content_id required' }); return null; }
-  return { content_type: t, content_id: id };
+  const parsed = parseBody(
+    req.method === 'GET' ? reactionSchema : commentSchema.pick({ content_type: true, content_id: true }),
+    {
+      content_type: req.query.content_type || req.body?.content_type,
+      content_id: req.query.content_id || req.body?.content_id,
+    }
+  );
+  if (!parsed.ok) {
+    res.status(400).json({ error: 'invalid target', fields: parsed.error.fieldErrors });
+    return null;
+  }
+  if (!VALID_CONTENT_TYPES.includes(parsed.data.content_type)) {
+    res.status(400).json({ error: 'invalid content_type' });
+    return null;
+  }
+  return parsed.data;
 }
 
 // GET /api/comments?content_type=...&content_id=... — public list
@@ -488,7 +671,11 @@ router.get('/comments', async (req, res) => {
 router.post('/comments', requireAuth, validate(commentSchema), async (req, res) => {
   const sb = tryGetSupabase();
   if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });
-  const { content_type, content_id, body } = req.body;
+  const t = _validateTarget(req, res);
+  if (!t) return;
+  const parsed = parseBody(commentSchema, { ...t, body: req.body?.body });
+  if (!parsed.ok) return res.status(400).json({ error: 'Comentariu invalid', fields: parsed.error.fieldErrors });
+  const { body } = parsed.data;
   // Look up user for denormalised email/name
   const user = await db.findOne('users', { id: req.session.userId });
   const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(' ') : '';
@@ -505,7 +692,11 @@ router.post('/comments', requireAuth, validate(commentSchema), async (req, res) 
     res.json({ ok: true, comment: data });
   } catch (err) {
     console.error('POST /api/comments', err);
-    res.status(500).json({ error: err.message });
+    reportError(err, {
+      tags: { area: 'api', route: 'comments_create' },
+      extra: { user_id: req.session?.userId || null, content_type: parsed.data.content_type },
+    });
+    res.status(500).json({ error: 'Nu am putut salva comentariul' });
   }
 });
 
@@ -517,17 +708,19 @@ router.delete('/comments/:id', requireAuth, async (req, res) => {
     const { data: c } = await sb.from('comments').select('user_id').eq('id', req.params.id).maybeSingle();
     if (!c) return res.status(404).json({ error: 'not found' });
     if (c.user_id !== req.session.userId) {
-      // not the author — only admin can delete others' comments. requireAdmin
-      // is enforced via header / session pattern; for v1 reuse the same logic
-      // (any logged-in user is treated as admin per existing requireAdmin).
-      // Tightening to a real role table is a separate concern.
+      const admin = await isAdminRequest(req);
+      if (!admin) return res.status(403).json({ error: 'forbidden' });
     }
     const { error } = await sb.from('comments').update({ status: 'deleted' }).eq('id', req.params.id);
     if (error) throw error;
-    res.json({ ok: true });
+    return res.json({ ok: true });
   } catch (err) {
-    console.error('DELETE /api/comments', err);
-    res.status(500).json({ error: err.message });
+    console.error('DELETE /api/comments secure', err.message);
+    reportError(err, {
+      tags: { area: 'api', route: 'comments_delete' },
+      extra: { id: req.params.id, user_id: req.session?.userId || null },
+    });
+    return res.status(500).json({ error: 'Nu am putut șterge comentariul' });
   }
 });
 
@@ -535,12 +728,15 @@ router.delete('/comments/:id', requireAuth, async (req, res) => {
 router.post('/reactions/toggle', requireAuth, validate(reactionToggleSchema), async (req, res) => {
   const sb = tryGetSupabase();
   if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });
-  const { content_type, content_id } = req.body;
+  const t = _validateTarget(req, res);
+  if (!t) return;
+  const parsed = parseBody(reactionSchema, t);
+  if (!parsed.ok) return res.status(400).json({ error: 'Reacție invalidă', fields: parsed.error.fieldErrors });
   try {
     const { data: existing } = await sb.from('reactions')
       .select('id')
-      .eq('content_type', content_type)
-      .eq('content_id', content_id)
+      .eq('content_type', parsed.data.content_type)
+      .eq('content_id', parsed.data.content_id)
       .eq('user_id', req.session.userId)
       .eq('kind', 'like')
       .maybeSingle();
@@ -549,8 +745,8 @@ router.post('/reactions/toggle', requireAuth, validate(reactionToggleSchema), as
       res.json({ ok: true, reacted: false });
     } else {
       await sb.from('reactions').insert({
-        content_type,
-        content_id,
+        content_type: parsed.data.content_type,
+        content_id:   parsed.data.content_id,
         user_id:      req.session.userId,
         kind:         'like',
       });
@@ -558,7 +754,11 @@ router.post('/reactions/toggle', requireAuth, validate(reactionToggleSchema), as
     }
   } catch (err) {
     console.error('POST /api/reactions/toggle', err);
-    res.status(500).json({ error: err.message });
+    reportError(err, {
+      tags: { area: 'api', route: 'reactions_toggle' },
+      extra: { user_id: req.session?.userId || null, content_type: parsed.data.content_type },
+    });
+    res.status(500).json({ error: 'Nu am putut salva reacția' });
   }
 });
 
@@ -598,11 +798,16 @@ router.get('/profile', requireAuth, async (req, res) => {
 // =============================================================================
 // PUT /api/profile
 // =============================================================================
-router.put('/profile', requireAuth, validate(profileUpdateSchema), async (req, res) => {
+router.put('/profile', requireAuth, async (req, res) => {
+  const parsed = parseBody(profileSchema, req.body || {});
+  if (!parsed.ok) {
+    return res.status(400).json({ error: 'Profil invalid', fields: parsed.error.fieldErrors });
+  }
+
   const {
     startupName, website, pitch, sector, stage, trl, country,
     teamSize, github, goals, amountIdx, horizon, priority,
-  } = req.body;
+  } = parsed.data;
 
   const data = {
     name:       startupName || null,
@@ -639,6 +844,25 @@ router.put('/profile', requireAuth, validate(profileUpdateSchema), async (req, r
   } catch (_) { /* non-fatal */ }
 
   res.json({ ok: true, startup });
+});
+
+router.delete('/profile', requireAuth, async (req, res) => {
+  try {
+    await db.remove('pipeline_items', { user_id: req.session.userId });
+    await db.remove('saved_grants', { user_id: req.session.userId });
+    await db.remove('startups', { user_id: req.session.userId });
+    await db.remove('users', { id: req.session.userId });
+    req.session.destroy(() => {});
+    res.clearCookie('elig.sid');
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('DELETE /api/profile', err.message);
+    reportError(err, {
+      tags: { area: 'api', route: 'profile_delete' },
+      extra: { user_id: req.session?.userId || null },
+    });
+    res.status(500).json({ error: 'Nu am putut șterge contul' });
+  }
 });
 
 // =============================================================================
@@ -730,6 +954,10 @@ router.get('/dashboard', requireAuth, async (req, res) => {
       }
     } catch (err) {
       console.error('Dashboard grant matching error:', err.message);
+      reportError(err, {
+        tags: { area: 'api', route: 'dashboard_matching' },
+        extra: { user_id: req.session?.userId || null },
+      });
       // topGrants stays [] — dashboard still works, just without matched grants
     }
   }
@@ -758,8 +986,12 @@ router.get('/pipeline', requireAuth, async (req, res) => {
 // =============================================================================
 // POST /api/pipeline
 // =============================================================================
-router.post('/pipeline', requireAuth, validate(pipelineSchema), async (req, res) => {
-  const { grantId, grantName, stage, notes, deadline } = req.body;
+router.post('/pipeline', requireAuth, async (req, res) => {
+  const parsed = parseBody(pipelineSchema, req.body || {});
+  if (!parsed.ok) {
+    return res.status(400).json({ error: 'Element pipeline invalid', fields: parsed.error.fieldErrors });
+  }
+  const { grantId, grantName, stage, notes, deadline } = parsed.data;
   const item = await db.insert('pipeline_items', {
     user_id:    req.session.userId,
     grant_id:   grantId   || null,

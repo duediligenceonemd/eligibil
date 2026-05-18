@@ -1,0 +1,29 @@
+name: Audits
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  audits:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify required audit files
+        run: npm run audit:files
+
+      - name: Verify i18n key parity
+        run: npm run audit:i18n

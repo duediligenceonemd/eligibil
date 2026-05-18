@@ -32,6 +32,8 @@ const NEWS_CATEGORY_OPTIONS = ['', 'Anunț', 'Update', 'Politici', 'Eveniment', 
 const BLOG_CATEGORY_OPTIONS = ['', 'Tutorial', 'Opinie', 'Studiu de caz', 'Interviu', 'Ghid'];
 const COMMENT_STATUS_OPTIONS = ['approved', 'hidden', 'deleted'];
 const COMMENT_CONTENT_TYPE_OPTIONS = ['grant', 'blog_post', 'news_article'];
+const FEEDBACK_RATING_OPTIONS = ['yes', 'no', 'unsure'];
+const FEEDBACK_INTEREST_OPTIONS = ['grant', 'accelerator', 'investor', 'credit', 'european_program', 'unknown'];
 
 const GRANTS_CONFIG = {
   title: 'Granturi',
@@ -307,6 +309,127 @@ const COMMENTS_CONFIG = {
   ],
 };
 
+const RESOURCE_TYPE_OPTIONS = [
+  '',
+  'grant_database',
+  'government_program',
+  'funding_resource',
+  'capital_resource',
+  'technical_resource',
+  'resource_directory',
+];
+
+const REGION_GROUP_OPTIONS = [
+  '',
+  'US',
+  'EU',
+  'Government',
+  'Capital',
+  'Funding Resource',
+  'Free Technical',
+  'Resources',
+];
+
+const RESOURCES_CONFIG = {
+  title: 'Resurse',
+  apiBase: '/api/admin/resources',
+  pk: 'id',
+  pkEditable: false,
+  newDefaults: {
+    source_file: 'DB_Top Startup Grant resources.xlsx',
+    resource_type: 'resource_directory',
+    region_group: 'Resources',
+    is_grant_like: false,
+  },
+  searchKeys: ['title', 'sheet_name', 'category', 'region_group', 'website', 'description'],
+  listColumns: [
+    { key: 'title',         label: 'Titlu',       primary: true },
+    { key: 'sheet_name',    label: 'Sheet',       chip: true,   width: 160 },
+    { key: 'category',      label: 'Categorie',                 width: 180 },
+    { key: 'region_group',  label: 'Regiune',                   width: 120 },
+    { key: 'resource_type', label: 'Tip',         chip: true,   width: 150 },
+    { key: 'row_number',    label: 'Rând',        mono: true,   width: 80 },
+    { key: 'website',       label: 'Website',                   width: 220,
+      render: (v) => {
+        if (!v) return '—';
+        try { return new URL(v, 'https://example.com').hostname.replace(/^www\./, ''); }
+        catch { return v; }
+      } },
+    { key: 'is_grant_like', label: 'Grant-like',  chip: true,   width: 110,
+      render: (v) => v ? 'Da' : 'Nu',
+      chipMap: { true: 'ok', false: '' } },
+  ],
+  defaultSort: { key: 'updated_at', dir: 'desc' },
+  schemaHelp: 'scripts/supabase-resources-schema.sql',
+  actions: [
+    {
+      id: 'generate-missing-descriptions',
+      label: 'Generează descrieri lipsă',
+      endpoint: '/api/admin/resources/generate-descriptions',
+      method: 'POST',
+      body: { limit: 20, overwrite: false },
+      successMessage: 'Descrierile lipsă au fost generate.',
+    },
+  ],
+  fields: [
+    { name: 'source_file',    label: 'Fișier sursă',        type: 'text',     group: 'Import', required: true },
+    { name: 'sheet_name',     label: 'Sheet name',          type: 'text',     group: 'Import', required: true },
+    { name: 'row_number',     label: 'Rând în sheet',       type: 'number',   group: 'Import', required: true },
+    { name: 'resource_index', label: 'Index resursă',       type: 'text',     group: 'Import' },
+    { name: 'import_batch',   label: 'Import batch',        type: 'text',     group: 'Import' },
+
+    { name: 'title',          label: 'Titlu',               type: 'text',     group: 'Conținut', required: true },
+    { name: 'amount_raw',     label: 'Amount raw',          type: 'text',     group: 'Conținut' },
+    { name: 'category',       label: 'Categorie',           type: 'text',     group: 'Conținut' },
+    { name: 'description',    label: 'Descriere',           type: 'textarea', group: 'Conținut' },
+    { name: 'short_summary_ro', label: 'Sumar scurt RO',    type: 'textarea', group: 'Conținut AI' },
+    { name: 'short_summary_en', label: 'Sumar scurt EN',    type: 'textarea', group: 'Conținut AI' },
+    { name: 'description_ro', label: 'Descriere RO',        type: 'textarea', group: 'Conținut AI' },
+    { name: 'description_en', label: 'Descriere EN',        type: 'textarea', group: 'Conținut AI' },
+    { name: 'description_source', label: 'Source',          type: 'text',     group: 'Conținut AI' },
+    { name: 'website',        label: 'Website',             type: 'text',     group: 'Conținut' },
+
+    { name: 'region_group',   label: 'Region group',        type: 'select',   group: 'Clasificare', options: REGION_GROUP_OPTIONS },
+    { name: 'resource_type',  label: 'Resource type',       type: 'select',   group: 'Clasificare', options: RESOURCE_TYPE_OPTIONS, required: true },
+    { name: 'is_grant_like',  label: 'Grant-like',          type: 'checkbox', group: 'Clasificare' },
+  ],
+};
+
+const FEEDBACK_CONFIG = {
+  title: 'Feedback',
+  apiBase: '/api/admin/feedback',
+  pk: 'id',
+  pkEditable: false,
+  newDefaults: {
+    rating: 'unsure',
+    funding_type_interest: 'unknown',
+    language: 'ro',
+  },
+  searchKeys: ['page', 'message', 'funding_type_interest', 'language', 'user_agent'],
+  listColumns: [
+    { key: 'created_at', label: 'Data', mono: true, width: 150,
+      render: (v) => v ? new Date(v).toISOString().slice(0, 16).replace('T', ' ') : '—' },
+    { key: 'rating', label: 'Răspuns', chip: true, width: 110,
+      chipMap: { yes: 'ok', no: 'warn', unsure: '' } },
+    { key: 'funding_type_interest', label: 'Interes', chip: true, width: 160 },
+    { key: 'page', label: 'Pagină', primary: true, width: 220 },
+    { key: 'language', label: 'Limbă', width: 80 },
+    { key: 'message', label: 'Mesaj', width: 320,
+      render: (v) => v ? String(v).slice(0, 120) : '—' },
+  ],
+  defaultSort: { key: 'created_at', dir: 'desc' },
+  schemaHelp: 'scripts/supabase-feedback-schema.sql',
+  fields: [
+    { name: 'rating', label: 'Răspuns principal', type: 'select', group: 'Semnal', options: FEEDBACK_RATING_OPTIONS, required: true },
+    { name: 'funding_type_interest', label: 'Tip finanțare căutat', type: 'select', group: 'Semnal', options: FEEDBACK_INTEREST_OPTIONS, required: true },
+    { name: 'language', label: 'Limbă', type: 'text', group: 'Context' },
+    { name: 'page', label: 'Pagină', type: 'text', group: 'Context', required: true },
+    { name: 'user_agent', label: 'User-Agent', type: 'textarea', group: 'Context' },
+    { name: 'message', label: 'Mesaj', type: 'textarea', group: 'Conținut' },
+    { name: 'created_at', label: 'Creat la', type: 'text', group: 'Audit' },
+  ],
+};
+
 // ─── Field component ──────────────────────────────────────────────────────────
 function Field({ field, value, onChange }) {
   const id = 'fld-' + field.name;
@@ -400,6 +523,7 @@ function CrudPage({ config }) {
   const [editing, setEditing]   = useState(null);   // current draft (mutated by Field components)
   const [savingState, setSaving] = useState(null); // 'saving' | 'saved' | { error: string }
   const [schemaMissing, setSchemaMissing] = useState(false);
+  const [actionState, setActionState] = useState(null);
 
   const refresh = useCallback(async () => {
     setError(null);
@@ -505,6 +629,32 @@ function CrudPage({ config }) {
     }
   };
 
+  const runAction = async (action) => {
+    setActionState({ id: action.id, status: 'running' });
+    try {
+      const response = await fetch(action.endpoint, {
+        method: action.method || 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(action.body || {}),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || ('API ' + response.status));
+      setActionState({
+        id: action.id,
+        status: 'done',
+        message: action.successMessage || 'Acțiune executată.',
+      });
+      await refresh();
+    } catch (err) {
+      setActionState({
+        id: action.id,
+        status: 'error',
+        message: err.message,
+      });
+    }
+  };
+
   // Group fields by section
   const grouped = useMemo(() => {
     const g = {};
@@ -530,16 +680,30 @@ function CrudPage({ config }) {
                    placeholder="Caută..."
                    value={search}
                    onChange={(e) => setSearch(e.target.value)} />
+            {(config.actions || []).map((action) => (
+              <button
+                key={action.id}
+                className="ap-btn"
+                onClick={() => runAction(action)}
+                disabled={actionState?.status === 'running' && actionState?.id === action.id}
+              >
+                {actionState?.status === 'running' && actionState?.id === action.id ? 'rulez…' : action.label}
+              </button>
+            ))}
             <button className="ap-btn ap-btn--primary" onClick={() => setSelectedId('__new__')}>+ Adaugă nou</button>
           </div>
         </div>
 
         {schemaMissing && (
           <div className="ap__banner">
-            Tabela încă nu există în Supabase. Aplică migrarea relevantă (vezi <code>scripts/supabase-events-schema.sql</code>) și revino.
+            Tabela încă nu există în Supabase. Aplică migrarea relevantă
+            {config.schemaHelp ? <> (vezi <code>{config.schemaHelp}</code>)</> : null}
+            {' '}și revino.
           </div>
         )}
         {error && <div className="ap__banner is-error">Eroare API: {error}</div>}
+        {actionState?.status === 'done' && <div className="ap__banner">{actionState.message}</div>}
+        {actionState?.status === 'error' && <div className="ap__banner is-error">Eroare acțiune: {actionState.message}</div>}
 
         {items === null && <div className="ap__empty"><h3>Se încarcă...</h3></div>}
         {items && items.length === 0 && !schemaMissing && (
@@ -639,6 +803,8 @@ function Dashboard({ stats }) {
     { num: (stats.staging?.pending || 0), lbl: 'Granturi pending (staging)' },
     { num: (stats.staging?.approved || 0), lbl: 'Granturi approved' },
     { num: (stats.staging?.rejected || 0), lbl: 'Granturi rejected' },
+    { num: stats.resources_total || 0,    lbl: 'Resurse totale' },
+    { num: stats.feedback_total || 0,     lbl: 'Feedback colectat' },
   ];
   return (
     <div>
@@ -670,6 +836,8 @@ function AdminApp() {
   const [newsCount, setNewsCount]       = useState(null);
   const [blogCount, setBlogCount]       = useState(null);
   const [commentsCount, setCommentsCount] = useState(null);
+  const [resourcesCount, setResourcesCount] = useState(null);
+  const [feedbackCount, setFeedbackCount] = useState(null);
 
   // Wait for auth.js to populate window.__USER (it dispatches 'auth-ready')
   useEffect(() => {
@@ -685,13 +853,15 @@ function AdminApp() {
       if (r.ok) setStats(await r.json());
     } catch {}
     try {
-      const [g, e, f, n, b, c] = await Promise.all([
+      const [g, e, f, n, b, c, rsrc, fb] = await Promise.all([
         fetch('/api/admin/grants',   { credentials: 'same-origin' }).then(r => r.json()),
         fetch('/api/admin/events',   { credentials: 'same-origin' }).then(r => r.json()),
         fetch('/api/admin/funders',  { credentials: 'same-origin' }).then(r => r.json()),
         fetch('/api/admin/news',     { credentials: 'same-origin' }).then(r => r.json()),
         fetch('/api/admin/blog',     { credentials: 'same-origin' }).then(r => r.json()),
         fetch('/api/admin/comments', { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/resources', { credentials: 'same-origin' }).then(r => r.json()),
+        fetch('/api/admin/feedback', { credentials: 'same-origin' }).then(r => r.json()),
       ]);
       setGrantsCount(g.items?.length ?? 0);
       setEventsCount(e.items?.length ?? 0);
@@ -699,6 +869,8 @@ function AdminApp() {
       setNewsCount(n.items?.length ?? 0);
       setBlogCount(b.items?.length ?? 0);
       setCommentsCount(c.items?.length ?? 0);
+      setResourcesCount(rsrc.total ?? rsrc.items?.length ?? 0);
+      setFeedbackCount(fb.items?.length ?? 0);
     } catch {}
   }, []);
 
@@ -712,6 +884,8 @@ function AdminApp() {
     { id: 'news',      label: 'Știri',       count: newsCount },
     { id: 'blog',      label: 'Blog',        count: blogCount },
     { id: 'comments',  label: 'Comentarii',  count: commentsCount },
+    { id: 'resources', label: 'Resurse',     count: resourcesCount },
+    { id: 'feedback',  label: 'Feedback',    count: feedbackCount },
   ];
 
   return (
@@ -747,6 +921,8 @@ function AdminApp() {
           {tab === 'news'      && <CrudPage config={NEWS_CONFIG} />}
           {tab === 'blog'      && <CrudPage config={BLOG_CONFIG} />}
           {tab === 'comments'  && <CrudPage config={COMMENTS_CONFIG} />}
+          {tab === 'resources' && <CrudPage config={RESOURCES_CONFIG} />}
+          {tab === 'feedback'  && <CrudPage config={FEEDBACK_CONFIG} />}
         </main>
       </div>
     </div>

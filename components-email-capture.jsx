@@ -5,6 +5,12 @@
 
 const { useState: useStateEC } = React;
 
+function trackAnalyticsEmail(eventName, payload) {
+  if (window.eligibilAnalytics && typeof window.eligibilAnalytics.track === 'function') {
+    window.eligibilAnalytics.track(eventName, payload);
+  }
+}
+
 function EmailCapture({ context = 'page', heading, sub }) {
   const [email, setEmail] = useStateEC('');
   const [state, setState] = useStateEC('idle'); // idle | sending | ok | error
@@ -24,6 +30,7 @@ function EmailCapture({ context = 'page', heading, sub }) {
         body: JSON.stringify({ email, context }),
       });
       if (r.ok) {
+        trackAnalyticsEmail('newsletter_signup', { context: context || 'page' });
         setState('ok'); setMsg('Te-ai abonat! Vei primi primul update în câteva zile.');
       } else if (r.status === 409) {
         setState('ok'); setMsg('Ești deja abonat. Mulțumim!');
