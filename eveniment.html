@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eveniment · eligibil.org</title>
+<meta name="description" content="Detalii eveniment startup — locație, organizator, registration, sectoare relevante, evenimente similare." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/styles-v2.css" />
+<link rel="stylesheet" href="/styles-org.css" />
+<link rel="stylesheet" href="/styles-mobile.css?v=20260515b" />
+<script src="/lang.js?v=20260515b" defer></script>
+<script src="/app-config.js" defer></script>
+<script src="/analytics.js" defer></script>
+<script src="/cookie-consent.js" defer></script>
+<script src="/feedback-widget.js" defer></script>
+
+<style>
+  .ev-hero { padding: 64px 0 28px; border-bottom: 1px solid var(--border-soft); }
+  .ev-crumbs { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+  .ev-crumbs a { color: inherit; text-decoration: none; }
+  .ev-type { display: inline-block; padding: 3px 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; background: var(--accent); color: #fff; border-radius: 3px; }
+  .ev-title { font-size: clamp(28px, 5vw, 48px); font-weight: 700; margin: 14px 0 8px; font-family: 'Space Grotesk', sans-serif; line-height: 1.08; }
+  .ev-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-2); }
+  .ev-meta strong { color: var(--ink-1); }
+  .ev-body { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 48px; padding: 48px 0; }
+  @media (max-width: 800px) { .ev-body { grid-template-columns: 1fr; gap: 28px; } }
+  .ev-section { margin-bottom: 32px; }
+  .ev-section h2 { font-size: 22px; margin: 0 0 12px; font-family: 'Space Grotesk', sans-serif; }
+  .ev-section p { font-size: 15px; line-height: 1.65; color: var(--ink-1); margin: 0 0 12px; }
+  .ev-aside { padding: 24px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 4px; }
+  .ev-aside dt { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-top: 14px; }
+  .ev-aside dt:first-child { margin-top: 0; }
+  .ev-aside dd { margin: 4px 0 0; font-size: 14px; color: var(--ink-1); }
+  .ev-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 18px; }
+  .ev-tag { padding: 4px 10px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .ev-cta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .ev-similar { padding: 32px 0 64px; border-top: 1px solid var(--border-soft); }
+  .ev-similar h2 { font-size: 22px; margin: 0 0 16px; font-family: 'Space Grotesk', sans-serif; }
+  .ev-similar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 800px) { .ev-similar-grid { grid-template-columns: 1fr; } }
+  .ev-similar-card { padding: 18px; background: var(--bg-2); border: 1px solid var(--border-soft); text-decoration: none; color: inherit; }
+  .ev-similar-card:hover { border-color: var(--accent); }
+  .ev-similar-card h3 { font-size: 16px; margin: 0 0 6px; font-family: 'Space Grotesk', sans-serif; }
+  .ev-similar-card p { font-size: 13px; color: var(--ink-2); margin: 0; }
+</style>
+</head>
+<body class="d-balanced">
+
+<div id="root"><div style="padding:48px;text-align:center;color:#666">Se încarcă…</div></div>
+
+<script>
+const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
+let tweaks = { accent: 'navy', density: 'balanced', dark: false };
+(function () {
+  document.documentElement.style.setProperty('--accent', ACCENTS[tweaks.accent]);
+  document.body.classList.add('d-' + tweaks.density);
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script src="/data.js?v=20260515b"></script>
+<script src="/data-org.js?v=20260515b"></script>
+<script type="text/babel" src="/thumbs.js?v=20260515b"></script>
+<script type="text/babel" src="/components-org-a.jsx?v=20260515b"></script>
+<script type="text/babel" src="/components-org-b.jsx?v=20260515b"></script>
+<script type="text/babel" src="/components-org-c.jsx?v=20260515b"></script>
+<script type="text/babel" src="/components-email-capture.jsx?v=20260515b"></script>
+
+<script type="text/babel">
+const { useState: useStateE, useEffect: useEffectE } = React;
+
+const TYPE_LABEL = {
+  conference: 'Conferință',
+  pitch_event: 'Pitch event',
+  webinar: 'Webinar',
+  workshop: 'Workshop',
+  networking: 'Networking',
+  hackathon: 'Hackathon',
+  accelerator_call: 'Accelerator',
+};
+
+function downloadIcs(ev) {
+  const dtStart = new Date(ev.start_date).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const dtEnd   = new Date(ev.end_date || ev.start_date).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//eligibil.org//EN',
+    'BEGIN:VEVENT',
+    'UID:' + ev.id + '@eligibil.org',
+    'DTSTAMP:' + dtStart,
+    'DTSTART:' + dtStart,
+    'DTEND:' + dtEnd,
+    'SUMMARY:' + (ev.title || '').replace(/\n/g, ' '),
+    'DESCRIPTION:' + (ev.short_summary_ro || '').replace(/\n/g, ' '),
+    'LOCATION:' + ([ev.venue, ev.city, ev.country].filter(Boolean).join(', ') || (ev.is_online ? 'Online' : '')),
+    ev.registration_url ? 'URL:' + ev.registration_url : '',
+    'END:VEVENT', 'END:VCALENDAR'
+  ].filter(Boolean).join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = (ev.slug_ro || 'eveniment') + '.ics';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 500);
+}
+
+function EventPage() {
+  const slug = (location.pathname.match(/^\/(?:evenimente|events)\/([a-z0-9-]+)/i) || [])[1];
+  const [event, setEvent] = useStateE(null);
+  const [similar, setSimilar] = useStateE([]);
+  const [loading, setLoading] = useStateE(true);
+  const [error, setError] = useStateE(null);
+
+  useEffectE(() => {
+    if (!slug) { setError('Slug invalid'); setLoading(false); return; }
+    fetch('/api/events/' + slug)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        setEvent(data);
+        // Document head meta
+        document.title = (data.title || 'Eveniment') + ' · eligibil.org';
+        const desc = data.short_summary_ro || data.short_summary_en || '';
+        const m = document.querySelector('meta[name="description"]');
+        if (m) m.setAttribute('content', desc);
+        // Similar events
+        return fetch('/api/events?type=' + data.event_type + '&country=' + (data.country || ''));
+      })
+      .then(r => r && r.ok ? r.json() : null)
+      .then(data => {
+        if (data) setSimilar((data.events || []).filter(e => e.slug_ro !== slug).slice(0, 3));
+      })
+      .catch(() => setError('Eveniment negăsit.'))
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) return <div style={{padding:48,textAlign:'center'}}>Se încarcă…</div>;
+  if (error || !event) return (
+    <section className="section"><div className="container">
+      <div className="ev-crumbs"><a href="/">Acasă</a> › <a href="/evenimente">Evenimente</a></div>
+      <h1 className="ev-title">Eveniment negăsit</h1>
+      <p>Slug-ul nu corespunde niciunui eveniment. Vezi <a href="/evenimente">toate evenimentele →</a></p>
+    </div></section>
+  );
+
+  const e = event;
+  const start = new Date(e.start_date);
+  const end = e.end_date ? new Date(e.end_date) : null;
+  const dateStr = start.toLocaleDateString('ro-RO', { day:'2-digit', month:'long', year:'numeric' });
+  const endStr = end ? end.toLocaleDateString('ro-RO', { day:'2-digit', month:'long', year:'numeric' }) : null;
+
+  return (
+    <>
+      <section className="ev-hero">
+        <div className="container">
+          <div className="ev-crumbs">
+            <a href="/">Acasă</a> › <a href="/evenimente">Evenimente</a> › <span>{e.title}</span>
+          </div>
+          <span className="ev-type">{TYPE_LABEL[e.event_type] || e.event_type}</span>
+          <h1 className="ev-title">{e.title}</h1>
+          <div className="ev-meta">
+            <span>📅 <strong>{dateStr}{endStr && endStr !== dateStr ? ' – ' + endStr : ''}</strong></span>
+            <span>📍 <strong>{e.is_online ? 'Online' : [e.venue, e.city, e.country].filter(Boolean).join(', ')}</strong></span>
+            <span>{e.is_free ? '💰 Gratuit' : (e.price_eur ? '💶 €' + e.price_eur : '')}</span>
+            {e.organizer_name && <span>👤 <strong>{e.organizer_name}</strong></span>}
+          </div>
+        </div>
+      </section>
+
+      <div className="container ev-body">
+        <div>
+          <div className="ev-section">
+            <h2>Despre eveniment</h2>
+            <p>{e.description_ro || e.short_summary_ro || 'Detalii suplimentare disponibile pe pagina organizatorului.'}</p>
+          </div>
+
+          {e.topics && e.topics.length > 0 && (
+            <div className="ev-section">
+              <h2>Subiecte relevante</h2>
+              <div className="ev-tags">
+                {e.topics.map(t => <span className="ev-tag" key={t}>{t}</span>)}
+              </div>
+            </div>
+          )}
+
+          {e.audience && e.audience.length > 0 && (
+            <div className="ev-section">
+              <h2>Cui i se adresează</h2>
+              <div className="ev-tags">
+                {e.audience.map(a => <span className="ev-tag" key={a}>{a}</span>)}
+              </div>
+            </div>
+          )}
+
+          <div className="ev-section" style={{marginTop:40}}>
+            <EmailCapture
+              context={`event:${slug}`}
+              heading="Vrei să afli de evenimente noi?"
+              sub="Primește săptămânal lista cu conferințe, deadline-uri și pitch events pentru fondatori din Moldova, România și Europa de Est."
+            />
+          </div>
+        </div>
+
+        <aside>
+          <div className="ev-aside">
+            <dl style={{margin:0}}>
+              <dt>Data</dt>
+              <dd>{dateStr}{endStr && endStr !== dateStr ? ' – ' + endStr : ''}</dd>
+              <dt>Locație</dt>
+              <dd>{e.is_online ? 'Online' : [e.venue, e.city, e.country].filter(Boolean).join(', ')}</dd>
+              <dt>Tip</dt>
+              <dd>{TYPE_LABEL[e.event_type] || e.event_type}</dd>
+              {e.organizer_name && (<><dt>Organizator</dt><dd>{e.organizer_url ? <a href={e.organizer_url} target="_blank" rel="noopener">{e.organizer_name} ↗</a> : e.organizer_name}</dd></>)}
+              <dt>Cost</dt>
+              <dd>{e.is_free ? 'Gratuit' : (e.price_eur ? `€${e.price_eur}` : '—')}</dd>
+            </dl>
+            <div className="ev-cta-row">
+              {e.registration_url && <a className="btn btn--accent" href={e.registration_url} target="_blank" rel="noopener" style={{flex:'1 1 100%',textAlign:'center'}}>Înregistrează-te →</a>}
+              <a className="btn btn--ghost" onClick={() => downloadIcs(e)} href="#" style={{flex:'1 1 100%',textAlign:'center'}}>Adaugă în calendar</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {similar.length > 0 && (
+        <section className="ev-similar">
+          <div className="container">
+            <h2>Evenimente similare</h2>
+            <div className="ev-similar-grid">
+              {similar.map(s => (
+                <a className="ev-similar-card" href={`/evenimente/${s.slug_ro}`} key={s.id}>
+                  <h3>{s.title}</h3>
+                  <p>{new Date(s.start_date).toLocaleDateString('ro-RO', {day:'2-digit',month:'short',year:'numeric'})} · {s.city || (s.is_online ? 'Online' : s.country)}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </>
+  );
+}
+
+function App() {
+  const [lang, setLangState] = useStateE((window.getLanguage && window.getLanguage()) || 'RO');
+  const setLang = (l) => { setLangState(l); if (window.setLanguage) window.setLanguage(l); };
+  useEffectE(() => {
+    const onLang = (e) => setLangState(e.detail.lang);
+    window.addEventListener('languagechange', onLang);
+    return () => window.removeEventListener('languagechange', onLang);
+  }, []);
+  return (
+    <>
+      <NavOrg lang={lang} setLang={setLang} />
+      <EventPage />
+      <FooterOrg lang={lang} setLang={setLang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>
