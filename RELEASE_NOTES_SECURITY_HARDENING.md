@@ -3,7 +3,7 @@
 ## Suggested Commit
 
 ```bash
-git add .env.example .github/workflows/audits.yml .github/workflows/build.yml .github/workflows/security.yml .github/workflows/smoke-pages.yml .github/workflows/diagnostics.yml README.md SECURITY_AUDIT.md SECURITY_STATUS.md TODAY_IMPLEMENTED.md components-login.jsx lib/email/templates.js lib/validation.js lib/supabase-session-store.js package.json routes/auth.js scripts/supabase-resources-schema.sql scripts/supabase-resources-rls.sql scripts/supabase-private-tables-rls.sql scripts/supabase-password-reset-schema.sql scripts/supabase-sessions-schema.sql scripts/send-deadline-alerts.js scripts/verify-production.js server.js reset-password.html terms.html waitlist-popup.js RELEASE_NOTES_SECURITY_HARDENING.md
+git add .env.example .github/workflows/audits.yml .github/workflows/build.yml .github/workflows/security.yml .github/workflows/smoke-pages.yml .github/workflows/diagnostics.yml README.md SECURITY_AUDIT.md SECURITY_STATUS.md TODAY_IMPLEMENTED.md components-login.jsx lib/email/templates.js lib/validation.js lib/supabase-session-store.js package.json package-lock.json routes/api.js routes/auth.js scripts/supabase-resources-schema.sql scripts/supabase-resources-rls.sql scripts/supabase-private-tables-rls.sql scripts/supabase-password-reset-schema.sql scripts/supabase-sessions-schema.sql scripts/send-deadline-alerts.js scripts/verify-production.js server.js reset-password.html terms.html waitlist-popup.js RELEASE_NOTES_SECURITY_HARDENING.md
 git commit -m "security: harden Supabase RLS, auth flows, and CI workflows"
 git push origin master
 ```
@@ -30,6 +30,8 @@ This release closes the main post-launch security and operations gaps for `eligi
 - persistent session store option:
   - `SESSION_STORE=supabase`
   - `scripts/supabase-sessions-schema.sql`
+- runtime fix in `routes/api.js` for comments/reactions validation
+- synced `package-lock.json` for the Resend dependency
 - GitHub Actions modernization:
   - `actions/checkout@v5`
   - `actions/setup-node@v5`
@@ -45,9 +47,13 @@ This release closes the main post-launch security and operations gaps for `eligi
 ## Verification
 
 - `npm run build` passes locally.
+- `require('./routes/api')` loads successfully.
 - Supabase RLS was applied and verified live for `funding_resources`.
 - Supabase RLS was applied and verified live for private operational tables.
 - `anon` and `authenticated` no longer have grants on private operational tables.
+- Cloud Run revision `eligibil-00053-tnp` deployed successfully.
+- `https://eligibil.org/api/health` returns `status: ok`.
+- `https://eligibil.org/api/resources/overview` returns the live 637-resource summary.
 
 ## Known Follow-Up
 

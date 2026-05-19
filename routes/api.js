@@ -668,7 +668,7 @@ router.get('/comments', async (req, res) => {
 });
 
 // POST /api/comments — auth required
-router.post('/comments', requireAuth, validate(commentSchema), async (req, res) => {
+router.post('/comments', requireAuth, async (req, res) => {
   const sb = tryGetSupabase();
   if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });
   const t = _validateTarget(req, res);
@@ -681,8 +681,8 @@ router.post('/comments', requireAuth, validate(commentSchema), async (req, res) 
   const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(' ') : '';
   try {
     const { data, error } = await sb.from('comments').insert({
-      content_type,
-      content_id,
+      content_type: parsed.data.content_type,
+      content_id:   parsed.data.content_id,
       user_id:      req.session.userId,
       user_email:   user?.email || null,
       user_name:    userName || user?.email || 'Utilizator',
@@ -725,7 +725,7 @@ router.delete('/comments/:id', requireAuth, async (req, res) => {
 });
 
 // POST /api/reactions/toggle — auth required, idempotent like-toggle
-router.post('/reactions/toggle', requireAuth, validate(reactionToggleSchema), async (req, res) => {
+router.post('/reactions/toggle', requireAuth, async (req, res) => {
   const sb = tryGetSupabase();
   if (!sb) return res.status(503).json({ error: 'Supabase neconfigurat' });
   const t = _validateTarget(req, res);
