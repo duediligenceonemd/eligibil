@@ -19,8 +19,8 @@
 require('dotenv').config();
 
 const path  = require('path');
-const XLSX  = require('xlsx');
 const { getSupabase } = require('../db/supabase');
+const { readWorkbookRows } = require('./excel-utils');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -78,12 +78,12 @@ function buildEmbedText(g) {
 
 // ── Parse Excel ───────────────────────────────────────────────────────────────
 
-function readExcelGrants() {
+async function readExcelGrants() {
   console.log(`  Citesc: ${EXCEL_PATH}`);
 
   let workbook;
   try {
-    workbook = XLSX.readFile(EXCEL_PATH);
+    workbook = await readWorkbookRows(EXCEL_PATH);
   } catch (err) {
     throw new Error(
       `Nu pot citi fișierul Excel: ${err.message}\n` +
@@ -96,14 +96,13 @@ function readExcelGrants() {
   const seenIds = new Set();
 
   for (const sheetIdx of DATA_SHEET_INDEXES) {
-    const sheetName = workbook.SheetNames[sheetIdx];
+    const sheetName = workbook.sheetNames[sheetIdx];
     if (!sheetName) {
       console.warn(`  [SKIP] Sheet index ${sheetIdx} nu există`);
       continue;
     }
 
-    const ws   = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+    const rows = workbook.getRows(sheetName);
 
     // Găsim dinamic rândul header (unde prima celulă = 'ID')
     const headerIdx = rows.findIndex(r => String(r[0] ?? '').trim() === 'ID');
@@ -247,7 +246,7 @@ async function main() {
 
   // ── 1. Parse Excel
   console.log('1. Citesc fișierul Excel...');
-  const grants = readExcelGrants();
+  const grants = await readExcelGrants();
   console.log(`   Total granturi parsate: ${grants.length}`);
   console.log();
 

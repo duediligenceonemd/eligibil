@@ -34,6 +34,15 @@ async function waitForServer(timeoutMs) {
   throw new Error(`Server did not become ready within ${timeoutMs}ms`);
 }
 
+function smokeEnv() {
+  return {
+    ...process.env,
+    NODE_ENV: process.env.NODE_ENV || 'test',
+    PORT: String(PORT),
+    SESSION_SECRET: process.env.SESSION_SECRET || 'smoke-test-session-secret-32-chars-min',
+  };
+}
+
 async function fetchPage(page) {
   const response = await fetch(`${BASE_URL}${page.path}`);
   const contentType = response.headers.get('content-type') || '';
@@ -61,11 +70,15 @@ async function fetchPage(page) {
 async function main() {
   const child = spawn(process.execPath, ['server.js'], {
     cwd: projectRoot,
-    env: { ...process.env, PORT: String(PORT) },
+    env: smokeEnv(),
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 
+  let stdout = '';
   let stderr = '';
+  child.stdout.on('data', (chunk) => {
+    stdout += chunk.toString();
+  });
   child.stderr.on('data', (chunk) => {
     stderr += chunk.toString();
   });
@@ -79,6 +92,11 @@ async function main() {
     }
   } finally {
     child.kill();
+  }
+
+  if (stdout.trim()) {
+    console.log('Server stdout during smoke test:');
+    console.log(stdout.trim());
   }
 
   if (stderr.trim()) {

@@ -18,8 +18,8 @@ require('dotenv').config();
 
 const path = require('node:path');
 const crypto = require('node:crypto');
-const XLSX = require('xlsx');
 const { getSupabase } = require('../db/supabase');
+const { readWorkbookRows } = require('./excel-utils');
 
 const EXCEL_PATH = process.env.RESOURCE_EXCEL_PATH || path.join(
   process.env.USERPROFILE || process.env.HOME || '',
@@ -158,10 +158,10 @@ function cleanWebsite(value) {
   }
 }
 
-function readWorkbook() {
+async function readWorkbook() {
   let workbook;
   try {
-    workbook = XLSX.readFile(EXCEL_PATH);
+    workbook = await readWorkbookRows(EXCEL_PATH);
   } catch (error) {
     throw new Error(
       `Nu pot citi workbook-ul: ${error.message}\n` +
@@ -174,15 +174,14 @@ function readWorkbook() {
   const rowsForInsert = [];
   const stats = [];
 
-  for (const sheetName of workbook.SheetNames) {
+  for (const sheetName of workbook.sheetNames) {
     const config = SHEET_CONFIG[sheetName] || {
       region_group: sheetName,
       resource_type: 'resource',
       is_grant_like: false,
     };
 
-    const worksheet = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: null });
+    const rows = workbook.getRows(sheetName);
     const headerRowIndex = detectHeaderRow(rows);
 
     if (headerRowIndex === -1) {
@@ -265,7 +264,7 @@ async function upsertRows(rows) {
 
 async function main() {
   const dryRun = process.argv.includes('--dry-run');
-  const { importBatch, sourceFile, rowsForInsert, stats } = readWorkbook();
+  const { importBatch, sourceFile, rowsForInsert, stats } = await readWorkbook();
 
   console.log('╔══════════════════════════════════════════════╗');
   console.log('║   eligibil.org — Funding Resources Import   ║');
