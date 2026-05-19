@@ -7,6 +7,30 @@ function trackAnalyticsOrg(eventName, payload) {
   }
 }
 
+function searchUrlFromOrgFilters(filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.sector) params.set('sector', filters.sector);
+  if (filters.tara) params.set('tara', filters.tara === 'UE' ? 'EU' : filters.tara);
+  if (filters.tip) params.set('tip', filters.tip);
+  if (filters.q) params.set('q', filters.q);
+  if (filters.amount) {
+    const clean = String(filters.amount)
+      .replace(/[€\s]/g, '')
+      .replace(/[–—-]/g, '-')
+      .replace(/K/g, '000')
+      .replace(/M/g, '000000');
+    if (clean.startsWith('<')) params.set('max', clean.slice(1));
+    else if (clean.endsWith('+')) params.set('min', clean.slice(0, -1));
+    else if (clean.includes('-')) {
+      const [min, max] = clean.split('-');
+      if (min) params.set('min', min);
+      if (max) params.set('max', max);
+    }
+  }
+  const query = params.toString();
+  return query ? `/search?${query}` : '/search';
+}
+
 /* ============================================================
    Nav with .org menu (Catalog · Produse · Resurse · About)
    ============================================================ */
@@ -149,6 +173,7 @@ function NavOrg({ lang, setLang }) {
    ============================================================ */
 function HeroOrg({ lang }) {
   const [activeChip, setActiveChip] = useStateOrgA(null);
+  const [filters, setFilters] = useStateOrgA({ sector: '', tara: '', tip: '', amount: '' });
   const resourcesHref = lang === 'EN' ? '/en/resources' : '/resurse';
   const popular = [
     'Granturi AI Moldova',
@@ -174,39 +199,53 @@ function HeroOrg({ lang }) {
                 Agregatorul de granturi, competiții și capital non-dilutiv pentru Moldova, România și Europa de Est. Peste 735 de oportunități verificate, actualizate zilnic, cu analiză AI de pregătire pentru fiecare.
               </p>
 
-              <div className="search" style={{ marginTop: 28 }}>
+              <form
+                className="search"
+                style={{ marginTop: 28 }}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  trackAnalyticsOrg('search_performed', {
+                    result_context: 'homepage',
+                    has_sector: !!filters.sector,
+                    has_country: !!filters.tara,
+                    has_type: !!filters.tip,
+                  });
+                  window.location.href = searchUrlFromOrgFilters(filters);
+                }}
+              >
                 <div className="search__row">
                   <div className="search__icon">
                     <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" strokeWidth="1.5"/><line x1="11" y1="11" x2="15" y2="15" stroke="currentColor" strokeWidth="1.5"/></svg>
                   </div>
-                  <select className="search__select" defaultValue="">
+                  <select className="search__select" value={filters.sector} onChange={(e) => setFilters({ ...filters, sector: e.target.value })}>
                     <option value="">Sector</option>
-                    {SECTORS.slice(0, 12).map(s => <option key={s.id}>{s.name}</option>)}
+                    {SECTORS.slice(0, 12).map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
                   </select>
-                  <select className="search__select" defaultValue="">
+                  <select className="search__select" value={filters.tara} onChange={(e) => setFilters({ ...filters, tara: e.target.value })}>
                     <option value="">Țară</option>
                     <option>Moldova</option><option>România</option><option>UE</option><option>SUA</option><option>Global</option>
                   </select>
-                  <select className="search__select" defaultValue="">
+                  <select className="search__select" value={filters.tip} onChange={(e) => setFilters({ ...filters, tip: e.target.value })}>
                     <option value="">Tip finanțare</option>
                     <option>Grant</option><option>Accelerator</option><option>Competiție</option><option>SBIR</option><option>Equity</option><option>Non-dilutiv</option><option>Consorțiu</option>
                   </select>
-                  <select className="search__select" defaultValue="">
+                  <select className="search__select" value={filters.amount} onChange={(e) => setFilters({ ...filters, amount: e.target.value })}>
                     <option value="">Sumă</option>
                     <option>&lt; €50K</option><option>€50K – €250K</option><option>€250K – €1M</option><option>€1M+</option>
                   </select>
-                  <button className="search__btn">Caută</button>
+                  <button type="submit" className="search__btn">Caută</button>
                 </div>
-              </div>
+              </form>
 
               <div className="search__suggest" style={{ marginTop: 14 }}>
                 <span className="search__suggest-label">Populare</span>
                 {popular.map(s => (
-                  <button
+                  <a
                     key={s}
                     className={`chip ${activeChip === s ? 'is-active' : ''}`}
+                    href={searchUrlFromOrgFilters({ q: s })}
                     onClick={() => setActiveChip(activeChip === s ? null : s)}
-                  >{s}</button>
+                  >{s}</a>
                 ))}
               </div>
 
@@ -328,10 +367,15 @@ function QuickFilters() {
             <div className="qf__pop">
               <span>Populare:</span>
               {popular.map(p => (
-                <button key={p} className="qf__chip">{p}</button>
+                <a key={p} className="qf__chip" href={searchUrlFromOrgFilters({ q: p })}>{p}</a>
               ))}
             </div>
-            <button className="btn btn--accent">Caută oportunități →</button>
+            <a className="btn btn--accent" href={searchUrlFromOrgFilters({
+              sector: pick.sector,
+              tara: pick.region,
+              tip: pick.kind,
+              amount: pick.amount,
+            })}>Caută oportunități →</a>
           </div>
         </div>
       </div>
@@ -420,7 +464,7 @@ function Positioning() {
               eligibil.org unește sute de surse de finanțare într-un singur loc și oferă fondatorilor claritate asupra oportunităților potrivite pentru contextul lor. Pentru fiecare program nu vezi doar un link, ci o analiză completă: eligibilitate, potrivire, pregătire, documente necesare, deadline și pași următori.
             </p>
             <div style={{ marginTop: 32, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <button className="btn btn--accent">Caută finanțare →</button>
+              <a className="btn btn--accent" href="/search">Caută finanțare →</a>
               <button className="btn btn--ghost">Analizează startupul</button>
             </div>
           </div>

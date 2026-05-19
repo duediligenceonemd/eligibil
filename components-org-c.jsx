@@ -170,7 +170,7 @@ function AboutOrg() {
               </div>
             </div>
             <div style={{ marginTop: 32, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <button className="btn btn--accent">Caută finanțare →</button>
+              <a className="btn btn--accent" href="/search">Caută finanțare →</a>
               <button className="btn btn--ghost">Analizează startupul meu</button>
             </div>
           </div>
@@ -236,7 +236,7 @@ function FinalCTAOrg() {
           <h2>Începe cu startupul tău. Află unde ești eligibil.</h2>
           <p>Caută printre sute de oportunități, încarcă documentele startupului și primește o analiză clară despre programele potrivite, documentele lipsă și următorii pași.</p>
           <div className="cta-tri__btns">
-            <button className="btn btn--accent">Caută finanțare →</button>
+            <a className="btn btn--accent" href="/search">Caută finanțare →</a>
             <button className="btn btn--ghost">Analizează startupul meu</button>
             <button className="btn btn--ghost">Listează un program</button>
           </div>
