@@ -8,6 +8,7 @@ const PORT = Number(process.env.SMOKE_PORT || 3100);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 const PAGES = [
   { path: '/', label: 'Home' },
+  { path: '/en', label: 'Home EN' },
   { path: '/about', label: 'About' },
   { path: '/parteneri', label: 'Parteneri' },
   { path: '/startupuri', label: 'Startupuri' },
