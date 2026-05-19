@@ -186,6 +186,21 @@ function AboutOrg() {
               </div>
             </div>
           </div>
+          {false && <form onSubmit={submitEarlyAccess} style={{ marginTop: 24, display: 'grid', gap: 10, maxWidth: 680 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+              <input aria-label="Nume" placeholder="Nume" style={{ padding: 12, border: '1px solid var(--border-soft)' }} />
+              <input aria-label="Email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" style={{ padding: 12, border: '1px solid var(--border-soft)' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 10 }}>
+              <select aria-label="Tip organizație" style={{ padding: 12, border: '1px solid var(--border-soft)' }}><option>Startup</option><option>IMM</option><option>ONG</option><option>Cercetător</option><option>Ecosystem builder</option></select>
+              <select aria-label="Țară" style={{ padding: 12, border: '1px solid var(--border-soft)' }}><option>Moldova</option><option>România</option><option>UE</option><option>Altă țară</option></select>
+              <select aria-label="Interes finanțare" style={{ padding: 12, border: '1px solid var(--border-soft)' }}><option>Granturi</option><option>Acceleratoare</option><option>Investitori</option><option>Evenimente</option></select>
+              <select aria-label="Stadiu" style={{ padding: 12, border: '1px solid var(--border-soft)' }}><option>Idee</option><option>MVP</option><option>Seed</option><option>Growth</option></select>
+            </div>
+            <label style={{ fontSize: 12, color: 'var(--ink-2)' }}><input type="checkbox" required /> Sunt de acord să fiu contactat despre early access. Datele nu sunt vândute.</label>
+            <button className="btn btn--accent" type="submit">Join early access</button>
+            {status && <div style={{ fontSize: 13, color: 'var(--ink-2)' }}>{status}</div>}
+          </form>}
         </div>
       </div>
     </section>
@@ -217,6 +232,21 @@ function FAQOrg() {
               </div>
             ))}
           </div>
+          {false && <form onSubmit={submitEarlyAccess} style={{ marginTop: 24, display: 'grid', gap: 10, maxWidth: 680 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+              <input aria-label="Nume" placeholder="Nume" style={{ padding: 12, border: '1px solid var(--border-soft)' }} />
+              <input aria-label="Email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" style={{ padding: 12, border: '1px solid var(--border-soft)' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 10 }}>
+              <select aria-label="Tip organizație" style={{ padding: 12, border: '1px solid var(--border-soft)' }}><option>Startup</option><option>IMM</option><option>ONG</option><option>Cercetător</option><option>Ecosystem builder</option></select>
+              <select aria-label="Țară" style={{ padding: 12, border: '1px solid var(--border-soft)' }}><option>Moldova</option><option>România</option><option>UE</option><option>Altă țară</option></select>
+              <select aria-label="Interes finanțare" style={{ padding: 12, border: '1px solid var(--border-soft)' }}><option>Granturi</option><option>Acceleratoare</option><option>Investitori</option><option>Evenimente</option></select>
+              <select aria-label="Stadiu" style={{ padding: 12, border: '1px solid var(--border-soft)' }}><option>Idee</option><option>MVP</option><option>Seed</option><option>Growth</option></select>
+            </div>
+            <label style={{ fontSize: 12, color: 'var(--ink-2)' }}><input type="checkbox" required /> Sunt de acord să fiu contactat despre early access. Datele nu sunt vândute.</label>
+            <button className="btn btn--accent" type="submit">Join early access</button>
+            {status && <div style={{ fontSize: 13, color: 'var(--ink-2)' }}>{status}</div>}
+          </form>}
         </div>
       </div>
     </section>
@@ -227,6 +257,23 @@ function FAQOrg() {
    Final CTA (section 18) — 3 buttons
    ============================================================ */
 function FinalCTAOrg() {
+  const [email, setEmail] = useStateOrgC('');
+  const [status, setStatus] = useStateOrgC('');
+  const submitEarlyAccess = async (event) => {
+    event.preventDefault();
+    if (!email) return;
+    setStatus('Se trimite...');
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'inline', variant: 'A', locale: 'ro' }),
+      });
+      setStatus(response.ok ? 'Mulțumim. Te-am adăugat pe lista early access.' : 'Nu am putut salva acum. Scrie-ne la contact@eligibil.org.');
+    } catch (error) {
+      setStatus('Nu am putut salva acum. Scrie-ne la contact@eligibil.org.');
+    }
+  };
   return (
     <section className="section" data-screen-label="15 CTA">
       <div className="container">
@@ -235,6 +282,15 @@ function FinalCTAOrg() {
           <div className="mono" style={{ fontSize: 11, opacity: .6, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14 }}>eligibil.org · 735+ surse · 5 produse AI</div>
           <h2>Începe cu startupul tău. Află unde ești eligibil.</h2>
           <p>Caută printre sute de oportunități, încarcă documentele startupului și primește o analiză clară despre programele potrivite, documentele lipsă și următorii pași.</p>
+          <form onSubmit={submitEarlyAccess} style={{ margin: '24px 0', display: 'grid', gap: 10, maxWidth: 680 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+              <input aria-label="Nume" placeholder="Nume" style={{ padding: 12, border: '1px solid var(--border-soft)' }} />
+              <input aria-label="Email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" style={{ padding: 12, border: '1px solid var(--border-soft)' }} />
+            </div>
+            <label style={{ fontSize: 12, color: 'var(--ink-2)' }}><input type="checkbox" required /> Sunt de acord să fiu contactat despre early access. Datele nu sunt vândute.</label>
+            <button className="btn btn--accent" type="submit">Join early access</button>
+            {status && <div style={{ fontSize: 13, color: 'var(--ink-2)' }}>{status}</div>}
+          </form>
           <div className="cta-tri__btns">
             <a className="btn btn--accent" href="/search">Caută finanțare →</a>
             <button className="btn btn--ghost">Analizează startupul meu</button>
@@ -256,6 +312,9 @@ function FooterOrg({ lang, setLang }) {
         <div className="footer__top">
           <div>
             <div className="footer__brand">eligibil<span style={{ color: 'var(--accent)' }}>.org</span></div>
+            <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 12, maxWidth: 340 }}>
+              Independent funding discovery and eligibility matching platform. We do not guarantee funding approval.
+            </p>
             <div className="footer__tag">AI Readiness &amp; Funding Orchestrator</div>
             <p style={{ fontSize: 13.5, color: 'var(--ink-2)', marginTop: 16, maxWidth: 300 }}>
               AI Readiness &amp; Funding Orchestrator pentru startupuri, cercetători și parteneri din Moldova, România și Europa de Est.
@@ -291,15 +350,15 @@ function FooterOrg({ lang, setLang }) {
           <div className="footer__col">
             <h5>eligibil.org</h5>
             <a href="/about">About</a>
-            <a href="mailto:info@eligibil.org">Contact</a>
-            <a href="/blog?cat=metodologie">Metodologie</a>
-            <a href="/blog?cat=data-quality">Calitatea datelor</a>
-            <a href="mailto:info@eligibil.org?subject=Scrie%20pentru%20noi">Scrie pentru noi</a>
-            <a href="mailto:info@eligibil.org?subject=Press">Press &amp; Media</a>
+            <a href="/contact">Contact</a>
+            <a href="/how-it-works">Cum funcționează</a>
+            <a href="/methodology">Metodologie</a>
+            <a href="/data-quality">Calitatea datelor</a>
+            <a href="/technology">Technology roadmap</a>
           </div>
           <div className="footer__col">
             <h5>Contact</h5>
-            <a href="mailto:info@eligibil.org">info@eligibil.org</a>
+            <a href="mailto:contact@eligibil.org">contact@eligibil.org</a>
             <a href="mailto:info@eligibil.org?subject=Chat%20live">Chat live · 09:00–18:00 EET</a>
             <div style={{ marginTop: 14, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {[
@@ -323,8 +382,9 @@ function FooterOrg({ lang, setLang }) {
             </div>
           </div>
           <div>
-            <a href="/legal/imprint">Imprint</a>
-            <a href="/legal/disclaimer">Disclaimer</a>
+            <a href="/contact">Contact</a>
+            <a href="/methodology">Methodology</a>
+            <a href="/data-quality">Data Quality</a>
             <a href="/legal/privacy">Privacy Policy</a>
             <a href="/legal/cookie">Cookies</a>
             <a href="/legal/terms">Terms of Use</a>

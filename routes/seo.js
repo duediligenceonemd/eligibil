@@ -53,6 +53,13 @@ const STATIC_PAGES = [
   { path: '/startupuri',  changefreq: 'weekly' },
   { path: '/glosar',      changefreq: 'monthly'},
   { path: '/about',       changefreq: 'monthly'},
+  { path: '/contact',     changefreq: 'monthly'},
+  { path: '/how-it-works', changefreq: 'monthly'},
+  { path: '/methodology', changefreq: 'monthly'},
+  { path: '/data-quality', changefreq: 'monthly'},
+  { path: '/technology',  changefreq: 'monthly'},
+  { path: '/privacy',     changefreq: 'monthly'},
+  { path: '/terms',       changefreq: 'monthly'},
 ];
 
 // ── Programmatic SEO listings — keep in sync with SEO_SECTORS / SEO_COUNTRIES

@@ -2,6 +2,47 @@
 
 > Find the right grants, faster. AI-powered matching for startups in Moldova, Romania & the EU.
 
+## AWS Activate / Startup Positioning
+
+Eligibil.org is being prepared as an early-stage, self-funded startup project for AWS Activate Founders. The product positioning is broader than a grant directory: it is an **AI-powered funding intelligence and eligibility matching platform** for startups, SMEs, NGOs, researchers, founders and ecosystem builders.
+
+Current development status:
+
+- MVP / early access in development.
+- Public opportunity discovery and resource catalog are live.
+- AI-assisted eligibility scoring, document readiness support, advanced recommendations and cloud-native ingestion workflows are part of the roadmap.
+- Eligibil.org does not guarantee funding approval. Official providers make final eligibility and award decisions.
+
+Target users:
+
+- Early-stage startups and founders
+- SMEs seeking non-dilutive funding
+- NGOs and research teams
+- Incubators, accelerators and ecosystem builders
+
+AWS infrastructure roadmap:
+
+- Amazon S3 for document and asset storage
+- Amazon CloudFront for fast content delivery
+- AWS Lambda and Amazon API Gateway for serverless backend workflows
+- Amazon RDS PostgreSQL or DynamoDB for structured opportunity and user data
+- Amazon OpenSearch for semantic/faceted funding search
+- Amazon Bedrock for AI-assisted matching, summarization and eligibility scoring
+- Amazon SES for notifications
+- Amazon EventBridge for scheduled data ingestion
+- Amazon CloudWatch for monitoring
+- AWS Budgets for cost control
+
+Security and cost-control notes:
+
+- Use environment variables for all secrets.
+- Never commit API keys, database credentials or service-role keys.
+- Enable MFA on the AWS root account.
+- Use AWS Budgets and alerts before enabling production-scale workloads.
+- Keep document processing and AI workloads scoped by quotas and rate limits.
+
+See also: `docs/aws-activate-application.md`.
+
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![Express](https://img.shields.io/badge/Express-4.x-000000?logo=express&logoColor=white)](https://expressjs.com)
 [![Supabase](https://img.shields.io/badge/Supabase-pgvector-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
