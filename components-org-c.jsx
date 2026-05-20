@@ -269,9 +269,9 @@ function FinalCTAOrg() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, source: 'inline', variant: 'A', locale: 'ro' }),
       });
-      setStatus(response.ok ? 'Mulțumim. Te-am adăugat pe lista early access.' : 'Nu am putut salva acum. Scrie-ne la contact@eligibil.org.');
+      setStatus(response.ok ? 'Mulțumim. Te-am adăugat pe lista early access.' : 'Nu am putut salva acum. Scrie-ne la admin@eligibil.org.');
     } catch (error) {
-      setStatus('Nu am putut salva acum. Scrie-ne la contact@eligibil.org.');
+      setStatus('Nu am putut salva acum. Scrie-ne la admin@eligibil.org.');
     }
   };
   return (
@@ -358,8 +358,8 @@ function FooterOrg({ lang, setLang }) {
           </div>
           <div className="footer__col">
             <h5>Contact</h5>
-            <a href="mailto:contact@eligibil.org">contact@eligibil.org</a>
-            <a href="mailto:info@eligibil.org?subject=Chat%20live">Chat live · 09:00–18:00 EET</a>
+            <a href="mailto:admin@eligibil.org">admin@eligibil.org</a>
+            <a href="mailto:admin@eligibil.org?subject=Eligibil.org%20inquiry">Scrie-ne direct · 09:00–18:00 EET</a>
             <div style={{ marginTop: 14, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {[
                 ['LinkedIn', 'https://www.linkedin.com/company/eligibil'],

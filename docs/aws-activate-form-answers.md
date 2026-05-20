@@ -12,7 +12,7 @@ https://eligibil.org
 Stanislav Florica
 
 ## Contact email
-contact@eligibil.org
+admin@eligibil.org
 
 ## Company stage
 MVP / early access in development
