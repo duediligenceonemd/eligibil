@@ -24,17 +24,24 @@
 <script src="/analytics.js" defer></script>
 <script src="/cookie-consent.js" defer></script>
 <script src="/feedback-widget.js" defer></script>
+<script src="/search-page.js" defer></script>
 </head>
 <body class="d-balanced">
 
-<div id="search-root"></div>
-
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
-
-<script src="/auth.js"></script>
-<script type="text/babel" src="/components-search.jsx"></script>
+<div id="search-root">
+  <div class="sb">
+    <section class="sb__loading">Se incarca pagina de cautare...</section>
+  </div>
+</div>
+<noscript>
+  <div class="sb">
+    <section class="sb__empty">
+      <h3>Activeaza JavaScript pentru cautare</h3>
+      <p>Pagina de cautare foloseste filtre dinamice si rezultate live din catalogul public.</p>
+      <p><a href="/contact">Daca intampini probleme, scrie-ne aici.</a></p>
+    </section>
+  </div>
+</noscript>
 
 <script src="/cookie-consent.js"></script>
 <script src="/clarity.js"></script>

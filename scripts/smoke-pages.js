@@ -10,6 +10,7 @@ const PAGES = [
   { path: '/', label: 'Home' },
   { path: '/en', label: 'Home EN' },
   { path: '/about', label: 'About' },
+  { path: '/search', label: 'Search' },
   { path: '/parteneri', label: 'Parteneri' },
   { path: '/startupuri', label: 'Startupuri' },
   { path: '/produse', label: 'Produse' },
