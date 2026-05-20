@@ -133,7 +133,7 @@ cp .env.example .env
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_KEY=your_anon_or_service_key
+SUPABASE_SERVICE_KEY=your-supabase-service-role-key
 OPENAI_API_KEY=sk-proj-...        # optional — falls back to FTS
 SESSION_SECRET=your-secret
 PORT=3000
