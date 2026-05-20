@@ -175,12 +175,14 @@ SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_SERVICE_KEY=your-supabase-service-role-key
 GA_MEASUREMENT_ID=
 SITE_URL=https://eligibil.org
+ALLOW_ADMIN_TOKEN_AUTH=false
 ```
 
 Notes:
 
 - `GA_MEASUREMENT_ID` is optional and only used after cookie analytics consent.
 - `SITE_URL` is used for SEO routes such as `sitemap.xml` and `llms.txt`.
+- `ALLOW_ADMIN_TOKEN_AUTH` should remain `false` in production unless you explicitly need header-based admin automation.
 
 ## Health & SEO Endpoints
 
