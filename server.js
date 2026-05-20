@@ -289,7 +289,7 @@ app.get(/^\/(ro|en)\/(granturi|grants)-(.+)$/, async (req, res, next) => {
 
 // /search — public catalog page. Static file served via the catch-all that
 // follows; we just need an explicit route ahead of the index.html fallback.
-app.get('/en', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/en', (req, res) => res.sendFile(path.join(__dirname, 'en.html')));
 app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'search.html')));
 app.get('/resurse', (req, res) => res.sendFile(path.join(__dirname, 'resources.html')));
 app.get('/en/resources', (req, res) => res.sendFile(path.join(__dirname, 'resources-en.html')));

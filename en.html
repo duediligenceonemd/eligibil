@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eligibil.org — AI Funding Matching Platform for Startups, SMEs and NGOs</title>
+<meta name="description" content="Eligibil.org helps startups, SMEs, NGOs and founders discover grants, accelerators, non-dilutive capital, investor opportunities and ecosystem programs through AI-assisted matching and eligibility scoring." />
+<link rel="canonical" href="https://eligibil.org/en" />
+<meta property="og:title" content="Eligibil.org — AI Funding Matching Platform for Startups, SMEs and NGOs" />
+<meta property="og:description" content="AI-powered funding intelligence and eligibility matching for startups, SMEs, NGOs, researchers and founders." />
+<meta property="og:url" content="https://eligibil.org/en" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Eligibil.org" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Eligibil.org — AI Funding Matching Platform" />
+<meta name="twitter:description" content="Discover grants, accelerators, non-dilutive capital and ecosystem programs through AI-assisted eligibility matching." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/styles-v2.css" />
+<link rel="stylesheet" href="/styles-org.css" />
+<link rel="stylesheet" href="/styles-mobile.css?v=20260514h" />
+<script src="/lang.js?v=20260514h" defer></script>
+<script src="/app-config.js" defer></script>
+<script src="/analytics.js" defer></script>
+<script src="/cookie-consent.js" defer></script>
+<script src="/feedback-widget.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://eligibil.org/#organization",
+      "name": "Eligibil.org",
+      "url": "https://eligibil.org",
+      "email": "admin@eligibil.org",
+      "description": "AI-powered funding intelligence and eligibility matching platform for startups, SMEs, NGOs, researchers and founders."
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://eligibil.org/#website",
+      "url": "https://eligibil.org",
+      "name": "Eligibil.org",
+      "publisher": { "@id": "https://eligibil.org/#organization" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://eligibil.org/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://eligibil.org/#app",
+      "name": "Eligibil.org",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "url": "https://eligibil.org/en",
+      "description": "AI-assisted funding discovery, eligibility scoring and startup profile matching platform."
+    }
+  ]
+}
+</script>
+<style>
+body.en-shell-pending #root { visibility: hidden; }
+body.en-shell-ready #root { visibility: visible; }
+</style>
+</head>
+<body class="d-balanced en-shell-pending">
+<div class="scroll-progress"><div class="scroll-progress__bar" id="scroll-bar"></div></div>
+<div id="root"></div>
+<script>
+const TWEAK_DEFAULTS = { accent: 'navy', density: 'balanced', dark: false, showReport: true };
+const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
+function applyTweaks(t) {
+  document.documentElement.style.setProperty('--accent', ACCENTS[t.accent] || ACCENTS.navy);
+  document.body.classList.remove('d-spacious', 'd-balanced', 'd-dense');
+  document.body.classList.add('d-' + (t.density || 'balanced'));
+  document.body.classList.toggle('dark', !!t.dark);
+  window.__TWEAKS = t;
+  window.dispatchEvent(new CustomEvent('tweaks-change', { detail: t }));
+}
+let tweaks = { ...TWEAK_DEFAULTS };
+applyTweaks(tweaks);
+window.__FORCE_LANG = 'EN';
+try { localStorage.setItem('eligibil_lang', 'EN'); } catch (e) {}
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  const bar = document.getElementById('scroll-bar');
+  if (bar) bar.style.width = pct + '%';
+});
+</script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="/data.js?v=20260514h"></script>
+<script src="/data-org.js?v=20260514h"></script>
+<script type="text/babel" src="/thumbs.js?v=20260514h"></script>
+<script type="text/babel" src="/components-org-a.jsx?v=20260514h"></script>
+<script type="text/babel" src="/components-org-b.jsx?v=20260514h"></script>
+<script type="text/babel" src="/components-org-c.jsx?v=20260514h"></script>
+<script type="text/babel">
+const { useState: useStateApp, useEffect: useEffectApp } = React;
+
+function App() {
+  const [lang, setLangState] = useStateApp('EN');
+  const setLang = (l) => {
+    setLangState(l);
+    if (window.setLanguage) window.setLanguage(l);
+  };
+  const [showReport, setShowReport] = useStateApp(window.__TWEAKS?.showReport ?? true);
+
+  useEffectApp(() => {
+    if (window.setLanguage) window.setLanguage('EN');
+    const onT = (e) => setShowReport(!!e.detail.showReport);
+    const onLang = (e) => setLangState(e.detail.lang);
+    window.addEventListener('tweaks-change', onT);
+    window.addEventListener('languagechange', onLang);
+    return () => {
+      window.removeEventListener('tweaks-change', onT);
+      window.removeEventListener('languagechange', onLang);
+    };
+  }, []);
+
+  return (
+    <>
+      <NavOrg lang={lang} setLang={setLang} />
+      <HeroOrg lang={lang} />
+      <Deadlines />
+      <UploadFlow />
+      {showReport && <SampleReportOrg />}
+      <ProductsOrg />
+      <DocGenOrg />
+      <ProgramsOrg />
+      <VerticalsGrid />
+      <AboutOrg />
+      <VerifiedPartners />
+      <ResourcesOrg />
+      <ReportsOrg />
+      <DataQualityOrg />
+      <FAQOrg />
+      <FinalCTAOrg />
+      <FooterOrg lang={lang} setLang={setLang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+<script src="/homepage-en-fix.js?v=20260520a"></script>
+<script src="/cookie-consent.js"></script>
+<script src="/clarity.js"></script>
+<script src="/waitlist-popup.js" defer></script>
+</body>
+</html>

@@ -297,12 +297,16 @@
 
   function apply() {
     if (window.getLanguage && window.getLanguage() !== 'EN') return;
-    if (window.location.pathname !== '/') return;
+    if (window.location.pathname !== '/' && window.location.pathname !== '/en') return;
     document.documentElement.lang = 'en';
     document.title = 'eligibil.org — Discover the best funding sources for your startup';
     applyTargetedOverrides();
     walk(document.body);
     applyTargetedOverrides();
+    if (document.body) {
+      document.body.classList.remove('en-shell-pending');
+      document.body.classList.add('en-shell-ready');
+    }
   }
 
   const observer = new MutationObserver(() => {
