@@ -5,10 +5,11 @@ require('dotenv').config();
 const { getSupabase } = require('../db/supabase');
 const { isBedrockEnabled, bedrockChat } = require('../lib/bedrock');
 
-// AI provider priority: AWS Bedrock (Claude Haiku) → OpenAI fallback
-const BEDROCK_MODEL  = process.env.AWS_HAIKU_MODEL || 'anthropic.claude-haiku-4-5-20251001-v1:0';
-const OPENAI_MODEL   = process.env.RESOURCE_DESCRIPTION_MODEL || 'gpt-4.1-mini';
-const DEFAULT_LIMIT  = Math.max(parseInt(process.env.RESOURCE_DESCRIPTION_LIMIT || '20', 10) || 20, 1);
+// AI provider priority: AWS Bedrock (Claude Haiku) → Anthropic direct → OpenAI fallback
+const BEDROCK_MODEL    = process.env.AWS_HAIKU_MODEL || 'anthropic.claude-haiku-4-5-20251001-v1:0';
+const ANTHROPIC_MODEL  = process.env.ANTHROPIC_CHAT_MODEL || 'claude-haiku-4-5-20251001';
+const OPENAI_MODEL     = process.env.RESOURCE_DESCRIPTION_MODEL || 'gpt-4.1-mini';
+const DEFAULT_LIMIT    = Math.max(parseInt(process.env.RESOURCE_DESCRIPTION_LIMIT || '20', 10) || 20, 1);
 
 // Source tag set at run time once we know which provider is active
 let DESCRIPTION_SOURCE = `openai:${OPENAI_MODEL}`;
@@ -97,7 +98,20 @@ async function generateOne(row) {
     }
   }
 
-  // 2. Fallback: OpenAI
+  // 2. Fallback: Anthropic direct SDK
+  if (!raw && process.env.ANTHROPIC_API_KEY) {
+    const Anthropic = require('@anthropic-ai/sdk');
+    const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const msg = await client.messages.create({
+      model:      ANTHROPIC_MODEL,
+      max_tokens: 600,
+      system:     SYSTEM_PROMPT,
+      messages:   [{ role: 'user', content: userPrompt }],
+    });
+    raw = msg.content?.[0]?.text || '';
+  }
+
+  // 3. Fallback: OpenAI
   if (!raw && process.env.OPENAI_API_KEY) {
     const { OpenAI } = require('openai');
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -113,7 +127,7 @@ async function generateOne(row) {
     raw = completion.choices?.[0]?.message?.content || '';
   }
 
-  if (!raw) throw new Error('No AI provider available (set AWS or OPENAI_API_KEY)');
+  if (!raw) throw new Error('No AI provider available (set AWS_ACCESS_KEY_ID, ANTHROPIC_API_KEY, or OPENAI_API_KEY)');
   return normalizeGenerated(parseJsonObject(raw));
 }
 
@@ -153,15 +167,20 @@ async function persistGenerated(supabase, rowId, payload, source) {
 }
 
 async function generateDescriptions(options = {}) {
-  const hasAws     = isBedrockEnabled('chat');
-  const hasOpenAI  = !!process.env.OPENAI_API_KEY;
+  const hasAws       = isBedrockEnabled('chat');
+  const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;
+  const hasOpenAI    = !!process.env.OPENAI_API_KEY;
 
-  if (!hasAws && !hasOpenAI) {
-    throw new Error('Niciun provider AI disponibil. Configurează AWS_ACCESS_KEY_ID sau OPENAI_API_KEY.');
+  if (!hasAws && !hasAnthropic && !hasOpenAI) {
+    throw new Error('Niciun provider AI disponibil. Configurează AWS_ACCESS_KEY_ID, ANTHROPIC_API_KEY sau OPENAI_API_KEY.');
   }
 
-  // Set source tag based on active provider
-  DESCRIPTION_SOURCE = hasAws ? `bedrock:${BEDROCK_MODEL}` : `openai:${OPENAI_MODEL}`;
+  // Set source tag based on active provider (highest priority wins)
+  DESCRIPTION_SOURCE = hasAws
+    ? `bedrock:${BEDROCK_MODEL}`
+    : hasAnthropic
+      ? `anthropic:${ANTHROPIC_MODEL}`
+      : `openai:${OPENAI_MODEL}`;
 
   const overwrite = !!options.overwrite;
   const limit = Math.max(parseInt(String(options.limit || DEFAULT_LIMIT), 10) || DEFAULT_LIMIT, 1);
