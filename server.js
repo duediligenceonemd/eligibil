@@ -13,6 +13,7 @@ const {
   authRegisterLimiter,
   newsletterLimiter,
   uploadLimiter,
+  chatLimiter,
 } = require('./lib/rate-limit');
 const compression = require('compression');
 const {
@@ -455,6 +456,7 @@ app.use('/api/auth/reset-password', authLoginLimiter);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/artefacts', uploadLimiter, require('./routes/artefacts'));
+app.use('/api/chat', chatLimiter, require('./routes/chat'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/newsletter', newsletterLimiter, require('./routes/newsletter'));
 app.use('/api/waitlist', require('./routes/waitlist'));

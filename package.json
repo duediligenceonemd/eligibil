@@ -45,6 +45,8 @@
     "stats:rescore": "node scripts/compute-user-stats.js --sync-json --rescore",
     "grants:enrich": "node scripts/enrich-grants-claude.js",
     "grants:enrich:dry": "node scripts/enrich-grants-claude.js --dry-run",
+    "embeddings:migrate": "node scripts/migrate-embeddings.js",
+    "embeddings:migrate:dry": "node scripts/migrate-embeddings.js --dry-run",
     "security:audit": "npm audit --audit-level=high",
     "security:fix": "npm audit fix",
     "security:check": "npx better-npm-audit audit"

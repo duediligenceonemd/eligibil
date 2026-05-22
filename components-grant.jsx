@@ -920,4 +920,175 @@ function GrantApp() {
   );
 }
 
+// ============== AI CHAT WIDGET ==============
+function GrantChatWidget({ grantId, grantName }) {
+  const [open, setOpen]       = useState(false);
+  const [input, setInput]     = useState('');
+  const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [error, setError]     = useState(null);
+  const bottomRef             = useRef(null);
+  const inputRef              = useRef(null);
+
+  const SUGGESTIONS = [
+    'Sunt eligibil pentru acest grant?',
+    'Ce documente trebuie să pregătesc?',
+    'Care sunt pașii de aplicare?',
+    'Care sunt criteriile de evaluare?',
+  ];
+
+  useEffect(() => {
+    if (open && bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [history, open]);
+
+  useEffect(() => {
+    if (open && inputRef.current) inputRef.current.focus();
+  }, [open]);
+
+  async function sendMessage(text) {
+    const msg = (text || input).trim();
+    if (!msg || loading) return;
+    setInput('');
+    setError(null);
+
+    const newHistory = [...history, { role: 'user', content: msg }];
+    setHistory(newHistory);
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: msg,
+          grantId: grantId || null,
+          history: newHistory.slice(-8),
+          language: 'ro',
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Eroare server');
+        setHistory(prev => prev.slice(0, -1));
+      } else {
+        setHistory(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      }
+    } catch (err) {
+      setError('Eroare de conexiune. Încearcă din nou.');
+      setHistory(prev => prev.slice(0, -1));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  return (
+    <div className="gchat">
+      {/* Floating button */}
+      <button
+        className={`gchat__btn${open ? ' gchat__btn--open' : ''}`}
+        onClick={() => setOpen(v => !v)}
+        title="Consilier AI granturi"
+        aria-label="Deschide chat AI"
+      >
+        {open ? '✕' : '💬'}
+        {!open && <span className="gchat__badge">AI</span>}
+      </button>
+
+      {/* Chat panel */}
+      {open && (
+        <div className="gchat__panel">
+          <div className="gchat__head">
+            <div className="gchat__head-icon">🤖</div>
+            <div>
+              <div className="gchat__head-t">Consilier AI</div>
+              <div className="gchat__head-s">{grantName || 'Grant advisor'}</div>
+            </div>
+            <button className="gchat__close" onClick={() => setOpen(false)}>✕</button>
+          </div>
+
+          <div className="gchat__msgs">
+            {history.length === 0 && (
+              <div className="gchat__welcome">
+                <div className="gchat__welcome-t">Bună! Sunt consilierul tău AI pentru granturi.</div>
+                <div className="gchat__welcome-s">Întreabă-mă orice despre acest grant:</div>
+                <div className="gchat__chips">
+                  {SUGGESTIONS.map((s, i) => (
+                    <button key={i} className="gchat__chip" onClick={() => sendMessage(s)}>{s}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {history.map((m, i) => (
+              <div key={i} className={`gchat__msg gchat__msg--${m.role}`}>
+                {m.role === 'assistant' && <span className="gchat__avatar">🤖</span>}
+                <div className="gchat__bubble">{m.content}</div>
+              </div>
+            ))}
+
+            {loading && (
+              <div className="gchat__msg gchat__msg--assistant">
+                <span className="gchat__avatar">🤖</span>
+                <div className="gchat__bubble gchat__bubble--loading">
+                  <span className="gchat__dot" />
+                  <span className="gchat__dot" />
+                  <span className="gchat__dot" />
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="gchat__error">{error}</div>
+            )}
+
+            <div ref={bottomRef} />
+          </div>
+
+          <div className="gchat__input-row">
+            <textarea
+              ref={inputRef}
+              className="gchat__input"
+              rows={2}
+              placeholder="Întreabă ceva despre eligibilitate, documente..."
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKey}
+              disabled={loading}
+              maxLength={1500}
+            />
+            <button
+              className="gchat__send"
+              onClick={() => sendMessage()}
+              disabled={loading || !input.trim()}
+              title="Trimite"
+            >
+              {loading ? '…' : '→'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 ReactDOM.createRoot(document.getElementById('grant-root')).render(<GrantApp />);
+
+if (document.getElementById('grant-chat-root')) {
+  const chatGrant = window.__GRANT_DATA__ || {};
+  ReactDOM.createRoot(document.getElementById('grant-chat-root')).render(
+    <GrantChatWidget
+      grantId={chatGrant.id || null}
+      grantName={chatGrant.nume_program || chatGrant.name || null}
+    />
+  );
+}
