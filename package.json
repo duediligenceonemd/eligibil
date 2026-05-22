@@ -17,7 +17,8 @@
     "accelerator"
   ],
   "scripts": {
-    "build": "node scripts/build.js",
+    "build": "node scripts/build-jsx.js && node scripts/build.js",
+    "build:jsx": "node scripts/build-jsx.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "verify:prod": "node scripts/verify-production.js",
@@ -72,5 +73,10 @@
     "resend": "^6.12.3",
     "rss-parser": "^3.13.0",
     "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/plugin-transform-react-jsx": "^7.28.6"
   }
 }
