@@ -195,12 +195,12 @@ SQL schemas: `scripts/supabase-*.sql`
 
 ## Pending Tasks
 
-- [ ] Password reset flow — end-to-end verification (routes/auth.js, reset-password.html)
+- [x] Password reset flow — end-to-end verified (register→forgot→verify→reset→login)
+- [x] RLS policies — all 26 tables have RLS enabled; sensitive tables locked (no GRANTs)
 - [ ] Deadline alerts — test `scripts/send-deadline-alerts.js` with real data
 - [ ] SEO structured data — JSON-LD on all public pages
 - [ ] Resource enrichment — AI descriptions for 567 funding_resources
 - [ ] Native RU/UA copy — replace EN fallback strings with proper translations
-- [ ] RLS policies — enable on waitlist, funding_resources, email_logs
 - [ ] DNS records — configure SPF, DKIM, DMARC for eligibil.org (Resend)
 - [ ] Stripe integration — payment flow (future)
 - [ ] Content pages — /stiri, /blog with CMS-like admin
@@ -209,7 +209,7 @@ SQL schemas: `scripts/supabase-*.sql`
 
 ## Security Notes
 
-- **RLS**: Disabled on `waitlist`, `funding_resources` — needs fixing
+- **RLS**: Enabled on all 26 tables; sensitive tables (waitlist, email_logs, etc.) have zero GRANTs to anon/authenticated
 - **Auth**: bcrypt 12 rounds, brute-force lockout (5 attempts/15min per IP+email)
 - **Sessions**: express-session with Supabase store, `elig.sid` cookie
 - **Email tokens**: HMAC-SHA256 signed (not JWT), `UNSUBSCRIBE_SECRET`
