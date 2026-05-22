@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://eligibil.org/partener">
 <title>Partener · eligibil.org</title>
 <meta name="description" content="Profil partener verificat eligibil.org — accelerator, fond, universitate sau program. Descriere, regiune, sectoare, contact." />
 
@@ -59,8 +61,8 @@ let tweaks = { accent: 'navy', density: 'balanced', dark: false };
 })();
 </script>
 
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
 <script src="/data.js?v=20260514h"></script>
@@ -130,7 +132,7 @@ function PartnerPage() {
             <div className="pt__sidehead">Despre organizație</div>
             <h3>Ce face {p.name}</h3>
             <p>
-              {p.about || `${p.name} este un ${p.type.toLowerCase()} cu sediul în ${p.region}, activ în ecosistemul de finanțare pentru startupuri și IMM-uri inovatoare. Lucrează cu fondatori, cercetători și echipe care vor să acceseze granturi, capital non-dilutiv, programe colaborative europene sau acceleratoare.`}
+              {p.about || `${p.name} este un ${p.type.toLowerCase()} cu sediul în ${p.region}, activ în ecosistemul de finanțare pentru startupuri. Lucrează cu fondatori, cercetători și echipe care vor să acceseze granturi, capital non-dilutiv, programe colaborative europene sau acceleratoare.`}
             </p>
             <p>
               {p.focus || `Focusul principal include sectoarele ${(p.tags || []).join(', ')} și colaborări cu programe europene precum Horizon Europe, EIC sau parteneriate cu fonduri și universități din regiune.`}

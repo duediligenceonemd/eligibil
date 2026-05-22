@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Despre eligibil.org · AI Funding Orchestrator</title>
-<meta name="description" content="eligibil.org este platforma AI care ajută startupuri și IMM-uri din Moldova, România și Europa de Est să găsească granturi, capital non-dilutiv, parteneri pentru consorții și să-și pregătească aplicațiile de finanțare." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>About eligibil.org · AI Funding Intelligence for Startup Founders</title>
+<meta name="description" content="eligibil.org is an AI-powered funding intelligence platform for startup founders. Built by AIGOV SOLUTION SRL, Republic of Moldova. Founded by Stanislav Florica." />
 <link rel="canonical" href="https://eligibil.org/about" />
-<meta property="og:title" content="Despre eligibil.org · AI Funding Orchestrator" />
-<meta property="og:description" content="Platforma AI care ajută startupuri și IMM-uri din Moldova, România și Europa de Est să găsească granturi și capital non-dilutiv." />
+<meta property="og:title" content="About eligibil.org · AI Funding Intelligence for Startup Founders" />
+<meta property="og:description" content="AI-powered funding intelligence platform for startup founders. Built by AIGOV SOLUTION SRL, Republic of Moldova." />
 <meta property="og:url" content="https://eligibil.org/about" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -53,7 +54,28 @@
 </head>
 <body class="d-balanced">
 
-<div id="root"><div style="padding:48px;text-align:center;color:#666">Se încarcă…</div></div>
+<div id="root">
+  <!-- Static fallback for search engines and no-JS visitors — React replaces this on load -->
+  <header style="padding:64px 24px 32px;max-width:960px;margin:0 auto">
+    <nav style="margin-bottom:32px"><a href="/" style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#0e1620;text-decoration:none">eligibil<span style="color:#1f3a5f">.org</span></a> &rsaquo; About</nav>
+    <span style="display:inline-block;padding:4px 12px;background:#1f3a5f;color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px">Early Access &middot; MVP in Development</span>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,4vw,48px);line-height:1.1;margin:0 0 16px;color:#0e1620">Building funding infrastructure for startup founders in Eastern Europe.</h1>
+    <p style="font-size:18px;line-height:1.55;color:#4a5568;max-width:720px;margin:0">eligibil.org is an AI platform helping startup founders discover grants, non-dilutive capital and consortium partners — in Moldova, Romania, Ukraine and across the EU.</p>
+  </header>
+  <main style="padding:0 24px;max-width:960px;margin:0 auto">
+    <section style="padding:32px 0;border-top:1px solid #e2e8f0">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 8px;color:#0e1620">Founder</h2>
+      <p style="font-size:16px;line-height:1.7;color:#4a5568;margin:0"><strong>Stanislav Florica</strong> — solo founder, self-funded. Legal entity: <strong>AIGOV SOLUTION SRL</strong>, Chisinau, Republic of Moldova.</p>
+    </section>
+    <section style="padding:32px 0;border-top:1px solid #e2e8f0">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 8px;color:#0e1620">Mission</h2>
+      <p style="font-size:16px;line-height:1.7;color:#4a5568;margin:0">Equalizing access to funding intelligence for startup founders in underserved ecosystems. AI-powered matching with 700+ verified grants, accelerators and non-dilutive programs. Interface in Romanian, English, Russian and Ukrainian.</p>
+    </section>
+    <section style="padding:32px 0;border-top:1px solid #e2e8f0">
+      <p style="font-size:15px;color:#4a5568;margin:0">Contact: <a href="mailto:admin@eligibil.org">admin@eligibil.org</a> &middot; <a href="/contact">Contact page</a> &middot; <a href="/technology">Technology</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></p>
+    </section>
+  </main>
+</div>
 
 <script>
 const ACCENTS = { navy:'#1f3a5f', forest:'#0a5c3e', rust:'#c24a1e', black:'#1a1a1a', plum:'#6b46c1' };
@@ -64,8 +86,8 @@ let tweaks = { accent: 'navy', density: 'balanced', dark: false };
 })();
 </script>
 
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
 <script src="/data.js?v=20260514h"></script>
@@ -98,7 +120,7 @@ function AboutPage() {
           <h2 className="ab__h2">Stanislav Florica</h2>
         </div>
         <div className="ab__prose">
-          <p>Eligibil.org este construit ca un MVP early-stage pentru a reduce frictiunea dintre fondatori si sursele reale de finantare. Viziunea porneste din Moldova, se extinde spre Romania si apoi spre piata UE.</p>
+          <p>Eligibil.org este construit ca un MVP early-stage pentru a reduce frictiunea dintre fondatorii de startupuri si sursele reale de finantare. Viziunea porneste din Moldova, se extinde spre Romania si apoi spre piata UE. Entitate juridica: <strong>AIGOV SOLUTION SRL</strong>, Chisinau, Republica Moldova.</p>
           <p>Platforma nu este un consultant care promite castigarea unui grant. Este infrastructura software pentru funding discovery, AI-assisted eligibility matching, document readiness si recomandari mai clare.</p>
         </div>
       </section>
@@ -111,7 +133,7 @@ function AboutPage() {
           </div>
           <div className="ab__prose">
             <p>
-              În fiecare an, sute de miliarde de euro din granturi europene, programe naționale și fonduri non-dilutive sunt distribuite startupurilor și IMM-urilor. Dar accesul la aceste resurse e dezechilibrat: ecosistemele mature (Berlin, Paris, Amsterdam) au consultanți, advisori și rețele care fac diferența. Moldova, România, Ucraina și restul Europei de Est rămân subreprezentate.
+              În fiecare an, sute de miliarde de euro din granturi europene, programe naționale și fonduri non-dilutive sunt distribuite startupurilor. Dar accesul la aceste resurse e dezechilibrat: ecosistemele mature (Berlin, Paris, Amsterdam) au consultanți, advisori și rețele care fac diferența. Fondatorii din Moldova, România, Ucraina și restul Europei de Est rămân subreprezentați.
             </p>
             <p>
               Construim instrumentele care egalizează acest acces. AI care citește pitch deck-ul tău și îți spune unde ești eligibil. Match Score pe baza datelor reale, nu a presupunerilor. Glosar deschis cu termeni explicați simplu. Catalog de parteneri verificați. Și o comunitate de fondatori care nu mai pierd timp căutând pe pagini web obscure.
@@ -121,8 +143,8 @@ function AboutPage() {
 
         <div className="ab__stats">
           <div className="ab__stat">
-            <div className="ab__stat-v">70+</div>
-            <div className="ab__stat-l">Granturi în catalog</div>
+            <div className="ab__stat-v">630+</div>
+            <div className="ab__stat-l">Surse de finanțare în catalog</div>
           </div>
           <div className="ab__stat">
             <div className="ab__stat-v">4</div>

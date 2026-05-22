@@ -248,7 +248,7 @@ router.get('/llms.txt', (req, res) => {
   res.send([
     '# eligibil.org',
     '',
-    '> eligibil.org is a funding discovery and matching platform for startups, SMEs, NGOs and researchers in Romania, Moldova and Europe.',
+    '> eligibil.org is an AI-powered funding intelligence platform for startup founders in Moldova, Romania and Eastern Europe.',
     '',
     '## Primary public entry points',
     `- Search: ${SITE_URL}/search`,

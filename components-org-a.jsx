@@ -190,23 +190,6 @@ function HeroOrg({ lang }) {
             <div className="org-hero__copy">
               <div className="hero__eyebrow">
                 <span className="hero__eyebrow-dot" />
-                Early access MVP · built for Moldova, Romania and the EU
-              </div>
-              <h1 className="org-hero__h1">
-                AI-powered funding intelligence and eligibility matching for <em>startups, SMEs, NGOs and founders.</em>
-              </h1>
-              <p className="org-hero__sub">
-                Eligibil.org helps teams discover grants, accelerators, EU programs, non-dilutive capital, investor opportunities, training programs and ecosystem events through structured data and AI-assisted matching.
-              </p>
-              <div className="org-hero__ctas" style={{ marginTop: 24, marginBottom: 18 }}>
-                <a className="btn btn--accent btn--sm" href="/register.html">Join early access →</a>
-                <a className="btn btn--ghost btn--sm" href="/how-it-works">Learn how it works</a>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.08em', alignSelf: 'center' }}>
-                  No funding guarantee · official providers make final decisions
-                </span>
-              </div>
-              <div className="hero__eyebrow">
-                <span className="hero__eyebrow-dot" />
                 735 surse · 5 produse AI · actualizat acum 2 minute
               </div>
               <h1 className="org-hero__h1">
@@ -330,7 +313,7 @@ function HeroOrg({ lang }) {
           {[
             ['Problem', 'Founders lose time across fragmented grant portals, accelerator pages, EU calls and investor lists. Eligibility rules are hard to compare and change often.'],
             ['Solution', 'Eligibil.org structures opportunities, eligibility criteria and startup profile signals so users can discover, compare and prioritize relevant funding paths.'],
-            ['Who it is for', 'Startups, SMEs, NGOs, researchers, founders and ecosystem builders across Moldova, Romania and the EU.'],
+            ['Who it is for', 'Startup founders across Moldova, Romania and the EU seeking grants, accelerators and non-dilutive capital.'],
             ['Technology roadmap', 'Designed for secure profiles, opportunity search, AI-assisted scoring, document readiness support, alerts, analytics and cloud-native workflows.'],
           ].map(([h, p]) => (
             <div className="qcol" key={h}>

@@ -195,7 +195,7 @@
     ['Peste 735 de oportunități verificate, actualizate zilnic, cu analiză AI de pregătire pentru fiecare.', 'Over 735 verified opportunities, updated daily, with AI readiness analysis for each one.'],
     ['fill out the form in minimum (30s)', 'fill out the minimum form (30s)'],
     ['For deep tech startups, researchers and spinouts, eligibil.org analyzes the technical whitepaper, methodology, TRL level, intellectual property, impact, risks and compatibility with programs such as EIC, Horizon Europe, Pathfinder or R&D grants.', 'For deep tech startups, researchers, and spinouts, eligibil.org analyzes the technical whitepaper, methodology, TRL level, intellectual property, impact, risks, and fit with programs such as EIC, Horizon Europe, Pathfinder, or R&D grants.'],
-    ['eligib.org estimates your startup\'s Technology Readiness Level based on uploaded documents, product description, prototype, technical validations, and existing traction.', 'eligibil.org estimates your startup\'s Technology Readiness Level based on uploaded documents, product description, prototype, technical validation, and existing traction.'],
+    ['eligibil.org estimates your startup\'s Technology Readiness Level based on uploaded documents, product description, prototype, technical validations, and existing traction.', 'eligibil.org estimates your startup\'s Technology Readiness Level based on uploaded documents, product description, prototype, technical validation, and existing traction.'],
     ['The funding aggregator for startups, researchers and founders in Eastern Europe.', 'The funding aggregator for startups, researchers, and founders in Eastern Europe.'],
     ['The accelerators, funds and institutions that build the ecosystem.', 'The accelerators, funds, and institutions that build the ecosystem.'],
     ['Reports, whitepapers and insights about the financing market.', 'Reports, whitepapers, and insights about the funding market.'],
@@ -283,8 +283,8 @@
 
   function applyTargetedOverrides() {
     setText('.hero__eyebrow', '735 SOURCES · 5 AI PRODUCTS · UPDATED 2 MINUTES AGO');
-    setText('.org-hero__h1', 'Discover the best funding sources for your startup.');
-    setText('.org-hero__sub', 'The aggregator of grants, competitions, and non-dilutive capital for Moldova, Romania, and Eastern Europe. Over 735 verified opportunities, updated daily, with AI readiness analysis for each one.');
+    setText('.org-hero__h1', 'AI-powered funding intelligence for startup founders.');
+    setText('.org-hero__sub', 'Eligibil.org helps startup founders discover grants, accelerators, EU programs, non-dilutive capital and ecosystem resources through structured data, AI-assisted eligibility matching and document analysis.');
     setText('.org-trust__lbl', 'FUNDS & ACCELERATORS', 3);
     setText('.org-trust__lbl', '4 LANGUAGES AVAILABLE', 4);
     setText('.section__label', '05 — AI PRODUCTS', 3);
@@ -299,7 +299,7 @@
     if (window.getLanguage && window.getLanguage() !== 'EN') return;
     if (window.location.pathname !== '/' && window.location.pathname !== '/en') return;
     document.documentElement.lang = 'en';
-    document.title = 'eligibil.org — Discover the best funding sources for your startup';
+    document.title = 'eligibil.org — AI Funding Intelligence for Startup Founders';
     applyTargetedOverrides();
     walk(document.body);
     applyTargetedOverrides();

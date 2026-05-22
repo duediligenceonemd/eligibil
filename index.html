@@ -1,25 +1,20 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<title>Eligibil.org — AI Funding Matching Platform for Startups, SMEs and NGOs</title>
-<meta name="description" content="Eligibil.org helps startups, SMEs, NGOs and founders discover grants, accelerators, non-dilutive capital, investor opportunities and ecosystem programs through AI-assisted matching and eligibility scoring." />
-<link rel="canonical" href="https://eligibil.org/" />
-<meta property="og:title" content="Eligibil.org — AI Funding Matching Platform for Startups, SMEs and NGOs" />
-<meta property="og:description" content="AI-powered funding intelligence and eligibility matching for startups, SMEs, NGOs, researchers and founders." />
-<meta name="twitter:title" content="Eligibil.org — AI Funding Matching Platform" />
-<meta name="twitter:description" content="Discover grants, accelerators, non-dilutive capital and ecosystem programs through AI-assisted eligibility matching." />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>eligibil.org — Descoperă cele mai bune surse de finanțare pentru startupul tău</title>
-<meta name="description" content="Platforma AI care ajută startupuri din Moldova, România și UE să găsească granturi, acceleratoare și capital non-dilutiv. Matching AI, score de eligibilitate, deadline tracking." />
-<meta property="og:title" content="eligibil.org — Finanțare AI pentru startupuri" />
-<meta property="og:description" content="Platforma AI care ajută startupuri din Moldova, România și UE să găsească granturi, acceleratoare și capital non-dilutiv." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>eligibil.org — AI Funding Intelligence for Startup Founders</title>
+<meta name="description" content="AI-powered funding intelligence platform matching startup founders with 700+ verified grants, accelerators and non-dilutive capital programs across Europe and globally. Currently in early access development." />
+<link rel="canonical" href="https://eligibil.org/" />
+<meta property="og:title" content="eligibil.org — AI Funding Intelligence for Startup Founders" />
+<meta property="og:description" content="AI-powered funding intelligence platform matching startup founders with 700+ verified grants, accelerators and non-dilutive capital programs across Europe and globally." />
 <meta property="og:url" content="https://eligibil.org" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="eligibil.org" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="eligibil.org — Finanțare AI pentru startupuri" />
-<meta name="twitter:description" content="Platforma AI care ajută startupuri din Moldova, România și UE să găsească granturi și capital non-dilutiv." />
+<meta name="twitter:title" content="eligibil.org — AI Funding Intelligence for Startup Founders" />
+<meta name="twitter:description" content="AI-powered funding intelligence platform matching startup founders with 700+ verified grants, accelerators and non-dilutive capital programs." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,16 +35,26 @@
     {
       "@type": "Organization",
       "@id": "https://eligibil.org/#organization",
-      "name": "Eligibil.org",
+      "name": "AIGOV SOLUTION SRL",
+      "alternateName": "Eligibil.org",
       "url": "https://eligibil.org",
-      "email": "contact@eligibil.org",
-      "description": "AI-powered funding intelligence and eligibility matching platform for startups, SMEs, NGOs, researchers and founders."
+      "email": "admin@eligibil.org",
+      "description": "AI-powered funding intelligence platform matching startup founders with verified grants, accelerators and non-dilutive capital programs across Europe.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "MD",
+        "addressLocality": "Chisinau"
+      },
+      "founder": {
+        "@type": "Person",
+        "name": "Stanislav Florica"
+      }
     },
     {
       "@type": "WebSite",
       "@id": "https://eligibil.org/#website",
       "url": "https://eligibil.org",
-      "name": "Eligibil.org",
+      "name": "eligibil.org",
       "publisher": { "@id": "https://eligibil.org/#organization" },
       "potentialAction": {
         "@type": "SearchAction",
@@ -60,11 +65,13 @@
     {
       "@type": "SoftwareApplication",
       "@id": "https://eligibil.org/#app",
-      "name": "Eligibil.org",
+      "name": "eligibil.org",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
       "url": "https://eligibil.org",
-      "description": "AI-assisted funding discovery, eligibility scoring and startup profile matching platform."
+      "description": "AI funding intelligence for startup founders — eligibility matching, document analysis and grant discovery across 700+ programs.",
+      "applicationSubCategory": "Funding Intelligence",
+      "creator": { "@id": "https://eligibil.org/#organization" }
     }
   ]
 }
@@ -93,7 +100,45 @@
 
 <div class="scroll-progress"><div class="scroll-progress__bar" id="scroll-bar"></div></div>
 
-<div id="root"></div>
+<div id="root">
+  <!-- Static fallback for search engines and no-JS visitors — React replaces this on load -->
+  <header style="padding:64px 24px 32px;max-width:960px;margin:0 auto">
+    <nav style="display:flex;align-items:center;justify-content:space-between;margin-bottom:40px">
+      <a href="/" style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:#0e1620;text-decoration:none">eligibil<span style="color:#1f3a5f">.org</span></a>
+      <span style="display:inline-block;padding:4px 12px;background:#1f3a5f;color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase">Early Access &middot; MVP in Development</span>
+    </nav>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,5vw,56px);line-height:1.05;margin:0 0 20px;color:#0e1620">AI Funding Intelligence for Startup Founders</h1>
+    <p style="font-size:19px;line-height:1.55;color:#4a5568;max-width:720px;margin:0">Eligibil.org matches startup founders with 700+ verified grants, accelerators and non-dilutive capital programs across Moldova, Romania, the EU and globally. AI-powered eligibility scoring, document analysis and deadline tracking.</p>
+  </header>
+  <main style="padding:0 24px;max-width:960px;margin:0 auto">
+    <section style="padding:32px 0;border-top:1px solid #e2e8f0">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0 0 16px;color:#0e1620">What we do</h2>
+      <ul style="font-size:16px;line-height:1.75;color:#4a5568;padding-left:20px;margin:0">
+        <li><strong>Funding discovery</strong> — searchable database of 700+ grants, accelerators and non-dilutive programs across 15+ countries</li>
+        <li><strong>AI eligibility matching</strong> — semantic comparison between your startup profile and funding program criteria</li>
+        <li><strong>Document analysis</strong> — AI scoring of pitch decks, whitepapers and videos against funding requirements</li>
+        <li><strong>Deadline tracking</strong> — alerts and calendar for upcoming application deadlines</li>
+        <li><strong>Multi-language</strong> — full interface in Romanian, English, Russian and Ukrainian</li>
+      </ul>
+    </section>
+    <section style="padding:32px 0;border-top:1px solid #e2e8f0">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0 0 16px;color:#0e1620">Who it's for</h2>
+      <p style="font-size:16px;line-height:1.7;color:#4a5568;margin:0">Startup founders in Moldova, Romania and the EU seeking non-dilutive funding — grants, accelerator programs, public tenders and ecosystem resources.</p>
+    </section>
+    <section style="padding:32px 0;border-top:1px solid #e2e8f0">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0 0 12px;color:#0e1620">Status</h2>
+      <p style="font-size:16px;line-height:1.7;color:#4a5568;margin:0">Eligibil.org is currently in <strong>early access development</strong> (MVP stage). Built by <strong>AIGOV SOLUTION SRL</strong>, Republic of Moldova. Founder: Stanislav Florica.</p>
+    </section>
+    <nav style="padding:32px 0;border-top:1px solid #e2e8f0;display:flex;flex-wrap:wrap;gap:16px;font-size:15px">
+      <a href="/search">Search Grants</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/technology">Technology</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+    </nav>
+  </main>
+</div>
 
 <div class="tweaks-panel" id="tweaks-panel">
   <h4>Tweaks</h4>
@@ -182,8 +227,8 @@ window.addEventListener('scroll', () => {
 });
 </script>
 
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
 <script src="data.js?v=20260514h"></script>

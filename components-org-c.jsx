@@ -132,7 +132,7 @@ function AboutOrg() {
     'ajută la pregătirea aplicațiilor',
     'conectează fondatori cu parteneri și consorții',
   ];
-  const audience = ['startupuri', 'fondatori early-stage', 'echipe deep tech', 'cercetători', 'spinout-uri universitare', 'IMM-uri inovatoare', 'acceleratoare', 'fonduri', 'instituții publice', 'programe de finanțare'];
+  const audience = ['fondatori de startupuri', 'fondatori early-stage', 'echipe deep tech', 'spinout-uri universitare', 'fondatori din Moldova', 'fondatori din Romania', 'fondatori din UE', 'acceleratoare', 'fonduri', 'programe de finanțare'];
   const benefits = [
     'vezi rapid ce programe sunt relevante',
     'înțelegi ce documente îți lipsesc',

@@ -1,3 +1,102 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Technology Roadmap · Eligibil.org</title><meta name="description" content="Cloud infrastructure roadmap for Eligibil.org, including planned AWS services for hosting, storage, search, AI-assisted matching and monitoring." /><link rel="canonical" href="https://eligibil.org/technology" /><link rel="stylesheet" href="/styles.css" /><link rel="stylesheet" href="/styles-v2.css" /><style>.page{max-width:960px;margin:auto;padding:72px 24px}h1{font-family:Space Grotesk,sans-serif;font-size:clamp(34px,6vw,60px)}p,li{font-size:17px;line-height:1.65;color:var(--ink-1)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{border:1px solid var(--border-soft);background:var(--bg-2);padding:18px}@media(max-width:760px){.grid{grid-template-columns:1fr}}</style></head><body class="d-balanced"><main class="page"><a href="/">eligibil.org</a><h1>Technology Roadmap</h1><p>Eligibil.org is designed as a cloud-native funding intelligence and eligibility matching platform. The current MVP uses a web application, database-backed opportunity catalog, user flows and monitoring. Future infrastructure is planned to support secure profiles, document processing, search, recommendations and AI-assisted scoring.</p><h2>Planned cloud infrastructure use cases</h2><ul><li>Web application hosting and fast content delivery</li><li>Secure user profiles and opportunity database</li><li>AI-assisted matching, summarization and eligibility scoring</li><li>Document and pitch deck readiness support</li><li>Search, recommendations, alerts and analytics</li><li>Scheduled ingestion and monitoring</li></ul><h2>Planned AWS services</h2><div class="grid"><div class="card">Amazon S3 for document and asset storage</div><div class="card">Amazon CloudFront for fast content delivery</div><div class="card">AWS Lambda for serverless workflows</div><div class="card">Amazon API Gateway for backend APIs</div><div class="card">Amazon RDS PostgreSQL or DynamoDB for structured data</div><div class="card">Amazon OpenSearch for semantic/faceted opportunity search</div><div class="card">Amazon Bedrock for AI-assisted matching and summaries</div><div class="card">Amazon SES for email notifications</div><div class="card">Amazon EventBridge for scheduled ingestion</div><div class="card">Amazon CloudWatch and AWS Budgets for monitoring and cost control</div></div><p><strong>Note:</strong> These are planned or roadmap services unless explicitly documented as implemented. Eligibil.org does not claim AWS Activate approval or production AWS usage.</p></main></body></html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script src="/app-config.js" defer></script>
+<script src="/analytics.js" defer></script>
+<title>Technology &amp; Roadmap · eligibil.org — AI Funding Intelligence for Startup Founders</title>
+<meta name="description" content="Technology stack and infrastructure roadmap for eligibil.org — AI funding intelligence platform for startup founders. Built by AIGOV SOLUTION SRL, Republic of Moldova." />
+<link rel="canonical" href="https://eligibil.org/technology" />
+<meta property="og:title" content="Technology & Roadmap · eligibil.org" />
+<meta property="og:description" content="Technology stack and infrastructure roadmap for eligibil.org — AI funding intelligence platform for startup founders." />
+<meta property="og:url" content="https://eligibil.org/technology" />
+<meta property="og:type" content="website" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/styles-v2.css" />
+<link rel="stylesheet" href="/styles-mobile.css?v=20260514h" />
+<style>
+  .page { max-width: 960px; margin: auto; padding: 72px 24px; }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent, #1f3a5f); margin-bottom: 12px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(34px, 6vw, 60px); line-height: 1.05; margin: 0 0 20px; }
+  h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; margin: 40px 0 16px; }
+  h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin: 28px 0 8px; }
+  p, li { font-size: 17px; line-height: 1.65; color: var(--ink-1, #4a5568); }
+  .badge { display: inline-block; padding: 4px 12px; background: #1f3a5f; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 16px 0; }
+  .card { border: 1px solid var(--border-soft, #e2e8f0); background: var(--bg-2, #f7f5f0); padding: 18px; }
+  .card strong { display: block; margin-bottom: 4px; }
+  .stack-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .stack-table th, .stack-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border-soft, #e2e8f0); font-size: 15px; }
+  .stack-table th { font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2, #718096); }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="d-balanced">
+<main class="page">
+  <a href="/" style="text-decoration:none;font-family:'Space Grotesk',sans-serif;font-weight:700;color:#0e1620">eligibil<span style="color:#1f3a5f">.org</span></a>
+  <div class="eyebrow" style="margin-top:24px">Technology &amp; Roadmap</div>
+  <span class="badge">Early Access &middot; MVP in Development</span>
+  <h1>Technology Stack &amp; Infrastructure Roadmap</h1>
+  <p>Eligibil.org is an AI-powered funding intelligence platform for startup founders. Below is the current technology stack powering the MVP and the planned cloud infrastructure for scaling.</p>
+
+  <h2>Current stack (MVP — live)</h2>
+  <table class="stack-table">
+    <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+    <tbody>
+      <tr><td>Server</td><td>Node.js + Express 4</td></tr>
+      <tr><td>Database</td><td>Supabase PostgreSQL + pgvector for semantic search</td></tr>
+      <tr><td>Frontend</td><td>Vanilla HTML/JS, Preact components (CDN)</td></tr>
+      <tr><td>Auth</td><td>bcrypt + express-session (custom, server-side)</td></tr>
+      <tr><td>AI — Embeddings</td><td>OpenAI text-embedding-3-small (grant vectorization)</td></tr>
+      <tr><td>AI — Extraction</td><td>Anthropic Claude API (grant parsing, enrichment)</td></tr>
+      <tr><td>Email</td><td>Resend (transactional, onboarding, deadline alerts)</td></tr>
+      <tr><td>Search</td><td>pgvector cosine similarity + full-text fallback</td></tr>
+      <tr><td>Hosting</td><td>Google Cloud Run (containerized)</td></tr>
+      <tr><td>i18n</td><td>4 languages: Romanian, English, Russian, Ukrainian</td></tr>
+      <tr><td>Monitoring</td><td>Sentry (errors + profiling), Google Analytics, Microsoft Clarity</td></tr>
+    </tbody>
+  </table>
+
+  <h2>AI use cases (current + planned)</h2>
+  <ul>
+    <li><strong>Document analysis</strong> — parsing and scoring pitch decks (PDF/PPTX), pitch videos (transcription + scoring), whitepapers and websites against funding eligibility criteria</li>
+    <li><strong>Eligibility matching</strong> — semantic comparison between founder profiles and the structured database of 700+ funding programs</li>
+    <li><strong>Recommendation generation</strong> — natural language gap analysis and improvement recommendations per funding opportunity</li>
+    <li><strong>Grant extraction</strong> — automated parsing of funding program announcements from emails, web pages and documents</li>
+    <li><strong>Multi-language support</strong> — operating in Romanian, English, Russian and Ukrainian for the target markets</li>
+  </ul>
+
+  <h2>Planned AWS infrastructure (roadmap)</h2>
+  <p>As the platform scales beyond MVP, the following AWS services are planned for production infrastructure:</p>
+  <div class="grid">
+    <div class="card"><strong>Amazon Bedrock</strong>AI-assisted matching, document analysis and recommendation generation (core AI infrastructure)</div>
+    <div class="card"><strong>Amazon S3</strong>Document and asset storage (pitch decks, whitepapers, exports)</div>
+    <div class="card"><strong>Amazon CloudFront</strong>Fast content delivery for static assets and public pages</div>
+    <div class="card"><strong>AWS Lambda</strong>Serverless workflows for grant ingestion, scoring and alerts</div>
+    <div class="card"><strong>Amazon API Gateway</strong>Backend API management and rate limiting</div>
+    <div class="card"><strong>Amazon RDS PostgreSQL</strong>Structured data storage with pgvector for semantic search</div>
+    <div class="card"><strong>Amazon OpenSearch</strong>Semantic and faceted search across funding programs</div>
+    <div class="card"><strong>Amazon SES</strong>Email notifications, deadline alerts and onboarding sequences</div>
+    <div class="card"><strong>Amazon EventBridge</strong>Scheduled ingestion pipelines and automation</div>
+    <div class="card"><strong>Amazon CloudWatch + AWS Budgets</strong>Monitoring, alerting and cost control</div>
+  </div>
+
+  <h2>Product roadmap</h2>
+  <ul>
+    <li><strong>Q2 2026</strong> — MVP early access: grant catalog, AI matching, document analysis, user profiles</li>
+    <li><strong>Q3 2026</strong> — Public launch: automated grant ingestion, deadline alerts, consortium matching</li>
+    <li><strong>Q4 2026</strong> — Scale: expanded grant database (1500+ programs), API access, advanced analytics</li>
+    <li><strong>2027</strong> — Growth: premium features, institutional partnerships, coverage expansion beyond EU</li>
+  </ul>
+
+  <section style="margin-top:40px;padding-top:32px;border-top:1px solid var(--border-soft, #e2e8f0)">
+    <h3>Operator</h3>
+    <p><strong>AIGOV SOLUTION SRL</strong>, Chisinau, Republic of Moldova.<br>
+    Founder: Stanislav Florica. Contact: <a href="mailto:admin@eligibil.org">admin@eligibil.org</a></p>
+    <p style="font-size:14px;color:var(--ink-2, #718096);margin-top:16px"><strong>Note:</strong> AWS services listed above are planned or roadmap items unless explicitly documented as implemented. Eligibil.org does not claim AWS Activate approval or production AWS usage at this stage.</p>
+  </section>
+</main>
+</body>
+</html>

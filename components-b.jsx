@@ -430,7 +430,7 @@ function Footer({ lang, setLang }) {
           </div>
         </div>
         <div className="footer__bottom">
-          <div>© 2026 eligibil.org · duediligence.one SRL + eligibil Foundation · IT Park Moldova</div>
+          <div>© 2026 eligibil.org · AIGOV SOLUTION SRL · Republic of Moldova</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <div className="lang-sw">
               {[['RO', '🇷🇴 RO'], ['EN', '🇬🇧 EN'], ['RU', '🇷🇺 RU'], ['UA', '🇺🇦 UA']].map(([k, l]) => (

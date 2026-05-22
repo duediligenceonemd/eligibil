@@ -14,6 +14,7 @@ const {
   newsletterLimiter,
   uploadLimiter,
 } = require('./lib/rate-limit');
+const compression = require('compression');
 const {
   requireAdminPage,
   requirePageSession,
@@ -28,6 +29,7 @@ const SESSION_MAX_AGE_MS = Number(process.env.SESSION_MAX_AGE_MS || 24 * 60 * 60
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
+app.use(compression());
 app.use(securityHeaders);
 app.use((req, res, next) => {
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self), payment=(self)');
@@ -47,11 +49,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://www.clarity.ms"],
+      scriptSrc:  ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://www.clarity.ms", "https://scripts.clarity.ms", "https://static.cloudflareinsights.com", "https://www.googletagmanager.com"],
       styleSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:    ["'self'", "https://fonts.gstatic.com"],
       imgSrc:     ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://www.clarity.ms"],
+      connectSrc: ["'self'", "https://www.clarity.ms", "https://scripts.clarity.ms", "https://www.google-analytics.com", "https://www.googletagmanager.com"],
     },
   },
   crossOriginEmbedderPolicy: false,
