@@ -313,6 +313,9 @@ app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.htm
 app.get('/politica-confidentialitate', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
 app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'terms.html')));
 app.get('/termeni-si-conditii', (req, res) => res.sendFile(path.join(__dirname, 'terms.html')));
+app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+app.get('/cookies', (req, res) => res.sendFile(path.join(__dirname, 'cookies.html')));
 app.get('/forgot-password', (req, res) => res.sendFile(path.join(__dirname, 'reset-password.html')));
 app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'reset-password.html')));
 

@@ -157,9 +157,9 @@ function NavOrg({ lang, setLang }) {
                 </button>
               ))}
             </div>
-            <a className="btn btn--ghost btn--sm" href="/login.html">Intră în cont</a>
-            <a className="btn btn--ghost btn--sm" href="/search">Caută finanțare</a>
-            <a className="btn btn--sm btn--accent" href="/upload-artefact">Analizează startupul</a>
+            <a className="btn btn--ghost btn--sm" href="/login">Intră în cont</a>
+            <a className="btn btn--ghost btn--sm" href="/register">Cont nou</a>
+            <a className="btn btn--sm btn--accent" href="/search">Caută finanțare</a>
           </div>
           </div>
         </div>
