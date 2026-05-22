@@ -41,10 +41,24 @@ const RESOURCE_TYPE_ALIASES = {
   technical_support: 'technical_resource',
 };
 
-// ── OpenAI embedding helper ───────────────────────────────────────────────────
-// Returns null if OPENAI_API_KEY not set (triggers FTS fallback).
+// ── Embedding helper — Bedrock Titan → OpenAI fallback → null (FTS) ─────────
 async function getQueryEmbedding(text) {
-  if (!process.env.OPENAI_API_KEY || !text) return null;
+  if (!text) return null;
+
+  // 1. Try AWS Bedrock Titan Embed V2
+  const { isBedrockEnabled, bedrockEmbed } = require('../lib/bedrock');
+  if (isBedrockEnabled('embeddings')) {
+    try {
+      const vec = await bedrockEmbed(text);
+      if (vec) return vec;
+    } catch (err) {
+      console.error('Bedrock embedding error:', err.message);
+      // Fall through to OpenAI
+    }
+  }
+
+  // 2. Fallback to OpenAI
+  if (!process.env.OPENAI_API_KEY) return null;
   try {
     const { OpenAI } = require('openai');
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

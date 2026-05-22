@@ -77,7 +77,9 @@ const PRODUCT_TO_ARTEFACT_TYPE = {
   trl:   'trl_eval',
 };
 
-// ── Lazy SDK init (so /upload doesn't crash when ANTHROPIC_API_KEY is absent)
+// ── AI provider: Bedrock → Anthropic SDK fallback ───────────────────────────
+const { isBedrockEnabled, bedrockChat } = require('../lib/bedrock');
+
 let _anthropic = null;
 function getAnthropic() {
   if (_anthropic) return _anthropic;
@@ -87,6 +89,7 @@ function getAnthropic() {
   return _anthropic;
 }
 const ANALYSIS_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929';
+const BEDROCK_ANALYSIS_MODEL = process.env.AWS_CHAT_MODEL || 'anthropic.claude-sonnet-4-5-20250929-v1:0';
 
 // =============================================================================
 // POST /api/artefacts/upload
@@ -397,27 +400,54 @@ ${textForAnalysis}
 
 Returnează JSON conform schemei.`;
 
-  const response = await anthropic.messages.create({
-    model:      ANALYSIS_MODEL,
-    max_tokens: 4000,
-    system:     systemPrompt,
-    messages:   [{ role: 'user', content: userPrompt }],
-  });
-  const text   = response.content[0].text.trim();
+  let text, usage, modelUsed;
+
+  // 1. Try AWS Bedrock
+  if (isBedrockEnabled('chat')) {
+    try {
+      const result = await bedrockChat({
+        model: BEDROCK_ANALYSIS_MODEL,
+        maxTokens: 4000,
+        system: systemPrompt,
+        userMessage: userPrompt,
+      });
+      text = result.text.trim();
+      usage = result.usage;
+      modelUsed = BEDROCK_ANALYSIS_MODEL;
+    } catch (err) {
+      console.error('Bedrock analysis error, falling back to Anthropic:', err.message);
+    }
+  }
+
+  // 2. Fallback to Anthropic SDK
+  if (!text && anthropic) {
+    const response = await anthropic.messages.create({
+      model:      ANALYSIS_MODEL,
+      max_tokens: 4000,
+      system:     systemPrompt,
+      messages:   [{ role: 'user', content: userPrompt }],
+    });
+    text = response.content[0].text.trim();
+    usage = response.usage;
+    modelUsed = ANALYSIS_MODEL;
+  }
+
+  if (!text) throw new Error('No AI provider available for analysis (set AWS or ANTHROPIC keys)');
+
   const clean  = text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
   const parsed = JSON.parse(clean);
 
-  // Cost estimate (sonnet 4.5: $3/$15 per Mtok, opus 4.5: $15/$75)
-  const m = ANALYSIS_MODEL;
+  // Cost estimate
+  const m = modelUsed;
   const inRate  = m.includes('opus') ? 15 : 3;
   const outRate = m.includes('opus') ? 75 : 15;
-  const cost = (response.usage.input_tokens * inRate + response.usage.output_tokens * outRate) / 1e6;
+  const cost = ((usage.input_tokens || 0) * inRate + (usage.output_tokens || 0) * outRate) / 1e6;
 
   return {
     ...parsed,
-    llm_model:     ANALYSIS_MODEL,
-    input_tokens:  response.usage.input_tokens,
-    output_tokens: response.usage.output_tokens,
+    llm_model:     modelUsed,
+    input_tokens:  usage.input_tokens || 0,
+    output_tokens: usage.output_tokens || 0,
     cost_usd:      Number(cost.toFixed(4)),
   };
 }

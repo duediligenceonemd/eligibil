@@ -174,9 +174,33 @@ async function readExcelGrants() {
 // ── Generate Embeddings ───────────────────────────────────────────────────────
 
 async function generateEmbeddings(grants) {
+  const { isBedrockEnabled, bedrockEmbedBatch } = require('../lib/bedrock');
+  const useBedrock = isBedrockEnabled('embeddings');
+  const total = grants.length;
+
+  if (useBedrock) {
+    console.log('  Using AWS Bedrock Titan Embed V2');
+    for (let i = 0; i < total; i += EMBED_BATCH) {
+      const batch  = grants.slice(i, i + EMBED_BATCH);
+      const inputs = batch.map(g => g._embedText);
+      const end    = Math.min(i + EMBED_BATCH, total);
+      process.stdout.write(`  Batch embeddings ${i + 1}–${end}/${total}... `);
+
+      const embeddings = await bedrockEmbedBatch(inputs);
+      embeddings.forEach((vec, j) => { batch[j].embedding = vec; });
+      console.log('✓');
+    }
+    return;
+  }
+
+  // Fallback: OpenAI
+  if (!process.env.OPENAI_API_KEY) {
+    console.warn('  ⚠ No embedding provider configured (set AWS_BEDROCK_EMBEDDINGS=1 or OPENAI_API_KEY)');
+    return;
+  }
+  console.log('  Using OpenAI text-embedding-3-small');
   const { OpenAI } = require('openai');
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const total  = grants.length;
 
   for (let i = 0; i < total; i += EMBED_BATCH) {
     const batch  = grants.slice(i, i + EMBED_BATCH);

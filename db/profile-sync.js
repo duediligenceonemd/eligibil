@@ -25,11 +25,9 @@ function getSupabaseSafe() {
 }
 
 /**
- * Generate embedding for a profile via OpenAI (optional)
+ * Generate embedding for a profile — Bedrock Titan → OpenAI fallback
  */
 async function embedProfile(profile) {
-  if (!process.env.OPENAI_API_KEY) return null;
-
   const text = [
     `Startup: ${profile.startup_name || profile.startupName || ''}`,
     `Sector: ${profile.sector || ''}`,
@@ -42,6 +40,19 @@ async function embedProfile(profile) {
 
   if (!text || text.length < 30) return null;
 
+  // 1. Try AWS Bedrock Titan Embed V2
+  const { isBedrockEnabled, bedrockEmbed } = require('../lib/bedrock');
+  if (isBedrockEnabled('embeddings')) {
+    try {
+      const vec = await bedrockEmbed(text);
+      if (vec) return vec;
+    } catch (err) {
+      console.warn('[profile-sync] Bedrock embedding failed:', err.message);
+    }
+  }
+
+  // 2. Fallback to OpenAI
+  if (!process.env.OPENAI_API_KEY) return null;
   try {
     const res = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',

@@ -45,10 +45,12 @@ const ONLY_ID = arg('id', null);
 // ─── Config ──────────────────────────────────────────────────────────────────
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 // Default to Opus for one-shot extraction quality; user can override to Sonnet
-// for ~5× cheaper if quality is acceptable. Brief used 'claude-opus-4-5' which
-// doesn't exist; corrected to a current model ID.
+// for ~5× cheaper if quality is acceptable.
 const MODEL   = process.env.ANTHROPIC_MODEL || 'claude-opus-4-7';
 const API_KEY = process.env.ANTHROPIC_API_KEY;
+const BEDROCK_MODEL = process.env.AWS_CHAT_MODEL || 'anthropic.claude-sonnet-4-5-20250929-v1:0';
+
+const { isBedrockEnabled, bedrockChat } = require('../lib/bedrock');
 
 // USD per million tokens. Adjust if Anthropic publishes new prices.
 const PRICING = {
@@ -113,18 +115,38 @@ function buildUserMessage(grant) {
          JSON.stringify(lean, null, 2);
 }
 
-// ─── Anthropic API call (raw fetch, prompt caching enabled) ─────────────────
+// ─── AI call: Bedrock → Anthropic API fallback ──────────────────────────────
 async function callClaude(grant) {
+  const userMessage = buildUserMessage(grant);
+
+  // 1. Try AWS Bedrock
+  if (isBedrockEnabled('chat')) {
+    try {
+      const result = await bedrockChat({
+        model: BEDROCK_MODEL,
+        maxTokens: 2000,
+        system: SYSTEM_PROMPT,
+        userMessage,
+      });
+      const text = result.text;
+      if (!text) throw new Error('No text in Bedrock response');
+      const clean = text.trim().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
+      return { parsed: JSON.parse(clean), usage: result.usage, via: 'bedrock' };
+    } catch (err) {
+      console.error('  Bedrock error, falling back to Anthropic:', err.message);
+    }
+  }
+
+  // 2. Fallback to Anthropic direct API
+  if (!API_KEY) throw new Error('No AI provider available (set AWS or ANTHROPIC keys)');
+
   const body = {
     model: MODEL,
     max_tokens: 2000,
-    // System block split for prompt caching: the schema text is identical
-    // across every call, so we mark it ephemeral. Anthropic charges 1.25×
-    // base input on first call (cache write) and 0.1× on subsequent reads.
     system: [
       { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
     ],
-    messages: [{ role: 'user', content: buildUserMessage(grant) }],
+    messages: [{ role: 'user', content: userMessage }],
   };
 
   const r = await fetch(CLAUDE_API_URL, {
@@ -146,9 +168,8 @@ async function callClaude(grant) {
   const text = data.content?.[0]?.text;
   if (!text) throw new Error('No text in Claude response');
 
-  // Strip code fences if model adds them despite instructions.
   const clean = text.trim().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
-  return { parsed: JSON.parse(clean), usage: data.usage || {} };
+  return { parsed: JSON.parse(clean), usage: data.usage || {}, via: 'anthropic' };
 }
 
 function validateEnriched(e) {
