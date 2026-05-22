@@ -34,6 +34,7 @@
   // ── DOM ──────────────────────────────────────────────────────────────────────
   const root = document.createElement('div');
   root.id = 'gcw-root';
+  root.setAttribute('data-no-translate', '');  // prevent lang.js from translating widget text
   root.innerHTML = `
     <style>
       #gcw-root { position:fixed; bottom:24px; right:24px; z-index:9999; font-family:'Inter',sans-serif; }
