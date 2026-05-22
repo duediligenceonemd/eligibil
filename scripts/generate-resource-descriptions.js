@@ -2,12 +2,16 @@
 
 require('dotenv').config();
 
-const { OpenAI } = require('openai');
 const { getSupabase } = require('../db/supabase');
+const { isBedrockEnabled, bedrockChat } = require('../lib/bedrock');
 
-const DEFAULT_MODEL = process.env.RESOURCE_DESCRIPTION_MODEL || 'gpt-4.1-mini';
-const DEFAULT_LIMIT = Math.max(parseInt(process.env.RESOURCE_DESCRIPTION_LIMIT || '20', 10) || 20, 1);
-const DESCRIPTION_SOURCE = `openai:${DEFAULT_MODEL}`;
+// AI provider priority: AWS Bedrock (Claude Haiku) → OpenAI fallback
+const BEDROCK_MODEL  = process.env.AWS_HAIKU_MODEL || 'anthropic.claude-haiku-4-5-20251001-v1:0';
+const OPENAI_MODEL   = process.env.RESOURCE_DESCRIPTION_MODEL || 'gpt-4.1-mini';
+const DEFAULT_LIMIT  = Math.max(parseInt(process.env.RESOURCE_DESCRIPTION_LIMIT || '20', 10) || 20, 1);
+
+// Source tag set at run time once we know which provider is active
+let DESCRIPTION_SOURCE = `openai:${OPENAI_MODEL}`;
 
 function buildPrompt(row) {
   return [
@@ -72,25 +76,45 @@ function normalizeGenerated(obj) {
   };
 }
 
-async function generateOne(client, model, row) {
-  const completion = await client.chat.completions.create({
-    model,
-    temperature: 0.3,
-    response_format: { type: 'json_object' },
-    messages: [
-      {
-        role: 'system',
-        content: 'You generate high-signal bilingual descriptions for startup funding resources.',
-      },
-      {
-        role: 'user',
-        content: buildPrompt(row),
-      },
-    ],
-  });
+const SYSTEM_PROMPT = 'You generate high-signal bilingual descriptions for startup funding resources. Always respond with a single valid JSON object — no markdown, no preamble.';
 
-  const content = completion.choices?.[0]?.message?.content || '';
-  return normalizeGenerated(parseJsonObject(content));
+async function generateOne(row) {
+  const userPrompt = buildPrompt(row);
+  let raw = null;
+
+  // 1. Try AWS Bedrock (Haiku — cheap, fast JSON extraction)
+  if (isBedrockEnabled('chat')) {
+    try {
+      const result = await bedrockChat({
+        model:      BEDROCK_MODEL,
+        maxTokens:  600,
+        system:     SYSTEM_PROMPT,
+        messages:   [{ role: 'user', content: userPrompt }],
+      });
+      raw = result.text;
+    } catch (err) {
+      console.error('  [bedrock] error, falling back to OpenAI:', err.message);
+    }
+  }
+
+  // 2. Fallback: OpenAI
+  if (!raw && process.env.OPENAI_API_KEY) {
+    const { OpenAI } = require('openai');
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const completion = await client.chat.completions.create({
+      model:           OPENAI_MODEL,
+      temperature:     0.3,
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user',   content: userPrompt },
+      ],
+    });
+    raw = completion.choices?.[0]?.message?.content || '';
+  }
+
+  if (!raw) throw new Error('No AI provider available (set AWS or OPENAI_API_KEY)');
+  return normalizeGenerated(parseJsonObject(raw));
 }
 
 async function fetchRows(supabase, { ids, limit, overwrite }) {
@@ -113,10 +137,10 @@ async function fetchRows(supabase, { ids, limit, overwrite }) {
   return data || [];
 }
 
-async function persistGenerated(supabase, rowId, payload, model) {
+async function persistGenerated(supabase, rowId, payload, source) {
   const update = {
     ...payload,
-    description_source: `openai:${model}`,
+    description_source: source,
     description_generated_at: new Date().toISOString(),
   };
 
@@ -129,31 +153,35 @@ async function persistGenerated(supabase, rowId, payload, model) {
 }
 
 async function generateDescriptions(options = {}) {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY lipsește. Generatorul de descrieri nu poate rula.');
+  const hasAws     = isBedrockEnabled('chat');
+  const hasOpenAI  = !!process.env.OPENAI_API_KEY;
+
+  if (!hasAws && !hasOpenAI) {
+    throw new Error('Niciun provider AI disponibil. Configurează AWS_ACCESS_KEY_ID sau OPENAI_API_KEY.');
   }
 
-  const model = options.model || DEFAULT_MODEL;
+  // Set source tag based on active provider
+  DESCRIPTION_SOURCE = hasAws ? `bedrock:${BEDROCK_MODEL}` : `openai:${OPENAI_MODEL}`;
+
   const overwrite = !!options.overwrite;
   const limit = Math.max(parseInt(String(options.limit || DEFAULT_LIMIT), 10) || DEFAULT_LIMIT, 1);
   const ids = Array.isArray(options.ids) ? options.ids.filter(Boolean) : [];
   const dryRun = !!options.dryRun;
 
   const supabase = getSupabase();
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const rows = await fetchRows(supabase, { ids, limit, overwrite });
 
   const results = [];
   for (const row of rows) {
-    const generated = await generateOne(client, model, row);
+    const generated = await generateOne(row);
     results.push({ id: row.id, title: row.title, ...generated });
     if (!dryRun) {
-      await persistGenerated(supabase, row.id, generated, model);
+      await persistGenerated(supabase, row.id, generated, DESCRIPTION_SOURCE);
     }
   }
 
   return {
-    model,
+    model:     DESCRIPTION_SOURCE,
     overwrite,
     dryRun,
     processed: results.length,

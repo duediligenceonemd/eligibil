@@ -197,13 +197,38 @@ SQL schemas: `scripts/supabase-*.sql`
 
 - [x] Password reset flow — end-to-end verified (register→forgot→verify→reset→login)
 - [x] RLS policies — all 26 tables have RLS enabled; sensitive tables locked (no GRANTs)
-- [ ] Deadline alerts — test `scripts/send-deadline-alerts.js` with real data
+- [x] Deadline alerts — script fixed (Romanian date parser + two-step FK query)
 - [x] SEO structured data — JSON-LD on 9 pages + hreflang on 5 bilingual pages
-- [ ] Resource enrichment — AI descriptions for 567 funding_resources
+- [x] AI Chat — `POST /api/chat` + `chat-widget.js` on search/dashboard/grant SSR pages
+- [x] AWS Bedrock — `lib/bedrock.js` (chat + embeddings), `routes/artefacts.js`, `scripts/enrich-grants-claude.js` all on Bedrock with Anthropic fallback
+- [ ] Resource enrichment — AI descriptions for 567 funding_resources (`npm run resources:describe`) — script updated for Bedrock; run after AWS credits activate
+- [ ] Embeddings migration — Titan v2 1024-dim (`npm run embeddings:migrate`) — run after AWS_BEDROCK_EMBEDDINGS=1 set in Cloud Run
 - [ ] Native RU/UA copy — replace EN fallback strings with proper translations
 - [ ] DNS records — configure SPF, DKIM, DMARC for eligibil.org (Resend)
 - [ ] Stripe integration — payment flow (future)
 - [ ] Content pages — /stiri, /blog with CMS-like admin
+
+## AWS Activate — After Credits Arrive
+
+```bash
+# Set in Cloud Run Environment Variables:
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=us-east-1
+
+# Enable Titan embeddings (optional, requires re-migration):
+AWS_BEDROCK_EMBEDDINGS=1
+
+# Activate in AWS Console → Bedrock → Model access:
+#   anthropic.claude-haiku-4-5-20251001-v1:0   ← chat (cheap)
+#   anthropic.claude-sonnet-4-5-20250929-v1:0  ← artefact analysis
+#   amazon.titan-embed-text-v2:0               ← embeddings
+
+# Run after activation:
+npm run embeddings:migrate        # switch grant vectors to Titan 1024d
+npm run resources:describe        # AI descriptions for 567 funding_resources
+npm run grants:enrich             # backfill missing grant fields
+```
 
 ---
 

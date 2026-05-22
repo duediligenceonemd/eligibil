@@ -318,5 +318,93 @@ function SearchApp() {
   );
 }
 
+// ── AI Chat Widget (shared with grant page) ───────────────────────────────────
+function SearchChatWidget() {
+  const { useState, useEffect, useRef } = React;
+  const [open, setOpen]       = useState(false);
+  const [input, setInput]     = useState('');
+  const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [error, setError]     = useState(null);
+  const bottomRef             = useRef(null);
+  const inputRef              = useRef(null);
+
+  const SUGGESTIONS = [
+    'Ce granturi sunt disponibile pentru Moldova?',
+    'Cum aleg între grant și accelerator?',
+    'Ce documente am nevoie în general?',
+    'Granturi pentru AI startups?',
+  ];
+
+  useEffect(() => {
+    if (open && bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [history, open]);
+  useEffect(() => { if (open && inputRef.current) inputRef.current.focus(); }, [open]);
+
+  async function send(text) {
+    const msg = (text || input).trim();
+    if (!msg || loading) return;
+    setInput(''); setError(null);
+    const newHistory = [...history, { role: 'user', content: msg }];
+    setHistory(newHistory); setLoading(true);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, history: newHistory.slice(-8), language: 'ro' }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || 'Eroare'); setHistory(p => p.slice(0, -1)); }
+      else setHistory(p => [...p, { role: 'assistant', content: data.reply }]);
+    } catch { setError('Eroare conexiune.'); setHistory(p => p.slice(0, -1)); }
+    finally { setLoading(false); }
+  }
+
+  return (
+    <div className="gchat">
+      <button className={`gchat__btn${open ? ' gchat__btn--open' : ''}`} onClick={() => setOpen(v => !v)} title="Consilier AI granturi">
+        {open ? '✕' : '💬'}
+        {!open && <span className="gchat__badge">AI</span>}
+      </button>
+      {open && (
+        <div className="gchat__panel">
+          <div className="gchat__head">
+            <div className="gchat__head-icon">🤖</div>
+            <div><div className="gchat__head-t">Consilier AI</div><div className="gchat__head-s">Întreabă despre granturi</div></div>
+            <button className="gchat__close" onClick={() => setOpen(false)}>✕</button>
+          </div>
+          <div className="gchat__msgs">
+            {history.length === 0 && (
+              <div className="gchat__welcome">
+                <div className="gchat__welcome-t">Bună! Cu ce te pot ajuta?</div>
+                <div className="gchat__chips">
+                  {SUGGESTIONS.map((s, i) => <button key={i} className="gchat__chip" onClick={() => send(s)}>{s}</button>)}
+                </div>
+              </div>
+            )}
+            {history.map((m, i) => (
+              <div key={i} className={`gchat__msg gchat__msg--${m.role}`}>
+                {m.role === 'assistant' && <span className="gchat__avatar">🤖</span>}
+                <div className="gchat__bubble">{m.content}</div>
+              </div>
+            ))}
+            {loading && <div className="gchat__msg gchat__msg--assistant"><span className="gchat__avatar">🤖</span><div className="gchat__bubble gchat__bubble--loading"><span className="gchat__dot"/><span className="gchat__dot"/><span className="gchat__dot"/></div></div>}
+            {error && <div className="gchat__error">{error}</div>}
+            <div ref={bottomRef}/>
+          </div>
+          <div className="gchat__input-row">
+            <textarea ref={inputRef} className="gchat__input" rows={2} placeholder="Întreabă despre granturi, eligibilitate..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}} disabled={loading} maxLength={1500}/>
+            <button className="gchat__send" onClick={() => send()} disabled={loading||!input.trim()}>{loading?'…':'→'}</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const root = ReactDOM.createRoot(document.getElementById('search-root'));
 root.render(<SearchApp />);
+
+if (document.getElementById('search-chat-root')) {
+  ReactDOM.createRoot(document.getElementById('search-chat-root')).render(<SearchChatWidget />);
+}
