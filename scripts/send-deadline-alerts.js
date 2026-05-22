@@ -23,6 +23,36 @@ function addDays(base, days) {
   return next;
 }
 
+const RO_MONTHS = {
+  ianuarie: 0, februarie: 1, martie: 2, aprilie: 3, mai: 4, iunie: 5,
+  iulie: 6, august: 7, septembrie: 8, octombrie: 9, noiembrie: 10, decembrie: 11,
+};
+
+/**
+ * Parse Romanian date strings like "01 iulie 2026" or ISO dates.
+ * Returns a Date or null for non-date values like "Rolling" / "Annual".
+ */
+function parseDeadline(raw) {
+  if (!raw || typeof raw !== 'string') return null;
+  const trimmed = raw.trim().toLowerCase();
+  if (['rolling', 'annual', 'continuous', 'ongoing', 'tbd', 'n/a', '-'].includes(trimmed)) return null;
+
+  // Try Romanian format: "DD monthName YYYY"
+  const roMatch = trimmed.match(/^(\d{1,2})\s+([a-zăâîșț]+)\s+(\d{4})$/);
+  if (roMatch) {
+    const day = Number(roMatch[1]);
+    const month = RO_MONTHS[roMatch[2]];
+    const year = Number(roMatch[3]);
+    if (month !== undefined && day >= 1 && day <= 31) {
+      return new Date(year, month, day);
+    }
+  }
+
+  // Fallback: try standard Date parsing (ISO, etc.)
+  const parsed = new Date(raw);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
 function daysUntil(deadline) {
   const today = new Date();
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -101,31 +131,56 @@ async function sendDeadlineAlerts() {
 
   const { pendingKeys, sentKeys } = await loadExistingAlerts(sb);
 
+  // Step 1: Fetch saved grants with user profiles (FK exists on user_id)
   const { data: saved, error } = await sb
     .from('saved_grants')
-    .select('user_id, grant_id, profiles!saved_grants_user_id_fkey(id, email), grants!saved_grants_grant_id_fkey(id, nume_program, slug_ro, suma_max, deadline, short_summary_ro, short_summary_en, status)')
-    .gte('grants.deadline', windowStart)
-    .lte('grants.deadline', windowEnd)
-    .eq('grants.status', 'Activ');
+    .select('user_id, grant_id, profiles!saved_grants_user_id_fkey(id, email)');
 
   if (error) {
     console.error('Failed to load saved grants for alerts:', error.message);
     process.exit(1);
   }
 
+  if (!saved || saved.length === 0) {
+    console.log('No saved grants found — nothing to alert.');
+    return;
+  }
+
+  // Step 2: Fetch referenced grants (grant_id is TEXT, no FK — separate query)
+  const grantIds = [...new Set(saved.map((r) => r.grant_id).filter(Boolean))];
+  const grantsMap = new Map();
+
+  // Batch in chunks of 50 to avoid URL length limits
+  for (let i = 0; i < grantIds.length; i += 50) {
+    const batch = grantIds.slice(i, i + 50);
+    const { data: grants } = await sb
+      .from('grants')
+      .select('id, nume_program, slug_ro, suma_max, deadline, short_summary_ro, short_summary_en, status')
+      .in('id', batch)
+      .eq('status', 'Activ');
+    for (const g of grants || []) grantsMap.set(g.id, g);
+  }
+
   let queuedCount = 0;
   let skippedCount = 0;
 
-  for (const row of saved || []) {
+  for (const row of saved) {
     const user = row.profiles;
-    const grant = row.grants;
+    const grant = grantsMap.get(row.grant_id);
 
     if (!user?.email || !grant?.deadline || !grant?.id) {
       skippedCount++;
       continue;
     }
 
-    const days = daysUntil(new Date(grant.deadline));
+    // Deadline is TEXT (Romanian dates like "01 iulie 2026", "Rolling", "Annual")
+    const deadlineDate = parseDeadline(grant.deadline);
+    if (!deadlineDate) {
+      skippedCount++;
+      continue;
+    }
+
+    const days = daysUntil(deadlineDate);
     if (!ALERT_DAYS.includes(days)) {
       skippedCount++;
       continue;

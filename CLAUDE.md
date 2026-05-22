@@ -198,7 +198,7 @@ SQL schemas: `scripts/supabase-*.sql`
 - [x] Password reset flow — end-to-end verified (register→forgot→verify→reset→login)
 - [x] RLS policies — all 26 tables have RLS enabled; sensitive tables locked (no GRANTs)
 - [ ] Deadline alerts — test `scripts/send-deadline-alerts.js` with real data
-- [ ] SEO structured data — JSON-LD on all public pages
+- [x] SEO structured data — JSON-LD on 9 pages + hreflang on 5 bilingual pages
 - [ ] Resource enrichment — AI descriptions for 567 funding_resources
 - [ ] Native RU/UA copy — replace EN fallback strings with proper translations
 - [ ] DNS records — configure SPF, DKIM, DMARC for eligibil.org (Resend)
