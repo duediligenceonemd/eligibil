@@ -25,7 +25,40 @@
 <script src="/analytics.js" defer></script>
 <script src="/cookie-consent.js" defer></script>
 <script src="/feedback-widget.js" defer></script>
-
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://eligibil.org/#organization",
+      "name": "AIGOV SOLUTION SRL",
+      "alternateName": "Eligibil.org",
+      "url": "https://eligibil.org",
+      "email": "admin@eligibil.org",
+      "description": "AI-powered funding intelligence platform matching startup founders with verified grants, accelerators and non-dilutive capital programs across Europe.",
+      "foundingDate": "2025",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "MD",
+        "addressLocality": "Chisinau"
+      },
+      "founder": {
+        "@type": "Person",
+        "name": "Stanislav Florica"
+      }
+    },
+    {
+      "@type": "AboutPage",
+      "url": "https://eligibil.org/about",
+      "name": "About eligibil.org",
+      "description": "AI-powered funding intelligence platform for startup founders. Built by AIGOV SOLUTION SRL, Republic of Moldova.",
+      "mainEntity": { "@id": "https://eligibil.org/#organization" },
+      "isPartOf": { "@id": "https://eligibil.org/#website" }
+    }
+  ]
+}
+</script>
 <style>
   .ab__hero { padding: 80px 0 32px; border-bottom: 1px solid var(--border-soft); }
   .ab__crumbs { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
