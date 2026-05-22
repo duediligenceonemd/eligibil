@@ -25,6 +25,7 @@ const adminAuth      = require('../lib/admin-auth');
 const { reportError } = require('../instrument');
 const { processInput } = require('../scripts/process-grants-inbox');
 const { generateDescriptions } = require('../scripts/generate-resource-descriptions');
+const { notifyGrant }         = require('../lib/indexnow');
 
 function tryGetSupabase() {
   try { return getSupabase(); } catch { return null; }
@@ -504,6 +505,8 @@ router.post('/grants', async (req, res) => {
   delete insert.embedding; delete insert.fts; delete insert.created_at; delete insert.updated_at;
   const { data, error } = await sb.from('grants').insert(insert).select().maybeSingle();
   if (error) return res.status(500).json({ error: error.message });
+  // Notify search engines via IndexNow (fire-and-forget)
+  if (data) notifyGrant(data).catch(() => {});
   res.json({ ok: true, item: data });
 });
 
@@ -518,6 +521,8 @@ router.put('/grants/:id', async (req, res) => {
   const { data, error } = await sb.from('grants').update(update).eq('id', req.params.id).select().maybeSingle();
   if (error) return res.status(500).json({ error: error.message });
   if (!data)  return res.status(404).json({ error: 'Grant not found' });
+  // Notify search engines via IndexNow (fire-and-forget)
+  notifyGrant(data).catch(() => {});
   res.json({ ok: true, item: data });
 });
 
