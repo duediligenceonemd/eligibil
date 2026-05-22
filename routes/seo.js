@@ -379,7 +379,7 @@ router.get('/llms.txt', async (req, res) => {
     try {
       const { data } = await sb
         .from('grants')
-        .select('nume_program, slug_ro, suma_maxima, valuta, deadline, tara, sector')
+        .select('nume_program, slug_ro, suma_max, deadline, tara, sector')
         .in('status', ['Activ', 'Active', 'active'])
         .order('created_at', { ascending: false })
         .limit(20);
@@ -390,7 +390,7 @@ router.get('/llms.txt', async (req, res) => {
   const recentSection = recentGrants.length
     ? recentGrants.map(g => {
         const slug  = g.slug_ro ? ` → ${SITE_URL}/ro/granturi/${g.slug_ro}` : '';
-        const suma  = g.suma_maxima ? ` | Max: ${g.suma_maxima.toLocaleString('ro')} ${g.valuta || 'EUR'}` : '';
+        const suma  = g.suma_max ? ` | Max: ${Number(g.suma_max).toLocaleString('ro')} EUR` : '';
         const dl    = g.deadline ? ` | Deadline: ${g.deadline}` : '';
         const tara  = g.tara ? ` | ${g.tara}` : '';
         return `- ${g.nume_program}${suma}${dl}${tara}${slug}`;
@@ -497,40 +497,38 @@ router.get('/llms-full.txt', async (req, res) => {
       const { data } = await sb
         .from('grants')
         .select(`
-          nume_program, slug_ro, slug_en, descriere, suma_minima, suma_maxima,
-          valuta, deadline, tara, sector, tip_finantare, trl_minim,
-          consortiu_obligatoriu, eligibilitate, organizatie_finantare,
-          rata_succes, durata_proiect
+          nume_program, slug_ro, slug_en, descriere, suma_min, suma_max,
+          deadline, tara, sector, tip, trl_min, trl_max,
+          organizatie, website, dilutiv, dificultate
         `)
         .in('status', ['Activ', 'Active', 'active'])
-        .order('suma_maxima', { ascending: false })
+        .order('suma_max', { ascending: false, nullsFirst: false })
         .limit(50);
       grants = data || [];
     } catch (_) { /* non-fatal */ }
   }
 
+  const fmtNum = (n) => n != null ? Number(n).toLocaleString('ro') : null;
   const grantBlocks = grants.map(g => {
     const url    = g.slug_ro ? `${SITE_URL}/ro/granturi/${g.slug_ro}` : SITE_URL;
     const suma   = [
-      g.suma_minima ? `${g.suma_minima.toLocaleString('ro')} ${g.valuta || 'EUR'}` : null,
-      g.suma_maxima ? `${g.suma_maxima.toLocaleString('ro')} ${g.valuta || 'EUR'}` : null,
+      g.suma_min ? `${fmtNum(g.suma_min)} EUR` : null,
+      g.suma_max ? `${fmtNum(g.suma_max)} EUR` : null,
     ].filter(Boolean).join(' — ');
 
     return [
       `### ${g.nume_program || 'Program necunoscut'}`,
       `**URL:** ${url}`,
-      g.tip_finantare   ? `**Tip:** ${g.tip_finantare}` : null,
-      g.organizatie_finantare ? `**Organizație:** ${g.organizatie_finantare}` : null,
+      g.tip             ? `**Tip:** ${g.tip}` : null,
+      g.organizatie     ? `**Organizație:** ${g.organizatie}` : null,
       suma              ? `**Sumă:** ${suma}` : null,
       g.deadline        ? `**Deadline:** ${g.deadline}` : null,
       g.tara            ? `**Țări eligibile:** ${g.tara}` : null,
       g.sector          ? `**Sector:** ${g.sector}` : null,
-      g.trl_minim != null ? `**TRL minim:** ${g.trl_minim}` : null,
-      g.consortiu_obligatoriu != null
-        ? `**Consortiu obligatoriu:** ${g.consortiu_obligatoriu ? 'Da' : 'Nu'}`
-        : null,
-      g.rata_succes     ? `**Rata de succes:** ${g.rata_succes}%` : null,
-      g.durata_proiect  ? `**Durată proiect:** ${g.durata_proiect} luni` : null,
+      g.trl_min != null ? `**TRL minim:** ${g.trl_min}` : null,
+      g.trl_max != null ? `**TRL maxim:** ${g.trl_max}` : null,
+      g.dilutiv != null ? `**Dilutiv:** ${g.dilutiv ? 'Da' : 'Nu'}` : null,
+      g.dificultate     ? `**Dificultate aplicare:** ${g.dificultate}` : null,
       g.descriere ? `\n**Descriere:**\n${String(g.descriere).slice(0, 500)}` : null,
     ].filter(Boolean).join('\n');
   }).join('\n\n---\n\n');
