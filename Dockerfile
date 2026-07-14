@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# eligibil.org — Node.js Express app for Cloud Run
+# eligibil.org — Node.js Express app for container platforms
 
 # ── Stage 1: Build (JSX → JS) ────────────────────────────────────────────────
 FROM node:20-alpine AS build
@@ -23,14 +23,15 @@ COPY . .
 # Copy pre-built dist/ from build stage
 COPY --from=build /app/dist ./dist
 
-# Cloud Run injects PORT env var (default 8080)
+# Container platforms inject PORT; keep 8080 as the portable default.
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
 
-# Health check
+# Process liveness only. Dependency readiness is exposed separately at
+# /api/health so a transient Supabase issue does not restart the container.
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- http://localhost:${PORT}/api/grants?limit=1 || exit 1
+  CMD wget -qO- http://localhost:${PORT}/ || exit 1
 
 # Run as non-root user (Alpine has 'node' user pre-installed)
 USER node
