@@ -39,3 +39,6 @@ jobs:
 
       - name: Run build validation
         run: npm run build
+
+      - name: Verify upload limits
+        run: npm run smoke:uploads
