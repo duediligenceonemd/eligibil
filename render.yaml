@@ -8,8 +8,7 @@
 #   4. Render reads this file and provisions everything
 #   5. Fill in environment variables marked sync:false
 #
-# Free tier: 750 hours/month, sleeps after 15 min idle, ~30s cold start
-# Paid Starter: $7/month, no sleep
+# Free tier sleeps after 15 minutes of inactivity and is the fallback target.
 # =============================================================================
 
 services:
@@ -30,11 +29,31 @@ services:
         value: 8080
       - key: SESSION_SECRET
         generateValue: true    # Render auto-generates secure value
+      - key: SESSION_STORE
+        value: supabase
+      - key: SESSION_TABLE
+        value: app_sessions
+      - key: SESSION_MAX_AGE_MS
+        value: 86400000
+      - key: SITE_URL
+        value: https://eligibil.org
+      - key: BASE_URL
+        value: https://eligibil.org
+      - key: ALLOW_ADMIN_TOKEN_AUTH
+        value: false
+      - key: UNSUBSCRIBE_SECRET
+        generateValue: true
 
       # Set these manually in Render dashboard (or via API)
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
         sync: false
       - key: OPENAI_API_KEY
         sync: false
@@ -45,4 +64,14 @@ services:
       - key: GMAIL_APP_PASSWORD
         sync: false
       - key: ADMIN_TOKEN
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_REPLY_TO
         sync: false

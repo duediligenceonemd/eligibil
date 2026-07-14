@@ -547,7 +547,8 @@ schtasks /create /tn "eligibil-grants-fetch" ^
 
 ## Deploy
 
-Production-ready configs for 4 platforms. Pick one and deploy in <5 minutes.
+The primary free target is Koyeb in Frankfurt. Render is maintained as the
+free fallback; the other platform configs remain available for paid accounts.
 
 ### One-click deploy buttons
 
@@ -558,34 +559,37 @@ Production-ready configs for 4 platforms. Pick one and deploy in <5 minutes.
 ### Manual deploy (PowerShell)
 
 ```powershell
-# Google Cloud Run (currently live: europe-west1)
-.\scripts\deploy.ps1 gcp
+# Koyeb Free (Frankfurt, Docker, sleeps after 1 hour)
+.\scripts\deploy.ps1 koyeb
 
-# Railway (no EU free tier, us-east1)
-.\scripts\deploy.ps1 railway
-
-# Render (Frankfurt, free tier sleeps after 15min idle)
+# Render Free fallback (Frankfurt, sleeps after 15 minutes)
 .\scripts\deploy.ps1 render
 
-# Fly.io (Frankfurt, scale-to-zero)
+# Paid or legacy targets
+.\scripts\deploy.ps1 gcp
+.\scripts\deploy.ps1 railway
 .\scripts\deploy.ps1 fly
 ```
 
 ### Platform comparison
 
-| Platform | Region near MD/RO | Free tier | Cold start | Custom domain |
-|----------|-------------------|-----------|------------|---------------|
-| **Google Cloud Run** ⭐ | europe-west1 (Belgium) | 2M req/mo, scale-to-zero | ~1s | Free, auto SSL |
-| **Fly.io** | fra (Frankfurt) | 3 VMs × 256MB | ~500ms | Free, auto SSL |
-| **Render** | Frankfurt | 750h/mo (sleeps 15min) | ~30s on free | Free, auto SSL |
-| **Railway** | us-east1 only | $5 credit/mo | ~1s | Free .up.railway.app |
+| Platform | Region near MD/RO | Free availability | Idle behavior | Custom domain |
+|----------|-------------------|-------------------|---------------|---------------|
+| **Koyeb** ⭐ | Frankfurt | One free 512 MB web instance | Sleeps after 1 hour | Yes, auto TLS |
+| **Render** | Frankfurt | One free 512 MB web service | Sleeps after 15 minutes | Yes, auto TLS |
+| **Google Cloud Run** | Belgium | Usage allowance, active billing required | Scale-to-zero | Yes |
+| **Railway** | Varies | Small monthly credit; no permanent free custom domain | Usage-based | Paid plan |
+| **Fly.io** | Frankfurt | No free allowance for new accounts | Configurable | Usage-based |
 
-**Recommendation:** Cloud Run (already live) or Fly.io for lowest latency to Eastern Europe users. Render free tier OK for testing only (sleeps).
+**Recommendation:** Koyeb Free for the current low-traffic deployment, with
+Render Free as a ready fallback. Both free tiers are intended for preview or
+hobby workloads and do not provide a production SLA.
 
 ### Config files
 
-- `Dockerfile` — used by all 4 platforms
+- `Dockerfile` — portable container build used by all hosting targets
 - `.dockerignore` — excludes secrets/local data from image
+- `scripts/deploy-koyeb.ps1` — idempotent Koyeb service and secret setup
 - `railway.toml` — Railway service config
 - `render.yaml` — Render Blueprint
 - `fly.toml` — Fly.io app config
@@ -597,17 +601,19 @@ Production-ready configs for 4 platforms. Pick one and deploy in <5 minutes.
 After purchasing the domain, map it to your chosen platform:
 
 ```bash
-# Google Cloud Run
-gcloud beta run domain-mappings create --service=eligibil --domain=eligibil.org --region=europe-west1
+# Koyeb
+koyeb domains create eligibil.org --attach-to eligibil
+koyeb domains create www.eligibil.org --attach-to eligibil
 
 # Fly.io
 flyctl certs create eligibil.org
 
-# Render: Settings → Custom Domains (web UI)
-# Railway: Settings → Networking → Custom Domain (web UI)
+# Render fallback: Settings → Custom Domains (web UI)
 ```
 
-All four issue automatic Let's Encrypt SSL certificates within ~10-30 minutes after DNS propagates.
+For Koyeb, point the Cloudflare apex and `www` records to the CNAME/ALIAS target
+shown by Koyeb. Cloudflare supports CNAME flattening at the zone apex. Keep the
+records DNS-only while Koyeb validates and issues its automatic TLS certificate.
 
 ---
 

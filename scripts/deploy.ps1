@@ -4,14 +4,15 @@
 # Usage:
 #   .\scripts\deploy.ps1 gcp        # Google Cloud Run
 #   .\scripts\deploy.ps1 railway    # Railway
-#   .\scripts\deploy.ps1 render     # Render (manual after first time)
+#   .\scripts\deploy.ps1 koyeb      # Koyeb Free (Frankfurt)
+#   .\scripts\deploy.ps1 render     # Render fallback
 #   .\scripts\deploy.ps1 fly        # Fly.io
-#   .\scripts\deploy.ps1 all        # Deploy to all configured platforms
+#   .\scripts\deploy.ps1 all        # Koyeb primary + Render fallback guidance
 # =============================================================================
 
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet('gcp', 'railway', 'render', 'fly', 'all')]
+    [ValidateSet('gcp', 'railway', 'koyeb', 'render', 'fly', 'all')]
     [string]$Platform
 )
 
@@ -74,6 +75,13 @@ function Deploy-Render {
     Write-Host "  git commit --allow-empty -m 'trigger render' && git push"
 }
 
+function Deploy-Koyeb {
+    Write-Host "==========================================="
+    Write-Host " Koyeb Free"
+    Write-Host "==========================================="
+    & "$PSScriptRoot\deploy-koyeb.ps1"
+}
+
 function Deploy-Fly {
     Write-Host "==========================================="
     Write-Host " Fly.io"
@@ -107,13 +115,13 @@ function Deploy-Fly {
 switch ($Platform) {
     'gcp'     { Deploy-GCP }
     'railway' { Deploy-Railway }
+    'koyeb'   { Deploy-Koyeb }
     'render'  { Deploy-Render }
     'fly'     { Deploy-Fly }
     'all'     {
-        Deploy-GCP
-        Deploy-Railway
+        Write-Warning "'all' skips paid or legacy platforms. Deploying the free primary and fallback instructions only."
+        Deploy-Koyeb
         Deploy-Render
-        Deploy-Fly
     }
 }
 
