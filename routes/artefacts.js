@@ -30,6 +30,7 @@ const usersDb           = require('../db/users-supabase');
 const { getSupabase }   = require('../db/supabase');
 
 const router = express.Router();
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 // ── Auth gate ─────────────────────────────────────────────────────────────
 function requireAuth(req, res, next) {
@@ -53,7 +54,7 @@ const upload = multer({
       cb(null, `${ts}_${safe}`);
     },
   }),
-  limits: { fileSize: 25 * 1024 * 1024 },   // 25 MB
+  limits: { fileSize: MAX_UPLOAD_BYTES },
   fileFilter: (req, file, cb) => {
     // Accept PDF + Office docs for the per-product upload flow.
     const ACCEPTED = new Set([
@@ -253,11 +254,24 @@ async function analyzeArtefact(artefactId, filePath, startup, userId) {
   }
 
   const anthropic = getAnthropic();
-  const analysis  = anthropic
-    ? await runClaudeAnalysis(anthropic, rawText, pageCount, startup)
-    : buildStubAnalysis(rawText, pageCount, startup);
+  const aiConfigured = isBedrockEnabled('chat') || !!anthropic;
+  let analysis = null;
+  let usedAiProvider = false;
 
-  const newStatus = anthropic ? 'analyzed' : 'awaiting_credits';
+  if (aiConfigured) {
+    try {
+      analysis = await runClaudeAnalysis(anthropic, rawText, pageCount, startup);
+      usedAiProvider = true;
+    } catch (err) {
+      // A provider outage or an account-level Bedrock restriction must not
+      // leave the artefact stuck in "processing" forever.
+      console.error('AI analysis unavailable, using deterministic fallback:', err.message);
+    }
+  }
+
+  if (!analysis) analysis = buildStubAnalysis(rawText, pageCount, startup);
+
+  const newStatus = usedAiProvider ? 'analyzed' : 'awaiting_credits';
 
   await sb.from('artefact_scores').insert({
     artefact_id:        artefactId,
@@ -269,7 +283,7 @@ async function analyzeArtefact(artefactId, filePath, startup, userId) {
     strengths:          analysis.strengths || [],
     gaps:               analysis.gaps || [],
     red_flags:          analysis.red_flags || [],
-    llm_model:          analysis.llm_model || (anthropic ? ANALYSIS_MODEL : 'stub-v1'),
+    llm_model:          analysis.llm_model || (usedAiProvider ? ANALYSIS_MODEL : 'stub-v1'),
     llm_input_tokens:   analysis.input_tokens  || 0,
     llm_output_tokens:  analysis.output_tokens || 0,
     llm_cost_usd:       analysis.cost_usd      || 0,
@@ -451,5 +465,22 @@ Returnează JSON conform schemei.`;
     cost_usd:      Number(cost.toFixed(4)),
   };
 }
+
+// Keep upload failures explicit for clients and monitoring. Multer raises the
+// size error before the route handler runs, so it needs router-level handling.
+router.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({
+      error: 'Fișierul depășește limita de 25 MB.',
+      max_file_size_bytes: MAX_UPLOAD_BYTES,
+    });
+  }
+
+  if (err?.message?.startsWith('Format neacceptat.')) {
+    return res.status(415).json({ error: err.message });
+  }
+
+  return next(err);
+});
 
 module.exports = router;

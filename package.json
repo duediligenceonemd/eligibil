@@ -25,6 +25,7 @@
     "audit:files": "node scripts/check-required-files.js",
     "audit:i18n": "node scripts/i18n-audit.js",
     "smoke:pages": "node scripts/smoke-pages.js",
+    "smoke:uploads": "node scripts/smoke-upload-limits.js",
     "seed": "node scripts/seed-grants.js",
     "seed:dry": "node scripts/seed-grants.js --dry-run",
     "db:push": "node scripts/push-schema.js",
